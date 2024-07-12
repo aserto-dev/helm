@@ -1,0 +1,107 @@
+# Default values for directory.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+image:
+  repository: ghcr.io/aserto-dev/multi-tenant-console
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  # tag: x.y.z
+
+imagePullSecrets:
+  - name: ghcr-creds
+
+port: 3000
+authorizerURL: "https://localhost:8383"
+directoryURL: "https://localhost:18383"
+
+# REQUIRED: specify and OIDC domain and audience
+oidc:
+  domain: ""
+  audience: ""
+
+rootDirectory:
+  tenantID: "06e1fdac-0676-11ef-b77e-0005a79d9368"
+  disableTLSVerification: false
+  grpcCertSecret: ""
+  # address: "{{ .Release.Name }}-aserto-directory.aserto.svc.cluster.local:8282"
+
+# Set the service log level (trace/debug/info/warn/error)
+# logLevel: info
+
+replicaCount: 1
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: directory.example.com
+      port: https
+    - host: grpc.directory.example.com
+      port: grpc
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: directory-example-com-tls
+  #    hosts:
+  #      - directory.example.com
+  #  - secretName: grpc-directory-example-com-tls
+  #    hosts:
+  #      - grpc.directory.example.com
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

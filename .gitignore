@@ -1,1 +1,2 @@
-aserto-lib-*.*.*.tgz
+/*/build/*-*.*.*.tgz
+/*/charts/*-*.*.*.tgz

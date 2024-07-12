@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "console.fullname" . }}
+  labels:
+    {{- include "console.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "console.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "console.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "console.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ include "console.port" . }}
+          env:
+            - name: LOG_LEVEL
+              value: {{ .Values.logLevel | default "info" }}
+            {{- with (include "aserto-lib.oidcConfig" . | fromYaml)}}
+            - name: REACT_APP_OIDC_CLIENT_ID
+              value: {{ .audience }}
+            - name: REACT_APP_OIDC_DOMAIN
+              value: https://{{ .domain }}
+            {{- end }}
+            - name: REACT_APP_DIRECTORY_SERVICE_URL
+              value: {{ .Values.directoryURL }}
+            - name: REACT_APP_AUTHORIZER_SERVICE_URL
+              value: {{ .Values.authorizerURL }}
+            - name: SERVER_PORT
+              value: {{ include "console.port" . | quote }}
+            {{- with (include "aserto-lib.rootDirectoryClient" .) | fromYaml }}
+            - name: DS0_SERVICE_URL
+              value: {{ .address }}
+            - name: DS0_TENANT_ID
+              value: {{ .tenant_id }}
+            {{- end }}
+            {{- with (include "aserto-lib.rootDirectoryApiKey" . | fromYaml) }}
+            - name: DS0_ROOT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .secretName }}
+                  key: {{ .secretKey }}
+            {{- end }}
+          livenessProbe:
+            httpGet:
+              port: {{ include "console.port" . }}
+              path: /
+          readinessProbe:
+            httpGet:
+              port: {{ include "console.port" . }}
+              path: /
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

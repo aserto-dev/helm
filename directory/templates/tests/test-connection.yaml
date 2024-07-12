@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "directory.fullname" . }}-test-connection"
+  labels:
+    {{- include "directory.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: grpcurl
+      image: fullstorydev/grpcurl
+      args:
+        - -insecure
+        - {{ include "aserto-lib.directoryAddress" . }}
+        - list
+  restartPolicy: Never

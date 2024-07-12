@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "discovery.fullname" . }}
+  labels:
+    {{- include "discovery.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: https
+      port: {{ include "aserto-lib.httpsPort" . }}
+      targetPort: https
+    - name: grpc
+      port: {{ include "aserto-lib.grpcPort" . }}
+      targetPort: grpc
+  selector:
+    {{- include "discovery.selectorLabels" . | nindent 4 }}
