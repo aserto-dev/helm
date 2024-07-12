@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "console.fullname" . }}
+  labels:
+    {{- include "console.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: http
+      port: {{ include "console.port" . }}
+      targetPort: http
+  selector:
+    {{- include "console.selectorLabels" . | nindent 4 }}

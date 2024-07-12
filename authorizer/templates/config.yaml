@@ -1,0 +1,66 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "authorizer.fullname" . }}-config
+  labels:
+    {{- include "authorizer.labels" . | nindent 4 }}
+stringData:
+  config.yaml: |
+    ---
+    # config schema version
+    version: 2
+
+    logging:
+      prod: true
+      log_level: {{ .Values.logLevel | default "info" }}
+
+    authorizer_id: b1d24af8-148d-11ef-b1c8-0af448375328
+
+    api:
+      health:
+        listen_address: 0.0.0.0:{{ include "aserto-lib.healthPort" . }}
+      metrics:
+        {{- include "aserto-lib.metricsService" . | nindent 8 }}
+      services:
+        authorizer:
+          grpc:
+            {{- include "aserto-lib.grpcService" . | nindent 12 }}
+          gateway:
+            {{- include "aserto-lib.httpsService" . | nindent 12 }}
+
+    ds0:
+      {{- include "aserto-lib.rootDirectoryClient" . | nindent 6 }}
+
+    remote_directory:
+      {{- include "aserto-lib.directoryClient" . | nindent 6 }}
+
+    jwt:
+      acceptable_time_skew_seconds: {{ .Values.jwtAcceptableTimeSkewSeconds | default "5" }}
+
+    auth:
+      authenticators_enabled:
+        root_key: true
+        oidc: true
+        anonymous: true
+        {{- if (.Values.authentication).machineAccounts }}
+        machine_account: true
+        {{- end }}
+
+      oidc:
+        {{- include "aserto-lib.oidcConfig" . | nindent 8 }}
+
+      root_keys:
+        keys:
+        - key: ${AUTHORIZER_ROOT_KEY}
+          account: root-key-authorizer@aserto.com
+
+    opa:
+      instance_id: "-"
+      graceful_shutdown_period_seconds: 2
+      flags:
+        enable_status_plugin: true
+      config:
+        services:
+          aserto-discovery:
+            {{- include "authorizer.opaDiscovery" . | nindent 12 }}

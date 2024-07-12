@@ -1,0 +1,13 @@
+---
+{{- $cfg := .Values.apiKey -}}
+{{- $data :=  (lookup "v1" "Secret" .Release.Namespace $cfg.secretName).data }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ $cfg.secretName }}
+data:
+  {{- if $data }}
+  {{ $cfg.secretKey }}: {{ get $data $cfg.secretKey }}
+  {{- else }}
+  {{ $cfg.secretKey }}: {{ randAlphaNum 20 | b64enc }}
+  {{- end }}
