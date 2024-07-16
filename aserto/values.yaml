@@ -30,18 +30,18 @@ global:
     directory:
       disableTLSVerification: true
 
-directory:
-  rootDirectory:
-    database:
-      host: ""
-      port: 5432
-      sslMode: require
+# directory:
+#   rootDirectory:
+#     database:
+#       host: ""
+#       port: 5432
+#       sslMode: require
 
-  tenantDirectory:
-    database:
-      host: ""
-      port: 5432
-      sslMode: require
+#   tenantDirectory:
+#     database:
+#       host: ""
+#       port: 5432
+#       sslMode: require
 
 console:
   image:

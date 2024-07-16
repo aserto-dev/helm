@@ -86,16 +86,16 @@ grpc:
 # https:
 #   allowed_origins:
 #     - https://*.example.com
-    #
-  # The services generates self-signed certificates by default.
-  # To use your own certificate provide the name of a secret
-  # of type kubernetes.io/tls
-  # certSecret: directory-rest-cert
+#
+#   The services generates self-signed certificates by default.
+#   To use your own certificate provide the name of a secret
+#   of type kubernetes.io/tls
+#   certSecret: directory-rest-cert
 
-  # read_timeout: 2s
-  # read_header_timeout: 2s
-  # write_timeout: 2s
-  # idle_timeout: 30s
+#   read_timeout: 2s
+#   read_header_timeout: 2s
+#   write_timeout: 2s
+#   idle_timeout: 30s
 
 # metrics:
 #   zpages: true
