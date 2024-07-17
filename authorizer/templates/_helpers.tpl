@@ -89,3 +89,10 @@ tls:
 {{- end }}
 {{- end }}
 {{- end }}
+
+{{- define "authorizer.gatewayService" }}
+{{ include "aserto-lib.httpsService" .  }}
+{{- $cfg := include "aserto-lib.httpsConfig" . | fromYaml }}
+allowed_headers:
+{{- $cfg.allowed_headers | default (list "Aserto-Tenant-Id" "Authorization" "Content-Type" "Depth") | toYaml | nindent 2 }}
+{{- end }}

@@ -13,13 +13,13 @@ global:
     grpc:
       connectionTimeoutSec: 2
 
-    https:
-      read_timeout: 2s
-      read_header_timeout: 2s
-      write_timeout: 2s
-      idle_timeout: 30s
-      # allowed_origins:
-      #   - https://*.example.com
+    # https:
+    #   read_timeout: 2s
+    #   read_header_timeout: 2s
+    #   write_timeout: 2s
+    #   idle_timeout: 30s
+    #   allowed_origins:
+    #     - https://*.example.com
 
     metrics:
       zpages: true
@@ -43,37 +43,22 @@ global:
 #       port: 5432
 #       sslMode: require
 
-console:
-  image:
-    tag: 0.1.11
-  port: 3000
+# scim:
+#   auth:
+#     secretName: scim-password
+#     secretKey: password
+#     basic:
+#       enabled: true
+#       username: scim
+#     bearer:
+#       enabled: true
 
-scim:
-  image:
-    tag: 0.0.7-e49a8ae-dirty-arm64
-
-  port: 8080
-
-  auth:
-    secretName: scim-password
-    secretKey: password
-    basic:
-      enabled: true
-      username: scim
-    bearer:
-      enabled: true
-
-  createEmailIdentities: true
-  createRoleGroups: false
-  userObjectType: user
-  identityObjectType: identity
-  identityRelation: identifier
-  groupObjectType: group
-  groupMemberRelation: memeber
-  groupMappings:
-    - subject_id: aserto-admin
-      object_type: system
-      object_id: system
-      relation: admin
-      subject_relation: member
-  userMappings: []
+#   createEmailIdentities: true
+#   createRoleGroups: false
+#   userObjectType: user
+#   identityObjectType: identity
+#   identityRelation: identifier
+#   groupObjectType: group
+#   groupMemberRelation: memeber
+#   groupMappings: []
+#   userMappings: []

@@ -35,8 +35,6 @@ certs:
   tls_ca_cert_path: '/https-certs/ca.crt'
 
 {{- $cfg := include "aserto-lib.httpsConfig" . | fromYaml }}
-allowed_headers:
-{{- $cfg.allowed_headers | default (list "Aserto-Tenant-Id" "Authorization" "Content-Type" "Depth") | toYaml | nindent 2 }}
 {{- if $cfg.allowed_origins }}
 allowed_origins:
 {{- $cfg.allowed_origins | toYaml | nindent 2 }}

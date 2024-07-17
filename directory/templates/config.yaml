@@ -119,6 +119,8 @@ stringData:
             account: root-key-directory-writer@aserto.com
           - key: ${DIRECTORY_DS_READ_KEY}
             account: root-key-directory-reader@aserto.com
+          - key: ${DIRECTORY_ROOT_DS_CLIENT_API_KEY}
+            account: root-key-directory-store-writer@aserto.com
 
         {{- if .Values.rootDirectory.runService }}
         tenant_overrides:

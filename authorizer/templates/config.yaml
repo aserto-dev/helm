@@ -27,7 +27,7 @@ stringData:
           grpc:
             {{- include "aserto-lib.grpcService" . | nindent 12 }}
           gateway:
-            {{- include "aserto-lib.httpsService" . | nindent 12 }}
+            {{- include "authorizer.gatewayService" . | nindent 12 }}
 
     ds0:
       {{- include "aserto-lib.rootDirectoryClient" . | nindent 6 }}
