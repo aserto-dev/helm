@@ -32,7 +32,7 @@ stringData:
       {{- include "discovery.cacheSettings" . | nindent 6 }}
 
     registries:
-      {{ .Values.registries | toYaml | nindent 6 }}
+      {{- include "discovery.registriesConfig" . | nindent 6 }}
 
     ds0:
       {{- include "aserto-lib.rootDirectoryClient" . | nindent 6 }}

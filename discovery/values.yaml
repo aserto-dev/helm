@@ -17,16 +17,13 @@ apiKey:
   secretName: discovery-keys
   secretKey: api-key
 
-# registries:
-#   - url: ghcr.io
-#     scheme: bearer
-#     token: "<<USER>>:<<TOKEN>>"
-#   - url: apcr.io
-#     scheme: basic
-#     token: "<<USER>>:<<TOKEN>>"
-#   - url: registry.prod.aserto.com
-#     scheme: basic
-#     token: "<<USER>>:<<TOKEN>"
+registries:
+  # ghcr.io:
+  #   scheme: bearer
+  #   # The secret's value should be in the form "username:token"
+  #   tokenSecretName: discovery-ghcr-token
+  #   tokenSecretKey: token
+
 
 bundleDefaults:
   responseHeaderTimeoutSeconds: 60
