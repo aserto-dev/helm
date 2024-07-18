@@ -103,7 +103,7 @@ spec:
             {{- end }}
 
             {{- if .Values.tenantDirectory.runService }}
-            {{- with .Values.tenantDirectory.apiKeys }}
+            {{- with (include "aserto-lib.directoryApiKeys" . | fromYaml) }}
             - name: DIRECTORY_DS_WRITE_KEY
               valueFrom:
                 secretKeyRef:
@@ -114,7 +114,6 @@ spec:
                 secretKeyRef:
                   name: {{ .secretName }}
                   key: {{ .readerSecretKey }}
-            {{ end -}}
             {{- end }}
 
             {{- with .Values.tenantDirectory.database }}
@@ -138,6 +137,7 @@ spec:
                 secretKeyRef:
                   name: {{ .reader.credentialsSecret }}
                   key: password
+            {{- end }}
             {{- end }}
 
             {{- if .Values.rootDirectory.runService -}}

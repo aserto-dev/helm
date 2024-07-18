@@ -85,3 +85,46 @@ cache_config:
 {{- end }}
 {{- end }}
 {{- end }}
+
+{{/*
+Converts a registry URL to an environment variable name.
+*/}}
+{{- define "discovery.registryTokenEnvVar" }}
+{{- printf "REGISTRY_TOKEN_%s" (replace "." "_" . | upper) }}
+{{- end }}
+
+{{/*
+Returns a list of registries with their configuration.
+*/}}
+{{- define "discovery.registriesConfig" }}
+{{- $regs := list }}
+{{- range $url, $cfg := (.Values.registries | required "discovery must have at least one registry configured") }}
+{{- $regs = append $regs (dict
+  "url" $url
+  "scheme" $cfg.scheme
+  "token" (printf "${%s}" (include "discovery.registryTokenEnvVar" $url)))
+}}
+{{- end }}
+{{- $regs | toYaml }}
+{{- end }}
+
+{{/*
+Returns deployment environemt variables that mount registry credentials.
+*/}}
+{{- define "discovery.registriesEnv" }}
+{{- $vars := list }}
+{{- range $url, $cfg := (.Values.registries | default dict) }}
+{{- $vars = append $vars (dict
+  "name" (include "discovery.registryTokenEnvVar" $url)
+  "valueFrom" (include "discovery.registryTokenValue" $cfg | fromYaml))
+}}
+{{- end }}
+{{- $vars | toYaml }}
+{{- end }}
+
+{{- define "discovery.registryTokenValue" }}
+secretKeyRef:
+  name: {{ .tokenSecretName }}
+  key: {{ .tokenSecretKey | default "token" }}
+{{- end }}
+

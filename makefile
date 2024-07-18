@@ -18,6 +18,11 @@ update:
 	@echo -e "$(ATTN_COLOR)==> update $(CHART) $(NO_COLOR)"
 	@helm dependency update $(CHART)
 
+.PHONY: build
+build:
+	@echo -e "$(ATTN_COLOR)==> build $(CHART) $(NO_COLOR)"
+	@helm dependency build $(CHART)
+
 .PHONY: package
 package:
 	@echo -e "$(ATTN_COLOR)==> package $(CHART) $(NO_COLOR)"
@@ -30,4 +35,4 @@ push:
 	@helm push $(CHART)/build/$(CHART)-$(CHART_VERSION).tgz $(CHART_REPO)
 
 .PHONY: release
-release: update package push
+release: build package push

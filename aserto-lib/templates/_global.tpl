@@ -13,5 +13,5 @@ Local values take precedence over global values.
 {{- $key := index . 1}}
 {{- $global := (($scope.Values).global).aserto | default dict | dig $key dict }}
 {{- $chart := $scope.Values.AsMap | dig  $key dict }}
-{{- merge $chart $global | toYaml}}
+{{- merge $chart $global | toYaml }}
 {{- end }}
