@@ -7,13 +7,14 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-    {{- with (include "aserto-lib.selfPorts" . | fromYaml )}}
     - name: https
-      port: {{ .https }}
+      port: {{ include "aserto-lib.httpsPort" . }}
       targetPort: https
     - name: grpc
-      port: {{ .grpc }}
+      port: {{ include "aserto-lib.grpcPort" . }}
       targetPort: grpc
-    {{- end }}
+    - name: metrics
+      port: {{ include "aserto-lib.metricsPort" . }}
+      targetPort: metrics
   selector:
     {{- include "directory.selectorLabels" . | nindent 4 }}

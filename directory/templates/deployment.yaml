@@ -72,6 +72,8 @@ spec:
               containerPort: {{ .https }}
             - name: grpc
               containerPort: {{ .grpc }}
+            - name: metrics
+              containerPort: {{ .metrics }}
             {{- end }}
           volumeMounts:
             - name: config

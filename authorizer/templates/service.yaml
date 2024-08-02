@@ -13,5 +13,8 @@ spec:
     - name: grpc
       port: {{ include "aserto-lib.grpcPort" . }}
       targetPort: grpc
+    - name: metrics
+      port: {{ include "aserto-lib.metricsPort" . }}
+      targetPort: metrics
   selector:
     {{- include "authorizer.selectorLabels" . | nindent 4 }}
