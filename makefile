@@ -11,33 +11,41 @@ CHART_REPO		:= "oci://ghcr.io/aserto-dev/helm"
 ifndef CHART
 $(error CHART must be set)
 endif
-CHART_VERSION   := $(shell cat $(CHART)/Chart.yaml | yq '.version')
+
+CHART_DIR		:= charts/${CHART}
+CHART_VERSION   := $(shell cat ${CHART_DIR}/Chart.yaml | yq '.version')
 
 .PHONY: clean
 clean:
-	@echo -e "$(ATTN_COLOR)==> clean $(CHART) $(NO_COLOR)"
-	@rm -rf $(CHART)/build
+	@echo -e "$(ATTN_COLOR)==> $@ ${CHART} $(NO_COLOR)"
+	@rm -rf ${CHART_DIR}/build
 
 .PHONY: update
 update:
-	@echo -e "$(ATTN_COLOR)==> update $(CHART) $(NO_COLOR)"
-	@helm dependency update $(CHART)
+	@echo -e "$(ATTN_COLOR)==> $@ ${CHART} $(NO_COLOR)"
+	@helm dependency update ${CHART_DIR}
 
 .PHONY: build
 build:
-	@echo -e "$(ATTN_COLOR)==> build $(CHART) $(NO_COLOR)"
-	@helm dependency build $(CHART)
+	@echo -e "$(ATTN_COLOR)==> $@ ${CHART} $(NO_COLOR)"
+	@helm dependency build ${CHART_DIR}
 
 .PHONY: package
 package:
-	@echo -e "$(ATTN_COLOR)==> package $(CHART) $(NO_COLOR)"
-	@mkdir -p $(CHART)/build
-	@helm package $(CHART) -u -d $(CHART)/build
+	@echo -e "$(ATTN_COLOR)==> $@ ${CHART} $(NO_COLOR)"
+	@mkdir -p ${CHART_DIR}/build
+	@helm package ${CHART_DIR} -u -d ${CHART_DIR}/build
 
 .PHONY: push
 push:
-	@echo -e "$(ATTN_COLOR)==> push $(CHART):$(CHART_VERSION) $(NO_COLOR)"
-	@helm push $(CHART)/build/$(CHART)-$(CHART_VERSION).tgz $(CHART_REPO)
+	@echo -e "$(ATTN_COLOR)==> $@ ${CHART}:$(CHART_VERSION) $(NO_COLOR)"
+	@helm push ${CHART_DIR}/build/${CHART}-$(CHART_VERSION).tgz $(CHART_REPO)
+
+.PHONY: lint
+lint:
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	ct lint --config ct.yaml --helm-repo-extra-args "aserto-helm=-u gh -p ${GITHUB_TOKEN}"
+
 
 .PHONY: release
 release: build package push

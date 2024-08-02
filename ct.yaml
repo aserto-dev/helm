@@ -1,0 +1,10 @@
+# See https://github.com/helm/chart-testing#configuration
+remote: origin
+target-branch: main
+chart-repos:
+  - aserto-helm=oci://ghcr.io/aserto-dev/helm
+helm-lint-extra-args: >
+  --set rootDirectory.database.host=root.db.hostname
+  --set tenantDirectory.database.host=tenant.db.hostname
+  --set oidc.domain=oidc_domain
+  --set oidc.audience=oidc_audience

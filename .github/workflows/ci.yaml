@@ -1,0 +1,90 @@
+name: ci
+
+on:
+  # Run on all PRs
+  pull_request:
+
+env:
+  HELM_VERSION: v3.14.4
+  PYTHON_VERSION: 3.x
+
+jobs:
+  diff:
+    runs-on: ubuntu-latest
+    outputs:
+      charts: ${{ steps.changes.outputs.changes }}
+    steps:
+      -
+        name: Find changed charts
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            charts/aserto:
+              - 'charts/aserto/**'
+            charts/aserto-lib:
+              - 'charts/aserto-lib/**'
+            charts/authorizer:
+              - 'charts/authorizer/**'
+            charts/console:
+              - 'charts/console/**'
+            charts/directory:
+              - 'charts/directory/**'
+            charts/discovery:
+              - 'charts/discovery/**'
+            charts/scim:
+              - 'charts/scim/**'
+  lint:
+    runs-on: ubuntu-latest
+    needs: diff
+    if: fromJSON(needs.diff.outputs.charts)
+    env:
+      CHARTS: ${{ join(fromJSON(needs.diff.outputs.charts)) }}
+    steps:
+      -
+        name: Read Configuration
+        uses: hashicorp/vault-action@v3
+        id: vault
+        with:
+          url: https://vault.eng.aserto.com/
+          token: ${{ secrets.VAULT_TOKEN }}
+          secrets: |
+            kv/data/github  "USERNAME"            | DOCKER_USERNAME;
+            kv/data/github  "READ_WRITE_TOKEN"    | READ_WRITE_TOKEN;
+      -
+        uses: actions/checkout@v4
+        with:
+          # Fetch the full history so that we can diff against the target branch
+          fetch-depth: 0
+      -
+        name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: ${{ env.HELM_VERSION }}
+      -
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          check-latest: true
+      -
+        name: Set up chart-testing
+        uses: helm/chart-testing-action@v2.6.0
+        with:
+          version: v3.10.0
+      -
+        name: Lint ${{ matrix.chart.name }}
+        run: |
+          ct lint --config ct.yaml \
+            --charts '${{ env.CHARTS }}' \
+            --target-branch ${{ github.event.repository.default_branch }} \
+            --helm-repo-extra-args "aserto-helm=-u gh -p ${READ_WRITE_TOKEN}"
+
+  # test-changes:
+  #   runs-on: ubuntu-latest
+  #   container: python:3
+  #   needs: detect-changes
+  #   strategy:
+  #     matrix:
+  #       chart: ${{ fromJSON(needs.detect-changes.outputs.charts) }}
+
+
