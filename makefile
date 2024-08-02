@@ -13,6 +13,11 @@ $(error CHART must be set)
 endif
 CHART_VERSION   := $(shell cat $(CHART)/Chart.yaml | yq '.version')
 
+.PHONY: clean
+clean:
+	@echo -e "$(ATTN_COLOR)==> clean $(CHART) $(NO_COLOR)"
+	@rm -rf $(CHART)/build
+
 .PHONY: update
 update:
 	@echo -e "$(ATTN_COLOR)==> update $(CHART) $(NO_COLOR)"
