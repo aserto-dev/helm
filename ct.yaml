@@ -4,7 +4,10 @@ target-branch: main
 chart-repos:
   - aserto-helm=oci://ghcr.io/aserto-dev/helm
 helm-lint-extra-args: >
+  --set global.aserto.rootDirectory.tenantID=root-tenant-id
   --set rootDirectory.database.host=root.db.hostname
   --set tenantDirectory.database.host=tenant.db.hostname
   --set oidc.domain=oidc_domain
   --set oidc.audience=oidc_audience
+  --set registries.ghcr.scheme=bearer
+  --set registries.ghcr.tokenSecretName=ghcr-token-secret

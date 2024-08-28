@@ -2,6 +2,10 @@ apiVersion: v2
 name: aserto-lib
 description: Common helpers for aserto charts
 
+maintainers:
+  - name: Aserto
+    url: https://github.com/aserto-dev
+
 # A chart can be either an 'application' or a 'library' chart.
 #
 # Application charts are a collection of templates that can be packaged into versioned archives
