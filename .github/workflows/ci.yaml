@@ -9,37 +9,8 @@ env:
   PYTHON_VERSION: 3.x
 
 jobs:
-  diff:
-    runs-on: ubuntu-latest
-    outputs:
-      charts: ${{ steps.changes.outputs.changes }}
-    steps:
-      -
-        name: Find changed charts
-        id: changes
-        uses: dorny/paths-filter@v3
-        with:
-          filters: |
-            charts/aserto:
-              - 'charts/aserto/**'
-            charts/aserto-lib:
-              - 'charts/aserto-lib/**'
-            charts/authorizer:
-              - 'charts/authorizer/**'
-            charts/console:
-              - 'charts/console/**'
-            charts/directory:
-              - 'charts/directory/**'
-            charts/discovery:
-              - 'charts/discovery/**'
-            charts/scim:
-              - 'charts/scim/**'
   lint:
     runs-on: ubuntu-latest
-    needs: diff
-    if: fromJSON(needs.diff.outputs.charts)
-    env:
-      CHARTS: ${{ join(fromJSON(needs.diff.outputs.charts)) }}
     steps:
       -
         name: Read Configuration
@@ -75,16 +46,5 @@ jobs:
         name: Lint ${{ matrix.chart.name }}
         run: |
           ct lint --config ct.yaml \
-            --charts '${{ env.CHARTS }}' \
             --target-branch ${{ github.event.repository.default_branch }} \
             --helm-repo-extra-args "aserto-helm=-u gh -p ${READ_WRITE_TOKEN}"
-
-  # test-changes:
-  #   runs-on: ubuntu-latest
-  #   container: python:3
-  #   needs: detect-changes
-  #   strategy:
-  #     matrix:
-  #       chart: ${{ fromJSON(needs.detect-changes.outputs.charts) }}
-
-

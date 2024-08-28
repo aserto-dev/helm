@@ -44,7 +44,7 @@ push:
 .PHONY: lint
 lint:
 	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
-	ct lint --config ct.yaml --helm-repo-extra-args "aserto-helm=-u gh -p ${GITHUB_TOKEN}"
+	@ct lint --config ct.yaml --helm-repo-extra-args "aserto-helm=-u gh -p ${GITHUB_TOKEN}"
 
 
 .PHONY: release
