@@ -1,6 +1,7 @@
 apiVersion: v2
 name: aserto
 description: A Helm chart for Kubernetes
+icon: https://www.aserto.com/images/aserto-logo.png
 
 maintainers:
   - name: Aserto

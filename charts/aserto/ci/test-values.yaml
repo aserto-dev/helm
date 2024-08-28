@@ -1,0 +1,18 @@
+global:
+  aserto:
+    oidc:
+      domain: oidc_domain
+      audience: oidc_audience
+discovery:
+  registries:
+    ghcr.io:
+      scheme: bearer
+      tokenSecretName: ghcr-token-secret
+directory:
+  rootDirectory:
+    tenantID: root-tenant-id
+    database:
+      host: root-db-host
+  tenantDirectory:
+    database:
+      host: tenant-db-host

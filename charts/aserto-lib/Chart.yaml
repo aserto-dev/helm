@@ -1,6 +1,7 @@
 apiVersion: v2
 name: aserto-lib
 description: Common helpers for aserto charts
+icon: https://www.aserto.com/images/aserto-logo.png
 
 maintainers:
   - name: Aserto
