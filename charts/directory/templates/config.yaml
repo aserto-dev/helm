@@ -50,7 +50,7 @@ stringData:
     {{- with .Values.tenantDirectory.database -}}
     db:
       writer:
-        host: "{{ .host | required ".Values.tenantDirectory.host is required." }}"
+        host: "{{ .host | required ".Values.tenantDirectory.database.host is required." }}"
         port: {{ .port | default 5432 }}
         db_name: {{ .dbName | default "aserto-ds" }}
         ssl_mode: {{ .sslMode | default "require" }}
@@ -59,7 +59,7 @@ stringData:
         {{ toYaml .admin.options | nindent 8 }}
         {{ end }}
       reader:
-        host: "{{ .host | required ".Values.tenantDirectory.host is required." }}"
+        host: "{{ .host | required ".Values.tenantDirectory.database.host is required." }}"
         port: {{ .port | default 5432 }}
         db_name: {{ .dbName | default "aserto-ds" }}
         ssl_mode: {{ .sslMode | default "require" }}

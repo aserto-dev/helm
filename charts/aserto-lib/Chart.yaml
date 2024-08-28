@@ -1,6 +1,11 @@
 apiVersion: v2
 name: aserto-lib
 description: Common helpers for aserto charts
+icon: https://www.aserto.com/images/aserto-logo.png
+
+maintainers:
+  - name: Aserto
+    url: https://github.com/aserto-dev
 
 # A chart can be either an 'application' or a 'library' chart.
 #

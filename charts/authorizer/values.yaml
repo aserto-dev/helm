@@ -47,8 +47,6 @@ grpc:
 #   of type kubernetes.io/tls
 #   certSecret: directory-rest-cert
 
-
-
 # Disable authorization
 # noAuthorization: false
 

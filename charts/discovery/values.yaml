@@ -33,7 +33,7 @@ bundleDefaults:
 cacheSettings:
   type: "bigcache"
   cacheConfig:
-    ttl: 900000000000 # 15 minutes
+    ttl: 900000000000  # 15 minutes
 
 
 # Set the service log level (trace/debug/info/warn/error)
