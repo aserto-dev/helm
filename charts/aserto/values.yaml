@@ -103,6 +103,7 @@ discovery:
     # ghcr.io:
     #   scheme: bearer
     #   tokenSecretName: discovery-ghcr-token
+    #   tokenSecretKey: token
 
 console:
   # Kubernetes pull secret for private Aserto images.

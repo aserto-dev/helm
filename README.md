@@ -55,6 +55,14 @@ CREATE DATABASE aserto-root-ds OWNER = aserto TEMPLATE = template0;
 
 ### Kubernetes Secrets
 
+The Aserto services require several secrets to be created in the kubernetes namespace to
+which the services are deployed. The examples in the sections below use `aseerto`.
+To create the namespace, use:
+
+```shell
+kubectl create namespace aserto
+```
+
 #### Database Credentials
 
 The database credentials must be stored in a Kubernetes secret in the same namespace as the
@@ -88,6 +96,22 @@ kubectl create secret docker-registry ghcr-creds \
   --docker-password=<access token>
 ```
 
+#### Policy Registry Credentials
+
+The discovery service requires read access to the container registry where your policies are stored.
+This can be any OCI registry such as ghcr.io, DockerHub, or a private registry.
+
+First, create a read-only access token in the registry you plan to use. The details differ from
+one registry to another, so consult your registry's documentation.
+
+The token must be stored in a Kuebernetes secret in the same namespace as the Aserto chart:
+
+```shell
+kubectl create secret generic discovery-ghcr-token \
+    --namespace aserto \
+    --from-literal=token=<access token>
+```
+
 ### OpenID Connect
 
 Authentication to the Aserto management console is done using OpenID Connect. Creating an OIDC
@@ -113,3 +137,26 @@ The top-level sections in the `values.yaml` file are:
 
 The `aserto` umbrella chart's [values.yaml](charts/aserto/values.yaml) file documents the available
 options.
+
+## Deployment
+
+To deploy the Aserto services, first create a `values.yaml` file with the desired configuration.
+A good starting point is the default [values.yaml](charts/aserto/values.yaml). You must provide
+values for several required fields:
+
+- `global.aserto.oidc` holds the domain and client ID for your OpenID Connect application used
+  to authenticate access to the management console.
+- `global.aserto.https.allowed_origins` should include the ingress domain where the management console
+  will be hosted.
+- `diretcory.rootDirectory.database.host` and `directory.tenantDirectory.database.host` should be set
+  to the hostname of the PostgreSQL instance(s) for the root and tenant directories.
+- `discovery.registries` must include configuration for at least one policy registry with the Kubernetes
+  secret that holds the access token.
+- `console.authorizerURL` and `console.directoryURL` should be set to the ingress URLs of the authorizer
+  and directory services.
+
+Deploy the chart in a release called `aserto` using:
+
+```shell
+helm install aserto oci://ghcr.io/aserto-dev/helm/aserto -f values.yaml
+```
