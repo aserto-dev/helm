@@ -34,17 +34,13 @@ dependencies:
     repository: oci://ghcr.io/aserto-dev/helm
   - name: authorizer
     version: ~0.1.3
-    # repository: oci://ghcr.io/aserto-dev/helm
-    repository: file://../authorizer
+    repository: oci://ghcr.io/aserto-dev/helm
   - name: discovery
     version: ~0.1.2
-    # repository: oci://ghcr.io/aserto-dev/helm
-    repository: file://../discovery
+    repository: oci://ghcr.io/aserto-dev/helm
   - name: console
     version: ~0.1.2
-    # repository: oci://ghcr.io/aserto-dev/helm
-    repository: file://../console
+    repository: oci://ghcr.io/aserto-dev/helm
   - name: scim
     version: ~0.1.1
-    # repository: oci://ghcr.io/aserto-dev/helm
-    repository: file://../scim
+    repository: oci://ghcr.io/aserto-dev/helm
