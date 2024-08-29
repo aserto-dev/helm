@@ -81,26 +81,29 @@ package-%:
 
 # Pattern-specific variable assignment.
 # https://www.gnu.org/software/make/manual/html_node/Pattern_002dspecific.html
-push-%: CHART_VERSION = ${shell cat ${CHARTS_DIR}/$*/Chart.yaml | yq '.version'}
+push-% bump-% version-%: CHART_VERSION = ${shell cat ${CHARTS_DIR}/$*/Chart.yaml | yq '.version'}
 
 .PHONY: push-%
 push-%:
 	@echo -e "${ATTN_COLOR}==> push $*:${CHART_VERSION} ${NO_COLOR}"
 	@helm push ${CHARTS_DIR}/$*/build/$*-${CHART_VERSION}.tgz ${CHART_REPO}
 
-# Pattern-specific variable assignment.
-# https://www.gnu.org/software/make/manual/html_node/Pattern_002dspecific.html
-bump-%: CHART_VERSION = ${shell cat ${CHARTS_DIR}/$*/Chart.yaml | yq '.version'}
-
 .PHONY: release-%
 release-%: update-% build-% package-% push-%;
 
 .PHONY: bump-%
-bump-%:
+bump-%: bump-chart-%
+
+.PHONY: bump-chart-%
+bump-chart-%:
 	@echo -e "${ATTN_COLOR}==> bump ${BUMP_PART} $* (${CHART_VERSION}) ${NO_COLOR}"
 	@bumpversion --no-tag --no-commit --allow-dirty --current-version ${CHART_VERSION} \
 		${BUMP_PART} ${CHARTS_DIR}/$*/Chart.yaml
 	@echo -e "New version: $$(cat ${CHARTS_DIR}/$*/Chart.yaml | yq '.version')"
+
+.PHONY: version-%
+version-%:
+	@echo -e "${ATTN_COLOR}==>  $* (${CHART_VERSION}) ${NO_COLOR}"
 
 .PHONY: install-ct
 install-ct: ${EXT_TMP_DIR} ${EXT_BIN_DIR}

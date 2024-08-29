@@ -1,6 +1,6 @@
 dependencies:
 - name: aserto-lib
   repository: oci://ghcr.io/aserto-dev/helm
-  version: 0.1.1
-digest: sha256:a57426135a9f75af6cd04d5bbb2342afa4bf0292eaef6c70797c5bf46f2b3c9d
-generated: "2024-08-29T15:21:17.398634-04:00"
+  version: 0.1.2
+digest: sha256:88d7d63bc5c8c6be05708a8631eeca3e563356156b38dd1a79ea24a7694ebd0f
+generated: "2024-08-29T17:26:30.325192-04:00"
