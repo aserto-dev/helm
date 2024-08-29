@@ -10,6 +10,7 @@ CHART_REPO		:= "oci://ghcr.io/aserto-dev/helm"
 
 CHARTS_DIR := charts
 CHARTS := ${shell ls ${CHARTS_DIR}}
+BUMP_PART ?= patch
 
 .PHONY: clean
 clean: ${addprefix clean-,${CHARTS}}
@@ -33,6 +34,9 @@ push: ${addprefix push-,${CHARTS}}
 
 .PHONY: release
 release: build package push
+
+.PHONY: bump
+bump: ${addprefix bump-,${CHARTS}}
 
 .PHONY: clean-%
 clean-%:
@@ -68,4 +72,15 @@ push-%: CHART_VERSION = ${shell cat ${CHARTS_DIR}/$*/Chart.yaml | yq '.version'}
 push-%:
 	@echo -e "${ATTN_COLOR}==> push $*:${CHART_VERSION} ${NO_COLOR}"
 	@helm push ${CHARTS_DIR}/$*/build/$*-${CHART_VERSION}.tgz ${CHART_REPO}
+
+# Pattern-specific variable assignment.
+# https://www.gnu.org/software/make/manual/html_node/Pattern_002dspecific.html
+bump-%: CHART_VERSION = ${shell cat ${CHARTS_DIR}/$*/Chart.yaml | yq '.version'}
+
+.PHONY: bump-%
+bump-%:
+	@echo -e "${ATTN_COLOR}==> bump ${BUMP_PART} $* (${CHART_VERSION}) ${NO_COLOR}"
+	@bumpversion --no-tag --no-commit --allow-dirty --current-version ${CHART_VERSION} \
+		${BUMP_PART} ${CHARTS_DIR}/$*/Chart.yaml
+	@echo -e "New version: $$(cat ${CHARTS_DIR}/$*/Chart.yaml | yq '.version')"
 
