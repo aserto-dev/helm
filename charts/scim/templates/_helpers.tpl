@@ -64,3 +64,11 @@ Create the name of the service account to use
 {{- define "scim.port" -}}
 {{ .Values.port | default "8080" }}
 {{- end }}
+
+{{- define "scim.auth.secretName" -}}
+{{ ((.Values).auth).secretName | default "scim-password" }}
+{{- end }}
+
+{{- define "scim.auth.secretKey" -}}
+{{ ((.Values).auth).secretKey | default "password" }}
+{{- end }}

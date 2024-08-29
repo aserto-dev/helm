@@ -1,58 +1,172 @@
 global:
+  # Configuration shared by all services.
   aserto:
+    # Kubernetes pull secret for private Aserto images.
+    # imagePullSecrets:
+    #   - name: ghcr-creds
+
+    # [REQUIRED] OpenID Connect configuration.
     oidc:
       domain: ""
       audience: ""
 
+    # Port configuration.
     ports:
       grpc: 8282
       https: 8383
       health: 8484
       mertics: 8585
 
-    grpc:
-      connectionTimeoutSec: 2
+    # # gRPC configuration.
+    # grpc:
+    #   connectionTimeoutSec: 2
 
-    # https:
-    #   read_timeout: 2s
-    #   read_header_timeout: 2s
-    #   write_timeout: 2s
-    #   idle_timeout: 30s
-    #   allowed_origins:
-    #     - https://*.example.com
+    # # HTTPS configuration.
+    https:
+      # read_timeout: 2s
+      # read_header_timeout: 2s
+      # write_timeout: 2s
+      # idle_timeout: 30s
 
-    metrics:
-      zpages: true
+      # [REQUIRED] Specify the ingress address of the
+      # conosle service.
+      allowed_origins:
+        # - https://console.aserto.example.com
+
+
+    # # Metrics configuration.
+    # metrics:
+    #   zpages: false
+    #   grpc:
+    #     counters: false
+    #     durations: false
+    #     gateway: false
 
     rootDirectory:
+      # Disable TLS verification on
       disableTLSVerification: true
+      # Tenant ID of the root directory.
       tenantID: 06e1fdac-0676-11ef-b77e-0005a79d9368
+
     directory:
       disableTLSVerification: true
 
-# directory:
-#   rootDirectory:
-#     database:
-#       host: ""
-#       port: 5432
-#       sslMode: require
+directory:
+  # Kubernetes pull secret for private Aserto images.
+  # imagePullSecrets:
+  #   - name: ghcr-creds
 
-#   tenantDirectory:
-#     database:
-#       host: ""
-#       port: 5432
-#       sslMode: require
+  # Override the directory image and tag.
+  # image:
+  #   repository: ghcr.io/aserto-dev/directory
+  #   tag: x.y.z
+  #   pullPolicy: IfNotPresent
+
+  # Configuration for the root directory.
+  rootDirectory:
+    # Database configuration.
+    database:
+      # [REQUIRED] Host name of the root directory PostgreSQL instance.
+      host: ""
+      port: 5432
+      # Set to 'disable` if the PostgreSQL instance does not use SSL.
+      sslMode: require
+      admin:
+        # Kubernetes secret containing credentials for the root database's owner.
+        credentialsSecret: pg-ds-credentials
+
+  # Configuration for the tenant directory.
+  tenantDirectory:
+    # Database configuration.
+    database:
+      # [REQUIRED] Host name of the tenant directory PostgreSQL instance.
+      host: ""
+      port: 5432
+      # Set to 'disable` if the PostgreSQL instance does not use SSL.
+      sslMode: require
+      admin:
+        # Kubernetes secret containing credentials for the tenant database's owner.
+        credentialsSecret: pg-ds-credentials
+
+discovery:
+  # Kubernetes pull secret for private Aserto images.
+  # imagePullSecrets:
+  #   - name: ghcr-creds
+
+  # Override the discovery image and tag.
+  # image:
+  #   repository: ghcr.io/aserto-dev/self-hosted-discovery
+  #   tag: x.y.z
+  #   pullPolicy: IfNotPresent
+  registries:
+    # [REQUIRED] At least one policy registry must be configured.
+    # ghcr.io:
+    #   scheme: bearer
+    #   tokenSecretName: discovery-ghcr-token
+    #   tokenSecretKey: token
+
+console:
+  # Kubernetes pull secret for private Aserto images.
+  # imagePullSecrets:
+  #   - name: ghcr-creds
+
+  # Override the console image and tag.
+  # image:
+  #   repository: ghcr.io/aserto-dev/multi-tenant-console
+  #   tag: x.y.z
+  #   pullPolicy: IfNotPresent
+
+  # Internal HTTP port for the console service.
+  # port: 3000
+
+  # [REQUIRED] Ingress address of the authorizer service.
+  # e.g. https://authorizer.aserto.example.com
+  authorizerURL: ""
+
+  # [REQUIRED] Ingress address of the directory service.
+  # e.g. https://directory.aserto.example.com
+  directoryURL: ""
+
+# authorizer:
+#   # Kubernetes pull secret for private Aserto images.
+#   imagePullSecrets:
+#     - name: ghcr-creds
+#
+#   # Override the authorizer image and tag.
+#   image:
+#     repository: ghcr.io/aserto-dev/directory
+#     tag: x.y.z
+#     pullPolicy: IfNotPresent
 
 # scim:
+#   # Kubernetes pull secret for private Aserto images.
+#   imagePullSecrets:
+#     - name: ghcr-creds
+#
+#   # Override the SCIM service image and tag.
+#   image:
+#     repository: ghcr.io/aserto-dev/scim
+#     tag: x.y.z
+#     pullPolicy: IfNotPresent
+#
+#   # SCIM authentication configuration.
 #   auth:
+#     # Kubernetes secret containing the SCIM service's password.
+#     # If the secret does not exist, it is created with a random
+#     # value on first install.
 #     secretName: scim-password
 #     secretKey: password
+#
+#     # Basic HTTP Auth configuration.
 #     basic:
+#       # Enable basic HTTP Auth.
 #       enabled: true
+#       # Basic auth user name.
 #       username: scim
 #     bearer:
+#       # Enable bearer token auth.
 #       enabled: true
-
+#
 #   createEmailIdentities: true
 #   createRoleGroups: false
 #   userObjectType: user

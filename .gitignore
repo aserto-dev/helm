@@ -1,2 +1,3 @@
-/*/build/*-*.*.*.tgz
-/*/charts/*-*.*.*.tgz
+.ext/
+/charts/*/build/*-*.*.*.tgz
+/charts/*/charts/*-*.*.*.tgz

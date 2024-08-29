@@ -39,18 +39,18 @@ cacheSettings:
 # Set the service log level (trace/debug/info/warn/error)
 # logLevel: info
 
-grpc:
-  # The services generates self-signed certificates by default.
-  # To use your own certificate provide the name of a secret
-  # of type kubernetes.io/tls
-  certSecret: discovery-grpc-cert
+# grpc:
+#   # The services generates self-signed certificates by default.
+#   # To use your own certificate provide the name of a secret
+#   # of type kubernetes.io/tls
+#   certSecret: discovery-grpc-cert
 
 # https:
 #   allowed_origins:
 #     - https://*.example.com
 #
-#   The services generates self-signed certificates by default.
-#   To use your own certificate provide the name of a secret of type kubernetes.io/tls
+#   # The services generates self-signed certificates by default.
+#   # To use your own certificate provide the name of a secret of type kubernetes.io/tls
 #   certSecret: directory-rest-cert
 
 #   read_timeout: 2s

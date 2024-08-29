@@ -8,9 +8,6 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   # tag: x.y.z
 
-imagePullSecrets:
-  - name: ghcr-creds
-
 global:
   aserto:
     ports:
@@ -27,24 +24,24 @@ global:
 
 port: 8080
 
-auth:
-  secretName: scim-password
-  secretKey: password
-  basic:
-    enabled: true
-    username: scim
-  bearer:
-    enabled: true
+# auth:
+#   secretName: scim-password
+#   secretKey: password
+#   basic:
+#     enabled: true
+#     username: scim
+#   bearer:
+#     enabled: true
 
-createEmailIdentities: true
-createRoleGroups: false
-userObjectType: user
-identityObjectType: identity
-identityRelation: identifier
-groupObjectType: group
-groupMemberRelation: memeber
-groupMappings: []
-userMappings: []
+# createEmailIdentities: true
+# createRoleGroups: false
+# userObjectType: user
+# identityObjectType: identity
+# identityRelation: identifier
+# groupObjectType: group
+# groupMemberRelation: memeber
+# groupMappings: []
+# userMappings: []
 
 rootDirectory:
   tenantID: "06e1fdac-0676-11ef-b77e-0005a79d9368"
