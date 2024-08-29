@@ -1,13 +1,14 @@
 ---
-{{- $cfg := .Values.auth -}}
-{{- $data :=  (lookup "v1" "Secret" .Release.Namespace $cfg.secretName).data }}
+{{- $secretName := include "scim.auth.secretName" . -}}
+{{- $secretKey := include "scim.auth.secretKey" . -}}
+{{- $data :=  (lookup "v1" "Secret" .Release.Namespace $secretName).data }}
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ $cfg.secretName }}
+  name: {{ $secretName }}
 data:
   {{- if $data }}
-  {{ $cfg.secretKey }}: {{ get $data $cfg.secretKey }}
+  {{ $secretKey }}: {{ get $data $secretKey }}
   {{- else }}
-  {{ $cfg.secretKey }}: {{ randAlphaNum 20 | b64enc }}
+  {{ $secretKey }}: {{ randAlphaNum 20 | b64enc }}
   {{- end }}

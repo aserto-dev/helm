@@ -20,10 +20,7 @@ spec:
       labels:
         {{- include "scim.selectorLabels" . | nindent 8 }}
     spec:
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      {{- include "aserto-lib.imagePullSecrets" . | nindent 6 }}
       serviceAccountName: {{ include "scim.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
@@ -84,13 +81,13 @@ spec:
             - name: ASERTO_SCIM_SERVER_AUTH_BASIC_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.auth.secretName }}
-                  key: {{ .Values.auth.secretKey }}
+                  name: {{ include "scim.auth.secretName" . }}
+                  key: {{ include "scim.auth.secretKey" . }}
             - name: ASERTO_SCIM_SERVER_AUTH_BEARER_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.auth.secretName }}
-                  key: {{ .Values.auth.secretKey }}
+                  name: {{ include "scim.auth.secretName" . }}
+                  key: {{ include "scim.auth.secretKey" . }}
             {{- with (include "aserto-lib.rootDirectoryApiKey" . | fromYaml) }}
             - name: ASERTO_SCIM_DIRECTORY_API_KEY
               valueFrom:

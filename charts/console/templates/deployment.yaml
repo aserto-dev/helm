@@ -20,10 +20,7 @@ spec:
       labels:
         {{- include "console.selectorLabels" . | nindent 8 }}
     spec:
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      {{- include "aserto-lib.imagePullSecrets" . | nindent 6 }}
       serviceAccountName: {{ include "console.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
@@ -47,9 +44,9 @@ spec:
               value: https://{{ .domain }}
             {{- end }}
             - name: REACT_APP_DIRECTORY_SERVICE_URL
-              value: {{ .Values.directoryURL }}
+              value: {{ .Values.directoryURL | required "console directoryURL is required" }}
             - name: REACT_APP_AUTHORIZER_SERVICE_URL
-              value: {{ .Values.authorizerURL }}
+              value: {{ .Values.authorizerURL | required "console authorizerURL is required" }}
             - name: SERVER_PORT
               value: {{ include "console.port" . | quote }}
             {{- with (include "aserto-lib.rootDirectoryClient" .) | fromYaml }}

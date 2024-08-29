@@ -8,12 +8,9 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   # tag: x.y.z
 
-imagePullSecrets:
-  - name: ghcr-creds
-
 port: 3000
-authorizerURL: "https://localhost:8383"
-directoryURL: "https://localhost:18383"
+authorizerURL: ""
+directoryURL: ""
 
 # REQUIRED: specify and OIDC domain and audience
 oidc:

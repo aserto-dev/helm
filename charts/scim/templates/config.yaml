@@ -20,21 +20,21 @@ stringData:
         tls_ca_cert_path: '/https-certs/ca.crt'
       auth:
         basic:
-          enabled: {{ .Values.auth.basic.enabled | default "true" }}
-          username: {{ .Values.auth.basic.username | default "scim" }}
+          enabled: {{ ((.Values.auth).basic).enabled | default "true" }}
+          username: {{ ((.Values.auth).basic).username | default "scim" }}
         bearer:
-          enabled: {{ .Values.auth.bearer.enabled | default "true" }}
+          enabled: {{ ((.Values.auth).bearer).enabled | default "true" }}
     directory:
       {{- include "aserto-lib.rootDirectoryClient" . | nindent 6 }}
     scim:
-      create_email_identities: {{ .Values.createEmailIdentities  }}
-      create_role_groups: {{ .Values.createRoleGroups }}
-      user_object_type: {{ .Values.userObjectType }}
-      identity_object_type: {{ .Values.identityObjectType }}
-      identity_relation: {{ .Values.identityRelation }}
-      group_object_type: {{ .Values.groupObjectType }}
-      group_member_relation: {{ .Values.groupMemberRelation }}
+      create_email_identities: {{ .Values.createEmailIdentities | default "true" }}
+      create_role_groups: {{ .Values.createRoleGroups | default "false" }}
+      user_object_type: {{ .Values.userObjectType | default "user" }}
+      identity_object_type: {{ .Values.identityObjectType | default "identity" }}
+      identity_relation: {{ .Values.identityRelation | default "identifier" }}
+      group_object_type: {{ .Values.groupObjectType | default "group" }}
+      group_member_relation: {{ .Values.groupMemberRelation | default "member" }}
       group_mappings:
-        {{- .Values.groupMappings | toYaml | nindent 8 }}
+        {{- .Values.groupMappings | default list | toYaml | nindent 8 }}
       user_mappings:
-        {{- .Values.userMappings | toYaml | nindent 8 }}
+        {{- .Values.userMappings | default list | toYaml | nindent 8 }}

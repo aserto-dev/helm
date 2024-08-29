@@ -1,3 +1,5 @@
 oidc:
   domain: oidc_domain
   audience: oidc_audience
+authorizerURL: https://authorizer.aserto.example.com
+directoryURL: https://directory.aserto.example.com

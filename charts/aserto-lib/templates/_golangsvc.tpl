@@ -51,12 +51,12 @@ Renders metrics service configuration.
 {{- define "aserto-lib.metricsService" -}}
 listen_address: 0.0.0.0:{{ include "aserto-lib.metricsPort" . }}
 {{- with (include "aserto-lib.mergeGlobal" (list . "metrics") | fromYaml) }}
-zpages: {{ .zpages | default "true" }}
+zpages: {{ .zpages | default "false" }}
 {{- if .grpc }}
 grpc:
-  counters: {{ (.grpc).counters | default "true" }}
-  durations: {{ (.grpc).durations | default "true" }}
-  gateway: {{ (.grpc).gateway | default "true" }}
+  counters: {{ (.grpc).counters | default "false" }}
+  durations: {{ (.grpc).durations | default "false" }}
+  gateway: {{ (.grpc).gateway | default "false" }}
 {{- end }}
 {{- end }}
 {{- end }}

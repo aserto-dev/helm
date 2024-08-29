@@ -1,4 +1,4 @@
-SHELL 	   		:= $(shell which bash)
+SHELL 	   		:= ${shell which bash}
 
 NO_COLOR   		:= \033[0m
 OK_COLOR   		:= \033[32;01m
@@ -8,44 +8,64 @@ ATTN_COLOR 		:= \033[33;01m
 
 CHART_REPO		:= "oci://ghcr.io/aserto-dev/helm"
 
-ifndef CHART
-$(error CHART must be set)
-endif
-
-CHART_DIR		:= charts/${CHART}
-CHART_VERSION   := $(shell cat ${CHART_DIR}/Chart.yaml | yq '.version')
+CHARTS_DIR := charts
+CHARTS := ${shell ls ${CHARTS_DIR}}
 
 .PHONY: clean
-clean:
-	@echo -e "$(ATTN_COLOR)==> $@ ${CHART} $(NO_COLOR)"
-	@rm -rf ${CHART_DIR}/build
-
-.PHONY: update
-update:
-	@echo -e "$(ATTN_COLOR)==> $@ ${CHART} $(NO_COLOR)"
-	@helm dependency update ${CHART_DIR}
-
-.PHONY: build
-build:
-	@echo -e "$(ATTN_COLOR)==> $@ ${CHART} $(NO_COLOR)"
-	@helm dependency build ${CHART_DIR}
-
-.PHONY: package
-package:
-	@echo -e "$(ATTN_COLOR)==> $@ ${CHART} $(NO_COLOR)"
-	@mkdir -p ${CHART_DIR}/build
-	@helm package ${CHART_DIR} -u -d ${CHART_DIR}/build
-
-.PHONY: push
-push:
-	@echo -e "$(ATTN_COLOR)==> $@ ${CHART}:$(CHART_VERSION) $(NO_COLOR)"
-	@helm push ${CHART_DIR}/build/${CHART}-$(CHART_VERSION).tgz $(CHART_REPO)
+clean: ${addprefix clean-,${CHARTS}}
 
 .PHONY: lint
 lint:
-	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@echo -e "${ATTN_COLOR}==> $@ ${NO_COLOR}"
 	@ct lint --config ct.yaml --helm-repo-extra-args "aserto-helm=-u gh -p ${GITHUB_TOKEN}"
 
+.PHONY: update
+update: ${addprefix update-,${CHARTS}}
+
+.PHONY: build
+build: ${addprefix build-,${CHARTS}}
+
+.PHONY: package
+package: ${addprefix package-,${CHARTS}}
+
+.PHONY: push
+push: ${addprefix push-,${CHARTS}}
 
 .PHONY: release
 release: build package push
+
+.PHONY: clean-%
+clean-%:
+	@echo -e "${ATTN_COLOR}==> clean $* ${NO_COLOR}"
+	@rm -rf ${CHARTS_DIR}/$*/build
+
+.PHONY: lint-%
+lint-%:
+	@echo -e "${ATTN_COLOR}==> lint $* ${NO_COLOR}"
+	@ct lint --charts ${CHARTS_DIR}/$* --config ct.yaml --helm-repo-extra-args "aserto-helm=-u gh -p ${GITHUB_TOKEN}"
+
+.PHONY: update-%
+update-%:
+	@echo -e "${ATTN_COLOR}==> update $* ${NO_COLOR}"
+	helm dependency update ${CHARTS_DIR}/$*
+
+.PHONY: build-%
+build-%:
+	@echo -e "${ATTN_COLOR}==> build $* ${NO_COLOR}"
+	@helm dependency build ${CHARTS_DIR}/$*
+
+.PHONY: package-%
+package-%:
+	@echo -e "${ATTN_COLOR}==> package $* ${NO_COLOR}"
+	@mkdir -p ${CHARTS_DIR}/$*/build
+	@helm package ${CHARTS_DIR}/$* -u -d ${CHARTS_DIR}/$*/build
+
+# Pattern-specific variable assignment.
+# https://www.gnu.org/software/make/manual/html_node/Pattern_002dspecific.html
+push-%: CHART_VERSION = ${shell cat ${CHARTS_DIR}/$*/Chart.yaml | yq '.version'}
+
+.PHONY: push-%
+push-%:
+	@echo -e "${ATTN_COLOR}==> push $*:${CHART_VERSION} ${NO_COLOR}"
+	@helm push ${CHARTS_DIR}/$*/build/$*-${CHART_VERSION}.tgz ${CHART_REPO}
+
