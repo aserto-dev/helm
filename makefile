@@ -7,10 +7,25 @@ WARN_COLOR 		:= \033[36;01m
 ATTN_COLOR 		:= \033[33;01m
 
 CHART_REPO		:= "oci://ghcr.io/aserto-dev/helm"
+CHARTS_DIR 		:= charts
+CHARTS 			:= ${shell ls ${CHARTS_DIR}}
+BUMP_PART 		?= patch
 
-CHARTS_DIR := charts
-CHARTS := ${shell ls ${CHARTS_DIR}}
-BUMP_PART ?= patch
+CT_VERSION		:= 3.11.0
+
+BIN_DIR			:= ./bin
+EXT_DIR			:= ./.ext
+EXT_BIN_DIR		:= ${EXT_DIR}/bin
+EXT_TMP_DIR		:= ${EXT_DIR}/tmp
+
+CT_LINT_CMD		:= ${EXT_BIN_DIR}/ct lint --config ct.yaml \
+	--chart-yaml-schema ${EXT_BIN_DIR}/etc/chart_schema.yaml \
+	--lint-conf ${EXT_BIN_DIR}/etc/lintconf.yaml \
+	--helm-repo-extra-args "aserto-helm=-u gh -p ${GITHUB_TOKEN}"
+
+
+.PHONY: deps
+deps: install-ct install-bumpversion;
 
 .PHONY: clean
 clean: ${addprefix clean-,${CHARTS}}
@@ -18,7 +33,7 @@ clean: ${addprefix clean-,${CHARTS}}
 .PHONY: lint
 lint:
 	@echo -e "${ATTN_COLOR}==> $@ ${NO_COLOR}"
-	@ct lint --config ct.yaml --helm-repo-extra-args "aserto-helm=-u gh -p ${GITHUB_TOKEN}"
+	@${CT_LINT_CMD}
 
 .PHONY: update
 update: ${addprefix update-,${CHARTS}}
@@ -32,11 +47,11 @@ package: ${addprefix package-,${CHARTS}}
 .PHONY: push
 push: ${addprefix push-,${CHARTS}}
 
-.PHONY: release
-release: build package push
-
 .PHONY: bump
 bump: ${addprefix bump-,${CHARTS}}
+
+.PHONY: release
+release: build package push
 
 .PHONY: clean-%
 clean-%:
@@ -46,7 +61,7 @@ clean-%:
 .PHONY: lint-%
 lint-%:
 	@echo -e "${ATTN_COLOR}==> lint $* ${NO_COLOR}"
-	@ct lint --charts ${CHARTS_DIR}/$* --config ct.yaml --helm-repo-extra-args "aserto-helm=-u gh -p ${GITHUB_TOKEN}"
+	@${CT_LINT_CMD} --charts ${CHARTS_DIR}/$*
 
 .PHONY: update-%
 update-%:
@@ -77,6 +92,9 @@ push-%:
 # https://www.gnu.org/software/make/manual/html_node/Pattern_002dspecific.html
 bump-%: CHART_VERSION = ${shell cat ${CHARTS_DIR}/$*/Chart.yaml | yq '.version'}
 
+.PHONY: release-%
+release-%: update-% build-% package-% push-%;
+
 .PHONY: bump-%
 bump-%:
 	@echo -e "${ATTN_COLOR}==> bump ${BUMP_PART} $* (${CHART_VERSION}) ${NO_COLOR}"
@@ -84,3 +102,29 @@ bump-%:
 		${BUMP_PART} ${CHARTS_DIR}/$*/Chart.yaml
 	@echo -e "New version: $$(cat ${CHARTS_DIR}/$*/Chart.yaml | yq '.version')"
 
+.PHONY: install-ct
+install-ct: ${EXT_TMP_DIR} ${EXT_BIN_DIR}
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@gh release download v${CT_VERSION} --repo https://github.com/helm/chart-testing \
+		--pattern "chart-testing_${CT_VERSION}_$$(uname -s | tr '[:upper:]' '[:lower:]')_$$(uname -m).tar.gz" \
+		--output "${EXT_TMP_DIR}/chart-testing.tar.gz" --clobber
+	@tar -xvf ${EXT_TMP_DIR}/chart-testing.tar.gz --directory ${EXT_BIN_DIR} ct etc/ &> /dev/null
+	@chmod +x ${EXT_BIN_DIR}/ct
+	@${EXT_BIN_DIR}/ct version
+
+.PHONY: install-bumpversion
+install-bumpversion: ${EXT_TMP_DIR} ${EXT_BIN_DIR}
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@pip install bump2version
+
+${BIN_DIR}:
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@mkdir -p ${BIN_DIR}
+
+${EXT_BIN_DIR}:
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@mkdir -p ${EXT_BIN_DIR}
+
+${EXT_TMP_DIR}:
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@mkdir -p ${EXT_TMP_DIR}
