@@ -1,3 +1,7 @@
+global:
+  aserto:
+    imagePullSecrets:
+      - name: ghcr-creds
 rootDirectory:
   tenantID: root-tenant-id
   database:

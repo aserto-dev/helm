@@ -92,10 +92,7 @@ push-%:
 release-%: update-% build-% package-% push-%;
 
 .PHONY: bump-%
-bump-%: bump-chart-%
-
-.PHONY: bump-chart-%
-bump-chart-%:
+bump-%:
 	@echo -e "${ATTN_COLOR}==> bump ${BUMP_PART} $* (${CHART_VERSION}) ${NO_COLOR}"
 	@bumpversion --no-tag --no-commit --allow-dirty --current-version ${CHART_VERSION} \
 		${BUMP_PART} ${CHARTS_DIR}/$*/Chart.yaml
