@@ -44,13 +44,14 @@ Additionally, if the role has the `CREATEDB` option, the service can create the 
 automatically at startup if they don't already exist.
 
 Without the `CREATEDB` option, you must create the databases manually before deploying the chart.
-The following SQL commands can be used to create the role and databases:
+The following SQL commands can be used to create the roles and databases:
 
 ```sql
-CREATE ROLE aserto CREATEROLE LOGIN PASSWORD '<password>';
+CREATE ROLE aserto_root CREATEROLE LOGIN PASSWORD '<password>';
+CREATE ROLE aserto_tenant CREATEROLE LOGIN PASSWORD '<password>';
 
-CREATE DATABASE aserto-ds OWNER = aserto TEMPLATE = template0;
-CREATE DATABASE aserto-root-ds OWNER = aserto TEMPLATE = template0;
+CREATE DATABASE "aserto-root-ds" OWNER = aserto_root TEMPLATE = template0;
+CREATE DATABASE "aserto-ds" OWNER = aserto_tenant TEMPLATE = template0;
 ```
 
 ### Kubernetes Secrets
