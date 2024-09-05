@@ -44,13 +44,14 @@ Additionally, if the role has the `CREATEDB` option, the service can create the 
 automatically at startup if they don't already exist.
 
 Without the `CREATEDB` option, you must create the databases manually before deploying the chart.
-The following SQL commands can be used to create the role and databases:
+The following SQL commands can be used to create the roles and databases:
 
 ```sql
-CREATE ROLE aserto CREATEROLE LOGIN PASSWORD '<password>';
+CREATE ROLE aserto_root CREATEROLE LOGIN PASSWORD '<password>';
+CREATE ROLE aserto_tenant CREATEROLE LOGIN PASSWORD '<password>';
 
-CREATE DATABASE aserto-ds OWNER = aserto TEMPLATE = template0;
-CREATE DATABASE aserto-root-ds OWNER = aserto TEMPLATE = template0;
+CREATE DATABASE "aserto-root-ds" OWNER = aserto_root TEMPLATE = template0;
+CREATE DATABASE "aserto-ds" OWNER = aserto_tenant TEMPLATE = template0;
 ```
 
 ### Kubernetes Secrets
@@ -137,6 +138,37 @@ The top-level sections in the `values.yaml` file are:
 
 The `aserto` umbrella chart's [values.yaml](charts/aserto/values.yaml) file documents the available
 options.
+
+To use the chart as a dependency in your own chart, add the following to the parent chart's `Chart.yaml`:
+```yaml
+dependencies:
+  - name: aserto
+    version: ~0.1.6
+    repository: oci://ghcr.io/aserto-dev/helm
+
+```
+Then run `helm dep update` to download the chart and its dependencies.
+
+When using the `aserto` chart as a dependency the parent's `values.yaml` file should
+keep the `global` values in place but move the other values into the `aserto` section.
+For example:
+```yaml
+global:
+  aserto:
+    ports:
+      grpc: 8282
+      https: 8383
+      health: 8484
+      mertics: 8585
+    ...
+
+aserto:
+  directory:
+    rootDirectory:
+      database:
+        port: 5432
+        ...
+```
 
 ## Deployment
 
