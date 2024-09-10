@@ -1,7 +1,7 @@
 dependencies:
 - name: directory
   repository: oci://ghcr.io/aserto-dev/helm
-  version: 0.1.5
+  version: 0.1.6
 - name: authorizer
   repository: oci://ghcr.io/aserto-dev/helm
   version: 0.1.5
@@ -14,5 +14,5 @@ dependencies:
 - name: scim
   repository: oci://ghcr.io/aserto-dev/helm
   version: 0.1.3
-digest: sha256:52549edf4d65b54d9aecfd26cd19974b0606f06a034ff3ac0574e9fea58670a3
-generated: "2024-08-30T07:51:19.880893-04:00"
+digest: sha256:9fdf8504143a355be2ded44d06abcc74423ece9dc4736495ab10d26d08e92043
+generated: "2024-09-10T16:31:54.603385-04:00"
