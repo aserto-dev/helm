@@ -21,6 +21,8 @@ stringData:
         listen_address: 0.0.0.0:{{ include "aserto-lib.healthPort" . }}
       metrics:
         {{- include "aserto-lib.metricsService" . | nindent 8 }}
+      admin:
+        authorized_keys_path: /admin-keys/authorized_keys
 
     {{ if .Values.rootDirectory.runService }}
     {{- with .Values.rootDirectory.database -}}

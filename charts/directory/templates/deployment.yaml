@@ -31,6 +31,9 @@ spec:
             items:
               - key: config.yaml
                 path: config.yaml
+        - name: admin-keys
+          configMap:
+            name: {{ include "directory.fullname" . }}-admin-keys
         - name: grpc-certs
         {{- with (include "aserto-lib.grpcConfig" . | fromYaml) }}
         {{- if .certSecret  }}
@@ -75,9 +78,14 @@ spec:
             - name: metrics
               containerPort: {{ .metrics }}
             {{- end }}
+            - containerPort: 2222
+              name: ssh-admin
           volumeMounts:
             - name: config
               mountPath: /config
+              readOnly: true
+            - name: admin-keys
+              mountPath: "/admin-keys"
               readOnly: true
             - name: grpc-certs
               mountPath: /grpc-certs

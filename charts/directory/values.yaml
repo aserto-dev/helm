@@ -19,6 +19,11 @@ image:
 #   domain: ""
 #   audience: ""
 
+# sshAdminKeys: |
+#   # Add your authorized SSH public keys here
+#   ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDf6
+#   ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDa7
+
 rootDirectory:
   runService: true
   # REQUIRED: root directory tenant ID
