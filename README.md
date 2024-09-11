@@ -170,6 +170,24 @@ aserto:
         ...
 ```
 
+### Directory Management Service
+
+The directory service exposes a management endpoint that is used, among other things, to initialize
+its internal database. The management endpoint authenticates using SSH keys.
+In order to be able to connect, you must provide at least one public key in the `directory.sshAdminKeys`
+value of the `values.yaml` file.
+
+Example:
+```yaml
+...
+directory:
+  sshAdminKeys: |
+    ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABg... admin@acme.com
+    ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... another_admin@acme.com
+...
+```
+
+
 ## Deployment
 
 To deploy the Aserto services, first create a `values.yaml` file with the desired configuration.
@@ -191,4 +209,45 @@ Deploy the chart in a release called `aserto` using:
 
 ```shell
 helm install aserto oci://ghcr.io/aserto-dev/helm/aserto -f values.yaml
+```
+
+### Directory Initialization
+
+Once the services are deployed and running, you'll need to initialize the root directory used internally
+to authorize access to all other services. This is done by connecting to the directory service's management
+endpoint and running the `provision-root-keys` command.
+
+To connect to the management endpoint, you must first port-forward the management service to your local machine:
+
+```shell
+kubectl --namespace <namespace> port-forward \
+  $(kubectl get pods --namespace <namespace> \
+    -l "app.kubernetes.io/name=directory,app.kubernetes.io/instance=<release>" \
+    -o jsonpath="{.items[0].metadata.name}") 2222:2222
+```
+
+Substitute `<namespace>` with the Kubernetes namespace where the Aserto services are deployed and `<release>` with the
+name of the Helm release (as listed in `helm list -n <namespace>`).
+
+For example, if the namespace and release are both `aserto`:
+```shell
+kubectl --namespace aserto port-forward \
+  $(kubectl get pods --namespace aserto \
+    -l "app.kubernetes.io/name=directory,app.kubernetes.io/instance=aserto" \
+    -o jsonpath="{.items[0].metadata.name}") 2222:2222
+```
+
+This forward port 2222 on your local machine to the directory service's management endpoint.
+
+In another terminal, run the `provision-root-keys` command using one of the SSH keys provided in the `values.yaml` file
+under `directory.sshAdminKeys`. For example:
+
+```shell
+ssh -p 2222 -i <private key path> localhost provision-root-keys
+```
+
+If you added your default SSH key (`~/.ssh/id_*.pub`) to `directory.sshAdminKeys`, you can omit the `-i` option:
+
+```shell
+ssh -p 2222 localhost provision-root-keys
 ```
