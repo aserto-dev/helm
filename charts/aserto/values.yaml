@@ -62,6 +62,12 @@ directory:
   #   tag: x.y.z
   #   pullPolicy: IfNotPresent
 
+  # Control access to the directory's management service.
+  # sshAdminKeys: |
+  #   # Add your authorized SSH public keys here
+  #   ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDf6
+  #   ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDa7
+
   # Configuration for the root directory.
   rootDirectory:
     # Database configuration.
