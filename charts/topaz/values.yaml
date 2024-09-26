@@ -14,6 +14,11 @@ logLevel: info
 # Set gRPC log level (trace/debug/info/warn/error)
 grpcLogLevel: info
 
+# Web console configuration.
+console:
+  # Enable the web console.
+  enabled: true
+
 # Directory configuration.
 # Using a local directory by default.
 directory:
@@ -39,7 +44,7 @@ directory:
       - exporter
 
     # [Optional] Sync from a remote directory.
-    # sync:
+    sync: {}
     #   address: "directory.prod.aserto.com:8443"
     #   # [Optional] API key for the remote directory
     #   apiKey: ""
@@ -58,7 +63,7 @@ directory:
 
   # Use a remote directory instead running a local edge.
   # If remote is specified, edge configuration is ignored.
-  # remote:
+  remote: {}
   #   # Remote directory address (e.g. directory.prod.aserto.com:8443)
   #   address: ""
   #   # [Optional] tenant ID for the remote directory
@@ -100,36 +105,49 @@ auth:
     - secretName: topaz-api-key
       secretKey: api-key
 
+# Port configuration.
+# The grpc and http ports can be overriden per service in the serviceOverrides section below.
 ports:
   grpc: 8282
   https: 8383
   health: 8484
   metrics: 8585
 
+# Metrics configuration
 metrics:
+  # Enable metrics.
   enabled: true
+  # Expose zpages UI for grpc metrics.
+  # The pages are available at /debug/tracez and /debug/rpcz.
   zpages: true
 
+# Global gRPC configuration.
+# These settings can be overridden per service in serviceOverrides below.
 grpc:
   connectionTimeoutSec: 2
 
-console:
-  enabled: true
-
+# Global configuration of the console and REST APIs.
+# These settings can be overridden per service in serviceOverrides below.
 http:
   # if specified, the domain will automatically be added to the allowedOrigins list.
+  # e.g. 'domain: https://topaz.example.com:8383'
   domain: ""
+  # if true, services are exposed over HTTP instead of HTTPS.
   noTLS: false
+  # HTTP server timeouts.
+  # See https://golang.org/pkg/net/http/#Server
   readTimeout: 2s
   readHeaderTimeout: 2s
   writeTimeout: 2s
   idleTimeout: 30s
+  # CORS allowed headers
   allowedHeaders:
     - Authorization
     - Content-Type
     - If-Match
     - If-None-Match
     - Depth
+  # CORS allowed methods
   allowedMethods:
     - GET
     - POST
@@ -141,24 +159,28 @@ http:
     - MKCOL
     - COPY
     - MOVE
-  allowedOrigins:
-    - "{{ .Values.https.domain }}"
+  # Additional allowed origins.
+  # https://localhost:* is always allowed and if 'domain' is specified,
+  # it is also automatically added.
+  additionalAllowedOrigins: []
 
 # Override grpc and/or http settings per service.
-serviceOverrides:
-  console:
-    # override http port and/or settings for a service.
-    # For example, to expose the console on port 8443 instead of 8383 and
-    # increase the read timeout for the console service:
-    http:
-      port: 8443
-      readTimeout: 5s
-  model:
-    # override grpc port and/or settings for a service.
-    grpc:
-      port: 7272
-      connectionTimeoutSec: 2
+serviceOverrides: {}
+#   # Examples:
+#   console:
+#     # override http port and read timeout for the console service.
+#     # For example, to expose the console on port 8443 instead of 8383 and
+#     # increase the read timeout for the console service:
+#     http:
+#       port: 8443
+#       readTimeout: 5s
+#   model:
+#     # override grpc port and connection timeout settings for the model service.
+#     grpc:
+#       port: 7272
+#       connectionTimeoutSec: 2
 
+# OPA configuration
 opa:
   gracefuShutdownPeriodSeconds: 2
   maxPluginWaitTimeSeconds: 30
@@ -173,46 +195,69 @@ opa:
     #   matchLabels:
     #     release: "stable"
   policy:
-    oci:
-      registry: https://ghcr.io
-      image: "ghcr.io/aserto-policies/policy-rebac:latest"
-      user: ""
-      apiKey: ""
-      apiKeySecret:
-        name: ""
-        key: ""
-      serviceConfig:
-        # Additional OPA service configuration.
-        # See https://www.openpolicyagent.org/docs/latest/configuration/#services
-        response_header_timeout_seconds: 5
-        # allow_insecure_tls: false
-        # headers:
-        #   "header-name": header-value
-      bundleConfig:
-        # Additional OPA bundle configuration.
-        # See https://www.openpolicyagent.org/docs/latest/configuration/#bundles
-        polling:
-          min_delay_seconds: 60
-          max_delay_seconds: 120
-    # discovery:
-    #   url: https://discovery.prod.aserto.com/api/v2/discovery
-    #   policyName: "policy-name"
-    #   apiKey: "1234567890"
+    # The 'oci' and 'discovery' fields are mutually exclusive.
+    # Exactly one of them must be specified.
+
+    # Run policy from an OCI registry.
+    oci: {}
+    #   # OCI registry URL.
+    #   registry: https://ghcr.io
+    #   # Policy image URI.
+    #   image: "ghcr.io/aserto-policies/policy-rebac:latest"
+    #   # [Optional] OCI registry user name.
+    #   # Note: Some registries including ghcr.io require that the user name is left empty
+    #   # when using a personal access token as the API key.
+    #   user: ""
+    #   # [Optional] OCI registry password, token, or API key.
+    #   apiKey: ""
+    #   # [Optional] Kubernetes secret containing the OCI registry password, token, or API key.
     #   apiKeySecret:
-    #     name: "discovery-api-key"
-    #     key: "apiKey"
+    #     # Secret name
+    #     name: ""
+    #     # Secret key
+    #     key: ""
+    #   # Additional OPA service configuration.
+    #   # See https://www.openpolicyagent.org/docs/latest/configuration/#services
+    #   serviceConfig:
+    #     response_header_timeout_seconds: 5
+    #     # allow_insecure_tls: false
+    #     # headers:
+    #     #   "header-name": header-value
+    #   # Additional OPA bundle configuration.
+    #   # See https://www.openpolicyagent.org/docs/latest/configuration/#bundles
+    #   bundleConfig:
+    #     polling:
+    #       min_delay_seconds: 60
+    #       max_delay_seconds: 120
+
+    # Retrieve policy configuration from a discovery service.
+    discovery: {}
+    #   # Discovery service URL.
+    #   url: https://discovery.prod.aserto.com/api/v2/discovery
+    #   # Name of policy to run.
+    #   policyName: "policy-name"
+    #   # [Optional] Discovery service API key.
+    #   apiKey: ""
+    #   # [Optional] Kubernetes secret containing the discovery service API key.
+    #   apiKeySecret:
+    #     # Secret name
+    #     name: ""
+    #     # Secret key
+    #     key: ""
     #   serviceConfig:
     #     # Additional OPA service configuration.
     #     # See https://www.openpolicyagent.org/docs/latest/configuration/#services
     #     response_header_timeout_seconds: 5
-    #     allow_insecure_tls: false
-    #     headers:
-    #       "header-name": header-value
+    #     # allow_insecure_tls: false
+    #     # headers:
+    #     #   "header-name": header-value
 
-# [Optional]
-tenantID: "<tenant id>"
+# [Optional] ID of the tenant that owns the policy.
+# This is required when running a policy from a discovery service.
+tenantID: ""
 
 
+# Standard Kubernetes configuration
 replicaCount: 1
 
 imagePullSecrets: []

@@ -151,4 +151,6 @@ stringData:
           resource: {{ include "topaz.discoveryResource" . }}
           persist: {{ $.Values.opa.persistence.enabled | default "false" }}
           {{- end }}
+        {{- else }}
+          {{- fail "either opa.policy.discovery or opa.policy.oci must be set"}}
         {{- end }}

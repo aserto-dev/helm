@@ -158,10 +158,13 @@ allowed_methods:
 {{- $cfg.allowedMethods | default list | toYaml | nindent 2 }}
 {{- end }}
 
-{{- if $cfg.allowedOrigins }}
-allowed_origins:
-{{- $cfg.allowedOrigins | default list | toYaml | nindent 2 }}
+{{- $origins := list "http://localhost:*" "https://localhost:*" }}
+{{- if $cfg.domain }}
+{{- $origins = append $origins $cfg.domain }}
 {{- end }}
+{{- $origins = concat $origins ($cfg.additionalAllowedOrigins | default list) }}
+allowed_origins:
+{{- $origins | toYaml | nindent 2 }}
 
 {{- if $cfg.noTLS }}
 http: false
