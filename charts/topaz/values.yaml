@@ -1,0 +1,312 @@
+# Default values for topaz.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+image:
+  repository: ghcr.io/aserto-dev/topaz
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  # tag: x.y.z
+
+# Set the service log level (trace/debug/info/warn/error)
+logLevel: info
+
+# Set gRPC log level (trace/debug/info/warn/error)
+grpcLogLevel: info
+
+# Directory configuration.
+# Using a local directory by default.
+directory:
+  # Local edge directory configuration.
+  edge:
+    # Timeout for loading the local database.
+    openTimeout: 5s
+    # Persistent volume for the local directory.
+    persistence:
+      enabled: false
+      # PersistentVolumeClaim options.
+      # See https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims
+      storage: 10Mi
+      # storageClassName: ""
+      # selector:
+      #   matchLabels:
+      #     release: "stable"
+    # Additional directory services to run.
+    # The 'model' and 'reader' services are always included.
+    services:
+      - writer
+      - importer
+      - exporter
+
+    # [Optional] Sync from a remote directory.
+    # sync:
+    #   address: "directory.prod.aserto.com:8443"
+    #   # [Optional] API key for the remote directory
+    #   apiKey: ""
+    #   # [Optional] Kubernetes secret containing the API key for the remote directory
+    #   apiKeySecret:
+    #     # Secret name
+    #     name: ""
+    #     # Secret key
+    #     key: ""
+    #   # Skip verification of remote TLS certificate
+    #   skipTLSVerification: false
+    #   # The frequency of syncs in minutes.
+    #   intervalMinutes: 1
+    #   # Request timeout
+    #   timeoutSeconds: 5
+
+  # Use a remote directory instead running a local edge.
+  # If remote is specified, edge configuration is ignored.
+  # remote:
+  #   # Remote directory address (e.g. directory.prod.aserto.com:8443)
+  #   address: ""
+  #   # [Optional] tenant ID for the remote directory
+  #   tenantID: ""
+  #   # [Optional] API key for the remote directory
+  #   apiKey: ""
+  #   # [Optional] Kubernetes secret containing the API key for the remote directory
+  #   apiKeySecret:
+  #     # Secret name
+  #     name: ""
+  #     # Secret key
+  #     key: ""
+  #   # [Optional] CA certificate for the remote directory
+  #   caCert: |
+  #     -----BEGIN CERTIFICATE-----
+  #     ...
+  #     -----END CERTIFICATE-----
+  #   # [Optional] Kubernetes secret containing the CA certificate for the remote directory
+  #   caCertSecret:
+  #     name: ""
+  #     key: "tls.crt"
+  #   # [Optional] Skip verification of remote TLS certificate
+  #   skipTLSVerification: false
+  #   # [Optional] Request timeout
+  #   timeoutSeconds: 5
+  #   # [Optional] Additional headers to include in requests to the remote directory
+  #   additionalHeaders:
+  #     "header-name": header-value
+
+# Acceptable clock skew for JWT validation.
+jwtAcceptableSkewSeconds: 5
+
+auth:
+  # [Optional] control access using API keys
+  apiKeys:
+    # keys can be specified directly
+    - key: a59692fa671e49a9a25861fd71472792
+    # or as references to Kubernetes secrets
+    - secretName: topaz-api-key
+      secretKey: api-key
+
+ports:
+  grpc: 8282
+  https: 8383
+  health: 8484
+  metrics: 8585
+
+metrics:
+  enabled: true
+  zpages: true
+
+grpc:
+  connectionTimeoutSec: 2
+
+console:
+  enabled: true
+
+http:
+  # if specified, the domain will automatically be added to the allowedOrigins list.
+  domain: ""
+  noTLS: false
+  readTimeout: 2s
+  readHeaderTimeout: 2s
+  writeTimeout: 2s
+  idleTimeout: 30s
+  allowedHeaders:
+    - Authorization
+    - Content-Type
+    - If-Match
+    - If-None-Match
+    - Depth
+  allowedMethods:
+    - GET
+    - POST
+    - HEAD
+    - DELETE
+    - PUT
+    - PATCH
+    - PROFIND
+    - MKCOL
+    - COPY
+    - MOVE
+  allowedOrigins:
+    - "{{ .Values.https.domain }}"
+
+# Override grpc and/or http settings per service.
+serviceOverrides:
+  console:
+    # override http port and/or settings for a service.
+    # For example, to expose the console on port 8443 instead of 8383 and
+    # increase the read timeout for the console service:
+    http:
+      port: 8443
+      readTimeout: 5s
+  model:
+    # override grpc port and/or settings for a service.
+    grpc:
+      port: 7272
+      connectionTimeoutSec: 2
+
+opa:
+  gracefuShutdownPeriodSeconds: 2
+  maxPluginWaitTimeSeconds: 30
+  # Persistent volume for bundles and discovery results.
+  persistence:
+    enabled: false
+    # PersistentVolumeClaim options.
+    # See https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims
+    storage: 10Mi
+    # storageClassName: ""
+    # selector:
+    #   matchLabels:
+    #     release: "stable"
+  policy:
+    oci:
+      registry: https://ghcr.io
+      image: "ghcr.io/aserto-policies/policy-rebac:latest"
+      user: ""
+      apiKey: ""
+      apiKeySecret:
+        name: ""
+        key: ""
+      serviceConfig:
+        # Additional OPA service configuration.
+        # See https://www.openpolicyagent.org/docs/latest/configuration/#services
+        response_header_timeout_seconds: 5
+        # allow_insecure_tls: false
+        # headers:
+        #   "header-name": header-value
+      bundleConfig:
+        # Additional OPA bundle configuration.
+        # See https://www.openpolicyagent.org/docs/latest/configuration/#bundles
+        polling:
+          min_delay_seconds: 60
+          max_delay_seconds: 120
+    # discovery:
+    #   url: https://discovery.prod.aserto.com/api/v2/discovery
+    #   policyName: "policy-name"
+    #   apiKey: "1234567890"
+    #   apiKeySecret:
+    #     name: "discovery-api-key"
+    #     key: "apiKey"
+    #   serviceConfig:
+    #     # Additional OPA service configuration.
+    #     # See https://www.openpolicyagent.org/docs/latest/configuration/#services
+    #     response_header_timeout_seconds: 5
+    #     allow_insecure_tls: false
+    #     headers:
+    #       "header-name": header-value
+
+# [Optional]
+tenantID: "<tenant id>"
+
+
+replicaCount: 1
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+# Additional volumes on the output Deployment definition.
+volumes: []
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts: []
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

@@ -1,0 +1,154 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "topaz.fullname" . }}-config
+  labels:
+    {{- include "topaz.labels" . | nindent 4 }}
+stringData:
+  config.yaml: |
+    # yaml-language-server: $schema=https://topaz.sh/schema/config.json
+    ---
+    version: 2
+
+    logging:
+      prod: true
+      log_level: {{ .Values.logLevel | default "info" }}
+      grpc_log_level: {{ .Values.grpcLogLevel | default "info" }}
+
+    {{ if empty ((.Values.directory).remote).address -}}
+    directory:
+      db_path: '${TOPAZ_DB_DIR}/directory.db'
+      request_timeout: {{ ((.Values.directory).edge).openTimeout | default "5s" }}
+
+    # TODO: apply 'reader' configuration
+    remote_directory:
+      address: 0.0.0.0:9292
+      api_key: "TODO: use reader key if configured"
+      ca_cert_path: "TODO: point to topaz CA cert"
+      timeout_in_seconds: {{ ((.Values.directory).remote).timeoutSeconds | default "5" }}
+    {{- else -}}
+    remote_directory:
+      {{- include "topaz.remoteDirectory" . | nindent 6 }}
+    {{- end }}
+
+    jwt:
+      acceptable_time_skew_seconds: {{ .Values.jwtAcceptableSkewSeconds | default "5"}}
+
+    # authentication configuration
+    auth:
+      {{- if not (empty (.Values.auth).apiKeys) }}
+      api_keys:
+        {{- include "topaz.apiKeys" . | nindent 8 }}
+      {{- end }}
+      options:
+        default:
+          enable_api_key: {{ print (not (empty (.Values.auth).apiKeys)) }}
+          enable_anonymous: {{ print (empty (.Values.auth).apiKeys) }}
+        overrides:
+          paths:
+            - /aserto.authorizer.v2.Authorizer/Info
+            - /grpc.reflection.v1.ServerReflection/ServerReflectionInfo
+            - /grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo
+          override:
+            enable_api_key: false
+            enable_anonymous: true
+
+    api:
+      health:
+        listen_address: 0.0.0.0:{{ include "aserto-lib.healthPort" . }}
+        certs:
+          tls_key_path: '${TOPAZ_CERTS_DIR}/gateway.key'
+          tls_cert_path: '${TOPAZ_CERTS_DIR}/gateway.crt'
+          tls_ca_cert_path: '${TOPAZ_CERTS_DIR}/gateway-ca.crt'
+
+      {{- if (.Values.metrics).enabled }}
+      metrics:
+        {{- include "aserto-lib.metricsService" . | nindent 8 }}
+        certs:
+          tls_key_path: '${TOPAZ_CERTS_DIR}/gateway.key'
+          tls_cert_path: '${TOPAZ_CERTS_DIR}/gateway.crt'
+          tls_ca_cert_path: '${TOPAZ_CERTS_DIR}/gateway-ca.crt'
+      {{- end }}
+
+      services:
+        {{- range (include "topaz.enabledServices" . | fromJsonArray) }}
+        {{ . }}:
+          {{- include "topaz.svcDependencies" (dict "service" .) | nindent 10 }}
+          {{- if not (eq . "console") }}
+          grpc:
+            {{- include "topaz.grpcService" (list $.Values .) | nindent 12 }}
+            certs:
+              tls_key_path: '${TOPAZ_CERTS_DIR}/grpc.key'
+              tls_cert_path: '${TOPAZ_CERTS_DIR}/grpc.crt'
+              tls_ca_cert_path: '${TOPAZ_CERTS_DIR}/grpc-ca.crt'
+          {{- end }}
+          gateway:
+            {{- include "topaz.gatewayService" (list $.Values .) | nindent 12 }}
+            certs:
+              tls_key_path: '${TOPAZ_CERTS_DIR}/gateway.key'
+              tls_cert_path: '${TOPAZ_CERTS_DIR}/gateway.crt'
+              tls_ca_cert_path: '${TOPAZ_CERTS_DIR}/gateway-ca.crt'
+        {{- end }}
+
+    opa:
+      instance_id: {{ .Values.tenantID | default (quote "-") }}
+      graceful_shutdown_period_seconds: {{ (.Values.opa).gracefuShutdownPeriodSeconds | default "2" }}
+      max_plugin_wait_time_seconds: {{ (.Values.opa).maxPluginWaitTimeSeconds | default "30" }}
+      local_bundles:
+        paths: []
+        skip_verification: true
+      config:
+        persistence_directory: "/opa-persistence"
+        services:
+        {{- if ((.Values.opa).policy).discovery | and ((.Values.opa).policy).oci }}
+          {{- fail "opa.policy.discovery and opa.policy.oci are mutually exclusive" }}
+        {{- end }}
+
+        {{- if ((.Values.opa).policy).oci }}
+          {{- with ((.Values.opa).policy).oci }}
+          oci:
+            type: oci
+            url: {{ .registry | required "opa.policy.oci.registry is required" }}
+          {{- if (.apiKey | or .apiKeySecret) }}
+            credentials:
+              bearer:
+                scheme: basic
+                token: {{ include "topaz.ociCredentials" . }}
+          {{- else }}
+            {{- fail "either opa.policy.discovery or opa.policy.oci must be set"}}
+          {{- end }}
+            {{- .serviceConfig | default dict | toYaml | nindent 12 }}
+        bundles:
+          topaz_policy:
+            service: oci
+            resource: {{ .image | required "opa.policy.oci.image is required" }}
+            persist: {{ $.Values.opa.persistence.enabled | default "false" }}
+            {{- if .bundleConfig }}
+            config:
+              {{- .bundleConfig | toYaml | nindent 14 }}
+            {{- end }}
+          {{- end }}
+        {{- else if ((.Values.opa).policy).discovery }}
+          {{- with ((.Values.opa).policy).discovery }}
+          discovery:
+            url: {{ .url | default "https://discovery.prod.aserto.com/api/v2/discovery" }}
+            credentials:
+              bearer:
+                token: {{ include "topaz.discoveryKey" .}}
+                scheme: "basic"
+            {{- $cfg := .serviceConfig | default dict -}}
+            {{- $headers := dig "headers" dict $cfg -}}
+            {{ $cfg = unset $cfg "headers" }}
+            headers:
+              Aserto-Tenant-Id: {{ $.Values.tenantID | required "policy discovery requires tenantID to be set" }}
+            {{- if $headers }}
+              {{- $headers | toYaml | nindent 14 }}
+            {{- end }}
+            {{- $cfg | default dict | toYaml | nindent 12 }}
+        discovery:
+          service: discovery
+          resource: {{ include "topaz.discoveryResource" . }}
+          persist: {{ $.Values.opa.persistence.enabled | default "false" }}
+          {{- end }}
+        {{- end }}
