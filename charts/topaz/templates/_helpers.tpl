@@ -77,11 +77,26 @@ api_key: {{ .apiKey }}
 insecure: true
 {{- end }}
 {{- if not (empty .caCert | and (empty .caCertSecret)) }}
-ca_cert_path: /directory-certs/ca.crt
+ca_cert_path: /directory-certs/{{ (.caCertSecret).key | default "tls.crt" }}
 {{- end }}
 {{- if not (empty .additionalHeaders) }}
 headers:
-  {{ toYaml .additionalHeaders | toYaml | nindent 2 }}
+  {{- toYaml .additionalHeaders | toYaml | nindent 2 }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{- define "topaz.remoteDirectoryCertVolume" -}}
+{{- $name := printf "%s-remote-ca" (include "topaz.fullname" .) -}}
+{{- with (.Values.directory).remote -}}
+{{- if .caCert -}}
+- name: remote-certs
+  configMap:
+    name: {{ $name }}
+{{- else if (.caCertSecret).name -}}
+- name: remote-certs
+  secret:
+    secretName: {{ $name }}
 {{- end }}
 {{- end }}
 {{- end }}

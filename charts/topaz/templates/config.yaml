@@ -36,7 +36,6 @@ stringData:
     jwt:
       acceptable_time_skew_seconds: {{ .Values.jwtAcceptableSkewSeconds | default "5"}}
 
-    # authentication configuration
     auth:
       {{- if not (empty (.Values.auth).apiKeys) }}
       api_keys:
@@ -59,17 +58,17 @@ stringData:
       health:
         listen_address: 0.0.0.0:{{ include "aserto-lib.healthPort" . }}
         certs:
-          tls_key_path: /https-certs/gateway.key
-          tls_cert_path: /http-certs/gateway.crt
-          tls_ca_cert_path: /http-certs/gateway-ca.crt
+          tls_key_path: /https-certs/tls.key
+          tls_cert_path: /http-certs/tls.crt
+          tls_ca_cert_path: /http-certs/ca.crt
 
       {{- if (.Values.metrics).enabled }}
       metrics:
         {{- include "aserto-lib.metricsService" . | nindent 8 }}
         certs:
-          tls_key_path: /https-certs/gateway.key
-          tls_cert_path: /http-certs/gateway.crt
-          tls_ca_cert_path: /http-certs/gateway-ca.crt
+          tls_key_path: /https-certs/tls.key
+          tls_cert_path: /http-certs/tls.crt
+          tls_ca_cert_path: /http-certs/ca.crt
       {{- end }}
 
       services:
@@ -80,16 +79,16 @@ stringData:
           grpc:
             {{- include "topaz.grpcService" (list $.Values .) | nindent 12 }}
             certs:
-              tls_key_path: /grpc-certs/grpc.key
-              tls_cert_path: /grpc-certs/grpc.crt
-              tls_ca_cert_path: /grpc-certs/grpc-ca.crt
+              tls_key_path: /grpc-certs/tls.key
+              tls_cert_path: /grpc-certs/tls.crt
+              tls_ca_cert_path: /grpc-certs/ca.crt
           {{- end }}
           gateway:
             {{- include "topaz.gatewayService" (list $.Values .) | nindent 12 }}
             certs:
-              tls_key_path: /https-certs/gateway.key
-              tls_cert_path: /http-certs/gateway.crt
-              tls_ca_cert_path: /http-certs/gateway-ca.crt
+              tls_key_path: /https-certs/tls.key
+              tls_cert_path: /http-certs/tls.crt
+              tls_ca_cert_path: /http-certs/ca.crt
         {{- end }}
 
     opa:
