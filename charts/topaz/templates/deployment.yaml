@@ -38,23 +38,29 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: grpc
-              containerPort: {{ (.Values.ports).grpc | default 8282 }}
+              containerPort: {{ (.Values.ports).grpc | default "8282" }}
               protocol: TCP
             - name: http
-              containerPort: {{ (.Values.ports).https | default 8383 }}
+              containerPort: {{ (.Values.ports).https | default "8383" }}
               protocol: TCP
             - name: health
-              containerPort: {{ (.Values.ports).health | default 8484 }}
+              containerPort: {{ (.Values.ports).health | default "8484" }}
               protocol: TCP
             {{- if (.Values.metrics).enabled }}
-            - name: health
-              containerPort: {{ (.Values.ports).metrics | default 8585 }}
+            - name: metrics
+              containerPort: {{ (.Values.ports).metrics | default "8585" }}
               protocol: TCP
             {{- end }}
+          {{/*
           livenessProbe:
+            grpc:
+              port: {{ (.Values.ports).health | default "8484" }}
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
+            grpc:
+              port: {{ (.Values.ports).health | default "8484" }}
             {{- toYaml .Values.readinessProbe | nindent 12 }}
+          */}}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:

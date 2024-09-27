@@ -59,36 +59,34 @@ stringData:
         listen_address: 0.0.0.0:{{ include "aserto-lib.healthPort" . }}
         certs:
           tls_key_path: /https-certs/tls.key
-          tls_cert_path: /http-certs/tls.crt
-          tls_ca_cert_path: /http-certs/ca.crt
+          tls_cert_path: /https-certs/tls.crt
+          tls_ca_cert_path: /https-certs/ca.crt
 
       {{- if (.Values.metrics).enabled }}
       metrics:
         {{- include "aserto-lib.metricsService" . | nindent 8 }}
         certs:
           tls_key_path: /https-certs/tls.key
-          tls_cert_path: /http-certs/tls.crt
-          tls_ca_cert_path: /http-certs/ca.crt
+          tls_cert_path: /https-certs/tls.crt
+          tls_ca_cert_path: /https-certs/ca.crt
       {{- end }}
 
       services:
         {{- range (include "topaz.enabledServices" . | fromJsonArray) }}
         {{ . }}:
-          {{- include "topaz.svcDependencies" (dict "service" .) | nindent 10 -}}
-          {{- if not (eq . "console") -}}
+          {{- include "topaz.svcDependencies" (dict "service" .) | nindent 10 }}
           grpc:
             {{- include "topaz.grpcService" (list $.Values .) | nindent 12 }}
             certs:
               tls_key_path: /grpc-certs/tls.key
               tls_cert_path: /grpc-certs/tls.crt
               tls_ca_cert_path: /grpc-certs/ca.crt
-          {{- end }}
           gateway:
             {{- include "topaz.gatewayService" (list $.Values .) | nindent 12 }}
             certs:
               tls_key_path: /https-certs/tls.key
-              tls_cert_path: /http-certs/tls.crt
-              tls_ca_cert_path: /http-certs/ca.crt
+              tls_cert_path: /https-certs/tls.crt
+              tls_ca_cert_path: /https-certs/ca.crt
         {{- end }}
 
     opa:
@@ -110,7 +108,7 @@ stringData:
           oci:
             type: oci
             url: {{ .registry | required "opa.policy.oci.registry is required" }}
-          {{- if (.apiKey | or .apiKeySecret) }}
+          {{- if (.apiKey | or (.apiKeySecret).name) }}
             credentials:
               bearer:
                 scheme: basic

@@ -140,11 +140,11 @@ Topaz API key configuration
 {{- end }}
 
 {{- define "topaz.ociCredentials" -}}
-{{- if .apiKeySecret -}}
+{{- if (.apiKeySecret).name -}}
 "${REGISTRY_API_KEY}"
-{{- else if .user }}
+{{- else if .user -}}
 {{ printf "%s:%s" .user .apiKey }}
-{{- else }}
+{{- else -}}
 {{ .apiKey }}
 {{- end }}
 {{- end }}
