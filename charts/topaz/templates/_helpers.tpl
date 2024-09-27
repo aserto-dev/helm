@@ -65,22 +65,24 @@ Create the name of the service account to use
 Remote directory configuration
 */}}
 {{- define "topaz.remoteDirectory" -}}
-address: {{ ((.Values.directory).remote).address }}
-{{- if not (empty ((.Values.directory).remote).tenantID) }}
-tenant_id: {{ ((.Values.directory).remote).tenantID }}
+{{- with (.Values.directory).remote -}}
+address: {{ .address }}
+{{- if not (empty .tenantID) }}
+tenant_id: {{ .tenantID }}
 {{- end }}
-{{- if not (empty ((.Values.directory).remote).apiKey) }}
-api_key: {{ ((.Values.directory).remote).apiKey }}
+{{- if not (empty .apiKey) }}
+api_key: {{ .apiKey }}
 {{- end }}
-{{- if ((.Values.directory).remote).skipTLSVerification }}
+{{- if .skipTLSVerification }}
 insecure: true
 {{- end }}
-{{- if not (empty ((.Values.directory).remote).caCert | and (empty ((.Values.directory).remote).caCertSecret)) }}
+{{- if not (empty .caCert | and (empty .caCertSecret)) }}
 ca_cert_path: /directory-certs/ca.crt
 {{- end }}
-{{- if not (empty ((.Values.directory).remote).additionalHeaders) }}
+{{- if not (empty .additionalHeaders) }}
 headers:
-  {{ toYaml ((.Values.directory).remote).additionalHeaders | toYaml | nindent 2 }}
+  {{ toYaml .additionalHeaders | toYaml | nindent 2 }}
+{{- end }}
 {{- end }}
 {{- end }}
 
@@ -88,7 +90,7 @@ headers:
 Topaz API key configuration
 */}}
 {{- define "topaz.apiKeys" -}}
-{{- range .Values.auth.apiKeys }}
+{{- range (.Values.auth).apiKeys }}
 {{- if .key -}}
 "{{ .key }}": root-key
 {{- else if .secretName -}}
@@ -96,6 +98,19 @@ Topaz API key configuration
 {{- $varName := printf "${API_KEY_%s_%s}" .secretName $secretKey | upper | replace "-" "_" }}
 "{{ $varName }}": root-key
 {{- end}}
+{{- end }}
+{{- end }}
+
+{{- define "topaz.apiKeyVolumes" -}}
+{{- range (.Values.auth).apiKeys -}}
+{{- if .secretName -}}
+{{- $secretKey := .secretKey | default "api-key" -}}
+- name: {{ printf "API_KEY_%s_%s" .secretName $secretKey | upper | replace "-" "_" }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ .secretName }}
+      key: {{ $secretKey }}
+{{- end }}
 {{- end }}
 {{- end }}
 
@@ -120,11 +135,11 @@ Topaz API key configuration
 {{- end }}
 
 {{- define "topaz.svcDependencies" -}}
-{{- $deps := dict "reader" "model" "writer" "model" "importer" "model" "authorizer" "reader" "console" "authorizer" }}
-{{- $dep := get $deps .service }}
+{{- $deps := dict "reader" "model" "writer" "model" "importer" "model" "authorizer" "reader" "console" "authorizer" -}}
+{{- $dep := get $deps .service -}}
 {{- if $dep -}}
 needs:
-  - {{ $dep  }}
+  - {{ $dep }}
 {{- end }}
 {{- end }}
 
@@ -133,7 +148,7 @@ needs:
 {{- $svc := last . -}}
 {{- $global := $values.http -}}
 {{- $cfg := merge (dig $svc "grpc" dict $values.serviceOverrides) $values.grpc -}}
-listen_address: 0.0.0.0:{{ $cfg.port | default "8282" }}
+listen_address: 0.0.0.0:{{ ($values.ports).grpc | default "8282" }}
 connection_timeout_seconds: {{ $cfg.connectionTimeoutSec | default "2" }}
 {{- end }}
 
@@ -142,7 +157,7 @@ connection_timeout_seconds: {{ $cfg.connectionTimeoutSec | default "2" }}
 {{- $values := first . -}}
 {{- $svc := last . -}}
 {{- $cfg := merge (dig $svc "http" dict $values.serviceOverrides) $values.http -}}
-listen_address: 0.0.0.0:{{ $cfg.port | default "8383" }}
+listen_address: 0.0.0.0:{{ ($values.ports).https | default "8383" }}
 
 {{- if $cfg.domain }}
 fdqn: {{ $cfg.domain }}
@@ -181,9 +196,9 @@ idle_timeout: {{ $cfg.idleTimeout | default "30s" }}
 
 {{- define "topaz.enabledServices" -}}
 {{- $services := list "authorizer" "model" "reader" |
-       concat (((.Values.directory).edge).services | default list) }}
+                 concat (((.Values.directory).edge).services | default list) }}
 {{- if .Values.console.enabled }}
-{{- $services = append $services "console" }}
+  {{- $services = append $services "console" }}
 {{- end }}
 {{- $services | toJson }}
 {{- end }}

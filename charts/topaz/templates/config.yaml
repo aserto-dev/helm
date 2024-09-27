@@ -18,14 +18,15 @@ stringData:
 
     {{ if empty ((.Values.directory).remote).address -}}
     directory:
-      db_path: '${TOPAZ_DB_DIR}/directory.db'
+      db_path: /db/directory.db
       request_timeout: {{ ((.Values.directory).edge).openTimeout | default "5s" }}
 
-    # TODO: apply 'reader' configuration
     remote_directory:
-      address: 0.0.0.0:9292
-      api_key: "TODO: use reader key if configured"
-      ca_cert_path: "TODO: point to topaz CA cert"
+      address: 0.0.0.0:{{ (.Values.ports).grpc | default "8282" }}
+      {{- if (.Values.auth).apiKeys }}
+      api_key: {{ include "topaz.apiKeys" . | fromYaml | keys | first }}
+      {{- end }}
+      ca_cert_path: /grpc-certs/grpc-ca.crt
       timeout_in_seconds: {{ ((.Values.directory).remote).timeoutSeconds | default "5" }}
     {{- else -}}
     remote_directory:
@@ -58,37 +59,37 @@ stringData:
       health:
         listen_address: 0.0.0.0:{{ include "aserto-lib.healthPort" . }}
         certs:
-          tls_key_path: '${TOPAZ_CERTS_DIR}/gateway.key'
-          tls_cert_path: '${TOPAZ_CERTS_DIR}/gateway.crt'
-          tls_ca_cert_path: '${TOPAZ_CERTS_DIR}/gateway-ca.crt'
+          tls_key_path: /https-certs/gateway.key
+          tls_cert_path: /http-certs/gateway.crt
+          tls_ca_cert_path: /http-certs/gateway-ca.crt
 
       {{- if (.Values.metrics).enabled }}
       metrics:
         {{- include "aserto-lib.metricsService" . | nindent 8 }}
         certs:
-          tls_key_path: '${TOPAZ_CERTS_DIR}/gateway.key'
-          tls_cert_path: '${TOPAZ_CERTS_DIR}/gateway.crt'
-          tls_ca_cert_path: '${TOPAZ_CERTS_DIR}/gateway-ca.crt'
+          tls_key_path: /https-certs/gateway.key
+          tls_cert_path: /http-certs/gateway.crt
+          tls_ca_cert_path: /http-certs/gateway-ca.crt
       {{- end }}
 
       services:
         {{- range (include "topaz.enabledServices" . | fromJsonArray) }}
         {{ . }}:
-          {{- include "topaz.svcDependencies" (dict "service" .) | nindent 10 }}
-          {{- if not (eq . "console") }}
+          {{- include "topaz.svcDependencies" (dict "service" .) | nindent 10 -}}
+          {{- if not (eq . "console") -}}
           grpc:
             {{- include "topaz.grpcService" (list $.Values .) | nindent 12 }}
             certs:
-              tls_key_path: '${TOPAZ_CERTS_DIR}/grpc.key'
-              tls_cert_path: '${TOPAZ_CERTS_DIR}/grpc.crt'
-              tls_ca_cert_path: '${TOPAZ_CERTS_DIR}/grpc-ca.crt'
+              tls_key_path: /grpc-certs/grpc.key
+              tls_cert_path: /grpc-certs/grpc.crt
+              tls_ca_cert_path: /grpc-certs/grpc-ca.crt
           {{- end }}
           gateway:
             {{- include "topaz.gatewayService" (list $.Values .) | nindent 12 }}
             certs:
-              tls_key_path: '${TOPAZ_CERTS_DIR}/gateway.key'
-              tls_cert_path: '${TOPAZ_CERTS_DIR}/gateway.crt'
-              tls_ca_cert_path: '${TOPAZ_CERTS_DIR}/gateway-ca.crt'
+              tls_key_path: /https-certs/gateway.key
+              tls_cert_path: /http-certs/gateway.crt
+              tls_ca_cert_path: /http-certs/gateway-ca.crt
         {{- end }}
 
     opa:

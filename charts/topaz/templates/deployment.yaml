@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{ include "topaz.fullname" . }}
   labels:
@@ -37,21 +37,86 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: http
-              containerPort: {{ .Values.service.port }}
+            - name: grpc
+              containerPort: {{ (.Values.ports).grpc | default 8282 }}
               protocol: TCP
+            - name: http
+              containerPort: {{ (.Values.ports).https | default 8383 }}
+              protocol: TCP
+            - name: health
+              containerPort: {{ (.Values.ports).health | default 8484 }}
+              protocol: TCP
+            {{- if (.Values.metrics).enabled }}
+            - name: health
+              containerPort: {{ (.Values.ports).metrics | default 8585 }}
+              protocol: TCP
+            {{- end }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- with .Values.volumeMounts }}
           volumeMounts:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-      {{- with .Values.volumes }}
+            - name: config
+              mountPath: /config
+              readOnly: true
+            - name: db
+              mountPath: /db
+              readOnly: false
+            - name: opa
+              mountPath: /opa-persistence
+              readOnly: false
+            - name: grpc-certs
+              mountPath: /grpc-certs
+            {{- if (.Values.certs).grpc }}
+              readOnly: true
+            {{- end }}
+            - name: https-certs
+              mountPath: /https-certs
+            {{- if (.Values.certs).https }}
+              readOnly: true
+            {{- end }}
+            {{- with .Values.volumeMounts }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
       volumes:
+        - name: config
+          secret:
+            secretName: {{ include "topaz.fullname" . }}-config
+            items:
+              - key: config.yaml
+                path: config.yaml
+        - name: grpc-certs
+        {{- with (.Values.certs).grpc }}
+          secret:
+            secretName: {{ . }}
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
+        - name: https-certs
+        {{- with (.Values.certs).https }}
+          secret:
+            secretName: {{ . }}
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
+        - name: db
+        {{- if empty (.Values.directory).remote | and (((.Values.directory).edge).persistence).enabled }}
+          persistentVolumeClaim:
+            claimName: pvc-db
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
+        - name: opa
+        {{- if ((.Values.opa).persistence).enabled }}
+          persistentVolumeClaim:
+            claimName: pvc-policy
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
+        {{- include "topaz.apiKeyVolumes" . | nindent 8 }}
+      {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.nodeSelector }}

@@ -1,0 +1,22 @@
+{{- if ((.Values.opa).persistence).enabled }}
+{{- with (.Values.opa).persistence }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-policy
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .storage | default "10Mi" }}
+  {{- if .storageClassName }}
+  storageClassName: {{ .storageClassName }}
+  {{- end }}
+  {{- if .selector }}
+  selector:
+    {{- .selector | toYaml | nindent 4 }}
+  {{- end }}
+{{- end }}
+{{- end }}
+

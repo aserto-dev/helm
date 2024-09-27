@@ -1,0 +1,21 @@
+{{- if empty (.Values.directory).remote | and (((.Values.directory).edge).persistence).enabled }}
+{{- with ((.Values.directory).edge).persistence }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-db
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .storage | default "1Gi" }}
+  {{- if .storageClassName }}
+  storageClassName: {{ .storageClassName }}
+  {{- end }}
+  {{- if .selector }}
+  selector:
+    {{- .selector | toYaml | nindent 4 }}
+  {{- end }}
+{{- end }}
+{{- end }}

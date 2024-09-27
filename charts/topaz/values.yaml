@@ -28,10 +28,10 @@ directory:
     openTimeout: 5s
     # Persistent volume for the local directory.
     persistence:
-      enabled: false
+      enabled: true
       # PersistentVolumeClaim options.
       # See https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims
-      storage: 10Mi
+      storage: 1Gi
       # storageClassName: ""
       # selector:
       #   matchLabels:
@@ -113,6 +113,14 @@ ports:
   health: 8484
   metrics: 8585
 
+# [Optional] cutsom TLS certificates for the gRPC and HTTPS servers.
+# If not provided, topaz generates self-signed certificates.
+# To use your own certificates provide the names of secrets
+# of type kubernetes.io/tls
+certs: {}
+  # grpc: topaz-grpc-cert
+  # https: topaz-https-cert
+
 # Metrics configuration
 metrics:
   # Enable metrics.
@@ -168,16 +176,13 @@ http:
 serviceOverrides: {}
 #   # Examples:
 #   console:
-#     # override http port and read timeout for the console service.
-#     # For example, to expose the console on port 8443 instead of 8383 and
-#     # increase the read timeout for the console service:
+#     # override http and read timeout for the console service.
+#     # For example,to increase the read timeout for the console service:
 #     http:
-#       port: 8443
 #       readTimeout: 5s
 #   model:
-#     # override grpc port and connection timeout settings for the model service.
+#     # override grpc connection timeout settings for the model service.
 #     grpc:
-#       port: 7272
 #       connectionTimeoutSec: 2
 
 # OPA configuration
@@ -199,36 +204,36 @@ opa:
     # Exactly one of them must be specified.
 
     # Run policy from an OCI registry.
-    oci: {}
-    #   # OCI registry URL.
-    #   registry: https://ghcr.io
-    #   # Policy image URI.
-    #   image: "ghcr.io/aserto-policies/policy-rebac:latest"
-    #   # [Optional] OCI registry user name.
-    #   # Note: Some registries including ghcr.io require that the user name is left empty
-    #   # when using a personal access token as the API key.
-    #   user: ""
-    #   # [Optional] OCI registry password, token, or API key.
-    #   apiKey: ""
-    #   # [Optional] Kubernetes secret containing the OCI registry password, token, or API key.
-    #   apiKeySecret:
-    #     # Secret name
-    #     name: ""
-    #     # Secret key
-    #     key: ""
-    #   # Additional OPA service configuration.
-    #   # See https://www.openpolicyagent.org/docs/latest/configuration/#services
-    #   serviceConfig:
-    #     response_header_timeout_seconds: 5
-    #     # allow_insecure_tls: false
-    #     # headers:
-    #     #   "header-name": header-value
-    #   # Additional OPA bundle configuration.
-    #   # See https://www.openpolicyagent.org/docs/latest/configuration/#bundles
-    #   bundleConfig:
-    #     polling:
-    #       min_delay_seconds: 60
-    #       max_delay_seconds: 120
+    oci:
+      # OCI registry URL.
+      registry: https://ghcr.io
+      # Policy image URI.
+      image: "ghcr.io/aserto-policies/policy-rebac:latest"
+      # [Optional] OCI registry user name.
+      # Note: Some registries including ghcr.io require that the user name is left empty
+      # when using a personal access token as the API key.
+      user: ""
+      # [Optional] OCI registry password, token, or API key.
+      apiKey: ""
+      # [Optional] Kubernetes secret containing the OCI registry password, token, or API key.
+      apiKeySecret:
+        # Secret name
+        name: ""
+        # Secret key
+        key: ""
+      # Additional OPA service configuration.
+      # See https://www.openpolicyagent.org/docs/latest/configuration/#services
+      serviceConfig:
+        response_header_timeout_seconds: 5
+        # allow_insecure_tls: false
+        # headers:
+        #   "header-name": header-value
+      # Additional OPA bundle configuration.
+      # See https://www.openpolicyagent.org/docs/latest/configuration/#bundles
+      bundleConfig:
+        polling:
+          min_delay_seconds: 60
+          max_delay_seconds: 120
 
     # Retrieve policy configuration from a discovery service.
     discovery: {}
@@ -291,7 +296,6 @@ securityContext: {}
 
 service:
   type: ClusterIP
-  port: 80
 
 ingress:
   enabled: false
@@ -322,13 +326,16 @@ resources: {}
   #   memory: 128Mi
 
 livenessProbe:
-  httpGet:
-    path: /
-    port: http
+  grpc:
+    port: health
+  failureThreshold: 1
+  periodSeconds: 10
+
 readinessProbe:
-  httpGet:
-    path: /
-    port: http
+  grpc:
+    port: health
+  initialDelaySeconds: 5
+  periodSeconds: 5
 
 autoscaling:
   enabled: false
