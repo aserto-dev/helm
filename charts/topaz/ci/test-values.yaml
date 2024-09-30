@@ -1,0 +1,6 @@
+opa:
+  policy:
+    oci:
+      registry: https://ghcr.io
+      # Policy image URI.
+      image: ghcr.io/aserto-policies/policy-rebac:latest

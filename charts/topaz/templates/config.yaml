@@ -113,8 +113,6 @@ stringData:
               bearer:
                 scheme: basic
                 token: {{ include "topaz.ociCredentials" . }}
-          {{- else }}
-            {{- fail "either opa.policy.discovery or opa.policy.oci must be set"}}
           {{- end }}
             {{- .serviceConfig | default dict | toYaml | nindent 12 }}
         bundles:
