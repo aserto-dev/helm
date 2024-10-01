@@ -63,20 +63,20 @@ directory:
 
   # Use a remote directory instead running a local edge.
   # If remote is specified, edge configuration is ignored.
-  remote: {}
-    # # Remote directory address (e.g. directory.prod.aserto.com:8443)
-    # address: ""
-    # # [Optional] tenant ID for the remote directory
-    # tenantID: ""
-    # # [Optional] API key for the remote directory
-    # apiKey: ""
-    # # [Optional] Kubernetes secret containing the API key for the remote directory
+  remote:
+    # Remote directory address (e.g. directory.prod.aserto.com:8443)
+    address: "directory.prod.aserto.com:8443"
+    # [Optional] tenant ID for the remote directory
+    tenantID: "14cb973f-71bc-11ee-8850-007961b3967b"
+    # [Optional] API key for the remote directory
+    apiKey: "0525e7b541afa26d5ce599d9b770eb31e7ff6f08317c5411781897003b083ebe"
+    # [Optional] Kubernetes secret containing the API key for the remote directory
     # apiKeySecret:
     #   # Secret name
     #   name: ""
     #   # Secret key
     #   key: ""
-    # # [Optional] CA certificate for the remote directory
+    # [Optional] CA certificate for the remote directory
     # caCert: |
     #   -----BEGIN CERTIFICATE-----
     #   ...
@@ -85,11 +85,11 @@ directory:
     # caCertSecret:
     #   name: ""
     #   key: ""
-    # # [Optional] Skip verification of remote TLS certificate
-    # skipTLSVerification: false
-    # # [Optional] Request timeout
-    # timeoutSeconds: 5
-    # # [Optional] Additional headers to include in requests to the remote directory
+    # [Optional] Skip verification of remote TLS certificate
+    skipTLSVerification: false
+    # [Optional] Request timeout
+    timeoutSeconds: 5
+    # [Optional] Additional headers to include in requests to the remote directory
     # additionalHeaders:
     #   "header-name": header-value
 

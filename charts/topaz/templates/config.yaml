@@ -74,7 +74,7 @@ stringData:
       services:
         {{- range (include "topaz.enabledServices" . | fromJsonArray) }}
         {{ . }}:
-          {{- include "topaz.svcDependencies" (dict "service" .) | nindent 10 }}
+          {{- include "topaz.svcDependencies" (dict "service" . "remote" (($.Values.directory).remote).address) | nindent 10 }}
           grpc:
             {{- include "topaz.grpcService" (list $.Values .) | nindent 12 }}
             certs:

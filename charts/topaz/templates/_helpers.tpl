@@ -160,6 +160,9 @@ env:
 
 {{- define "topaz.svcDependencies" -}}
 {{- $deps := dict "reader" "model" "writer" "model" "importer" "model" "authorizer" "reader" "console" "authorizer" -}}
+{{- if $.remote }}
+  {{- $deps = unset $deps "authorizer" }}
+{{- end }}
 {{- $dep := get $deps .service -}}
 {{- if $dep -}}
 needs:
@@ -219,8 +222,11 @@ idle_timeout: {{ $cfg.idleTimeout | default "30s" }}
 {{- end }}
 
 {{- define "topaz.enabledServices" -}}
-{{- $services := list "authorizer" "model" "reader" |
-                 concat (((.Values.directory).edge).services | default list) }}
+{{- $services := list "authorizer" -}}
+{{- if empty ((.Values.directory).remote).address -}}
+{{- $services = concat $services (list "model" "reader") |
+                concat (((.Values.directory).edge).services | default list) }}
+{{- end }}
 {{- if .Values.console.enabled }}
   {{- $services = append $services "console" }}
 {{- end }}
