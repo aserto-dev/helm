@@ -85,7 +85,7 @@ stringData:
         {{- end }}
 
     opa:
-      instance_id: {{ .Values.tenantID | default (quote "-") }}
+      instance_id: {{ ((.Values.policy).discovery).tenantID | default (quote "-") }}
       graceful_shutdown_period_seconds: {{ (.Values.opa).gracefuShutdownPeriodSeconds | default "2" }}
       max_plugin_wait_time_seconds: {{ (.Values.opa).maxPluginWaitTimeSeconds | default "30" }}
       local_bundles:
@@ -132,7 +132,7 @@ stringData:
             {{- $headers := dig "headers" dict $cfg -}}
             {{ $cfg = unset $cfg "headers" }}
             headers:
-              Aserto-Tenant-Id: {{ $.Values.tenantID | required "policy discovery requires tenantID to be set" }}
+              Aserto-Tenant-Id: {{ .tenantID | required "policy discovery requires tenantID to be set" }}
             {{- if $headers }}
               {{- $headers | toYaml | nindent 14 }}
             {{- end }}

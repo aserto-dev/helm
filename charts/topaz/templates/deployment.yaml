@@ -68,8 +68,10 @@ spec:
           env:
             - name: TOPAZ_CFG_DIR
               value: /config
+            {{- include "topaz.remoteDirectoryKeyEnv" . | nindent 12 }}
             {{- include "topaz.apiKeysEnv" . | nindent 12 }}
             {{- include "topaz.edgeKeyEnv" . | nindent 12 }}
+            {{- include "topaz.discoveryKeyEnv" . | nindent 12 }}
           volumeMounts:
             - name: config
               mountPath: /config

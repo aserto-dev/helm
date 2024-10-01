@@ -55,7 +55,7 @@ directory:
       #   # Secret name
       #   name: ""
       #   # Secret key
-      #   key: ""
+      #   key: "api-key"
       # # Skip verification of remote TLS certificate
       # skipTLSVerification: false
       # # The frequency of syncs in minutes.
@@ -86,7 +86,7 @@ directory:
     # # [Optional] Kubernetes secret containing the CA certificate for the remote directory
     # caCertSecret:
     #   name: ""
-    #   key: ""
+    #   key: "api-key"
     # [Optional] Skip verification of remote TLS certificate
     # skipTLSVerification: false
     # # [Optional] Request timeout
@@ -206,36 +206,36 @@ opa:
     # Exactly one of them must be specified.
 
     # Run policy from an OCI registry.
-    oci:
-      # OCI registry URL.
-      registry: https://ghcr.io
-      # Policy image URI.
-      image: "ghcr.io/aserto-policies/policy-rebac:latest"
-      # [Optional] OCI registry user name.
-      # Note: Some registries including ghcr.io require that the user name is left empty
-      # when using a personal access token as the API key.
-      user: ""
-      # [Optional] OCI registry password, token, or API key.
-      apiKey: ""
-      # [Optional] Kubernetes secret containing the OCI registry password, token, or API key.
-      apiKeySecret:
-        # Secret name
-        name: ""
-        # Secret key
-        key: ""
-      # Additional OPA service configuration.
-      # See https://www.openpolicyagent.org/docs/latest/configuration/#services
-      serviceConfig:
-        response_header_timeout_seconds: 5
-        # allow_insecure_tls: false
-        # headers:
-        #   "header-name": header-value
-      # Additional OPA bundle configuration.
-      # See https://www.openpolicyagent.org/docs/latest/configuration/#bundles
-      bundleConfig:
-        polling:
-          min_delay_seconds: 60
-          max_delay_seconds: 120
+    oci: {}
+    #   # OCI registry URL.
+    #   registry: https://ghcr.io
+    #   # Policy image URI.
+    #   image: "ghcr.io/aserto-policies/policy-rebac:latest"
+    #   # [Optional] OCI registry user name.
+    #   # Note: Some registries including ghcr.io require that the user name is left empty
+    #   # when using a personal access token as the API key.
+    #   user: ""
+    #   # [Optional] OCI registry password, token, or API key.
+    #   apiKey: ""
+    #   # [Optional] Kubernetes secret containing the OCI registry password, token, or API key.
+    #   apiKeySecret:
+    #     # Secret name
+    #     name: ""
+    #     # Secret key
+    #     key: "api-key"
+    #   # Additional OPA service configuration.
+    #   # See https://www.openpolicyagent.org/docs/latest/configuration/#services
+    #   serviceConfig:
+    #     response_header_timeout_seconds: 5
+    #     # allow_insecure_tls: false
+    #     # headers:
+    #     #   "header-name": header-value
+    #   # Additional OPA bundle configuration.
+    #   # See https://www.openpolicyagent.org/docs/latest/configuration/#bundles
+    #   bundleConfig:
+    #     polling:
+    #       min_delay_seconds: 60
+    #       max_delay_seconds: 120
 
     # Retrieve policy configuration from a discovery service.
     discovery: {}
@@ -243,6 +243,8 @@ opa:
     #   url: https://discovery.prod.aserto.com/api/v2/discovery
     #   # Name of policy to run.
     #   policyName: "policy-name"
+    #   # ID of the tenant that owns the policy.
+    #   tenantID: ""
     #   # [Optional] Discovery service API key.
     #   apiKey: ""
     #   # [Optional] Kubernetes secret containing the discovery service API key.
@@ -250,7 +252,7 @@ opa:
     #     # Secret name
     #     name: ""
     #     # Secret key
-    #     key: ""
+    #     key: "api-key"
     #   serviceConfig:
     #     # Additional OPA service configuration.
     #     # See https://www.openpolicyagent.org/docs/latest/configuration/#services
@@ -258,11 +260,6 @@ opa:
     #     # allow_insecure_tls: false
     #     # headers:
     #     #   "header-name": header-value
-
-# [Optional] ID of the tenant that owns the policy.
-# This is required when running a policy from a discovery service.
-tenantID: ""
-
 
 # Standard Kubernetes configuration
 replicaCount: 1

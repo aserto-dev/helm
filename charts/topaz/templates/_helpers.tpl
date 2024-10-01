@@ -72,7 +72,7 @@ tenant_id: {{ .tenantID }}
 {{- end }}
 {{- if .apiKey }}
 api_key: {{ .apiKey }}
-{{- else if (.apiKeySecret).name -}}
+{{- else if (.apiKeySecret).name }}
 api_key: "${DIRECTORY_API_KEY}"
 {{- end }}
 {{- if .skipTLSVerification }}
@@ -85,6 +85,16 @@ ca_cert_path: /directory-certs/{{ (.caCertSecret).key | default "tls.crt" }}
 headers:
   {{- toYaml .additionalHeaders | toYaml | nindent 2 }}
 {{- end }}
+{{- end }}
+{{- end }}
+
+{{- define "topaz.remoteDirectoryKeyEnv" -}}
+{{- with ((.Values.directory).remote).apiKeySecret -}}
+- name: DIRECTORY_API_KEY
+  valueFrom:
+    secretKeyRef:
+      name: {{ .name }}
+      key: {{ .key | default "api-key" }}
 {{- end }}
 {{- end }}
 
@@ -136,20 +146,20 @@ Topaz API key configuration
 {{- end }}
 
 {{- define "topaz.apiKeysEnv" -}}
-{{- $keys := list -}}
-{{- range (.Values.auth).apiKeys -}}
+{{- $keys := list }}
+{{- range (.Values.auth).apiKeys }}
   {{- if .secretName -}}
     {{- $keys = append $keys . }}
-  {{- end -}}
-{{- end -}}
-{{- range $keys -}}
-{{- $secretKey := .secretKey | default "api-key" -}}
-  - name: {{ printf "API_KEY_%s_%s" .secretName $secretKey | upper | replace "-" "_" }}
-    valueFrom:
-      secretKeyRef:
-        name: {{ .secretName }}
-        key: {{ $secretKey }}
-{{- end -}}
+  {{- end }}
+{{- end }}
+{{- range $keys }}
+{{- $secretKey := .secretKey | default "api-key" }}
+- name: {{ printf "API_KEY_%s_%s" .secretName $secretKey | upper | replace "-" "_" }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ .secretName }}
+      key: {{ $secretKey }}
+{{- end }}
 {{- end -}}
 
 {{- define "topaz.discoveryKey" -}}
@@ -161,6 +171,17 @@ Topaz API key configuration
 {{ fail "either apiKey or apiKeySecret must be set in opa.policy.discovery" }}
 {{- end }}
 {{- end }}
+
+{{- define "topaz.discoveryKeyEnv" -}}
+{{- with (((.Values.opa).policy).discovery).apiKeySecret -}}
+- name: DISCOVERY_API_KEY
+  valueFrom:
+    secretKeyRef:
+      name: {{ .name }}
+      key: {{ .key | default "api-key" }}
+{{- end }}
+{{- end }}
+
 
 {{- define "topaz.edgeKey" -}}
 {{- if .apiKey -}}
