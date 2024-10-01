@@ -67,11 +67,13 @@ Remote directory configuration
 {{- define "topaz.remoteDirectory" -}}
 {{- with (.Values.directory).remote -}}
 address: {{ .address }}
-{{- if not (empty .tenantID) }}
+{{- if .tenantID }}
 tenant_id: {{ .tenantID }}
 {{- end }}
-{{- if not (empty .apiKey) }}
+{{- if .apiKey }}
 api_key: {{ .apiKey }}
+{{- else if (.apiKeySecret).name -}}
+api_key: "${DIRECTORY_API_KEY}"
 {{- end }}
 {{- if .skipTLSVerification }}
 insecure: true
@@ -134,32 +136,47 @@ Topaz API key configuration
 {{- end }}
 
 {{- define "topaz.apiKeysEnv" -}}
-{{- $keys := list }}
+{{- $keys := list -}}
 {{- range (.Values.auth).apiKeys -}}
   {{- if .secretName -}}
     {{- $keys = append $keys . }}
   {{- end -}}
 {{- end -}}
-{{- if $keys -}}
-env:
-{{- range $keys }}
-{{- $secretKey := .secretKey | default "api-key" }}
+{{- range $keys -}}
+{{- $secretKey := .secretKey | default "api-key" -}}
   - name: {{ printf "API_KEY_%s_%s" .secretName $secretKey | upper | replace "-" "_" }}
     valueFrom:
       secretKeyRef:
         name: {{ .secretName }}
         key: {{ $secretKey }}
-{{- end }}
-{{- end }}
-{{- end }}
+{{- end -}}
+{{- end -}}
 
 {{- define "topaz.discoveryKey" -}}
 {{- if .apiKey -}}
 {{- .apiKey }}
-{{- else if .apiKeySecret | and .apiKeySecret.name -}}
+{{- else if (.apiKeySecret | and .apiKeySecret.name) -}}
 "${DISCOVERY_API_KEY}"
 {{- else }}
 {{ fail "either apiKey or apiKeySecret must be set in opa.policy.discovery" }}
+{{- end }}
+{{- end }}
+
+{{- define "topaz.edgeKey" -}}
+{{- if .apiKey -}}
+{{- .apiKey -}}
+{{- else if (.apiKeySecret | and .apiKeySecret.name) -}}
+"${EDGE_API_KEY}"
+{{- end }}
+{{- end }}
+
+{{- define "topaz.edgeKeyEnv" -}}
+{{- with (((.Values.directory).edge).sync).apiKeySecret -}}
+- name: EDGE_API_KEY
+  valueFrom:
+    secretKeyRef:
+      name: {{ .name }}
+      key: {{ .key | default "api-key" }}
 {{- end }}
 {{- end }}
 

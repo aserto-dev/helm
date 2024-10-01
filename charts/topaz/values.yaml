@@ -45,21 +45,23 @@ directory:
 
     # [Optional] Sync from a remote directory.
     sync: {}
-    #   address: "directory.prod.aserto.com:8443"
-    #   # [Optional] API key for the remote directory
-    #   apiKey: ""
-    #   # [Optional] Kubernetes secret containing the API key for the remote directory
-    #   apiKeySecret:
-    #     # Secret name
-    #     name: ""
-    #     # Secret key
-    #     key: ""
-    #   # Skip verification of remote TLS certificate
-    #   skipTLSVerification: false
-    #   # The frequency of syncs in minutes.
-    #   intervalMinutes: 1
-    #   # Request timeout
-    #   timeoutSeconds: 5
+      # address: ""
+      # # [Optional] tenant ID for the remote directory
+      # tenantID: ""
+      # # [Optional] API key for the remote directory
+      # apiKey: ""
+      # # [Optional] Kubernetes secret containing the API key for the remote directory
+      # apiKeySecret:
+      #   # Secret name
+      #   name: ""
+      #   # Secret key
+      #   key: ""
+      # # Skip verification of remote TLS certificate
+      # skipTLSVerification: false
+      # # The frequency of syncs in minutes.
+      # intervalMinutes: 1
+      # # Request timeout
+      # timeoutSeconds: 5
 
   # Use a remote directory instead running a local edge.
   # If remote is specified, edge configuration is ignored.
@@ -98,7 +100,7 @@ jwtAcceptableSkewSeconds: 5
 
 auth:
   # [Optional] control access using API keys
-  # apiKeys:
+  apiKeys:
   #   # keys can be specified directly
   #   - key: a59692fa671e49a9a25861fd71472792
   #   # or as references to Kubernetes secrets

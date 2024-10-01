@@ -145,3 +145,15 @@ stringData:
         {{- else }}
           {{- fail "either opa.policy.discovery or opa.policy.oci must be set"}}
         {{- end }}
+      {{- if (((.Values.directory).edge).sync).address | and (empty ((.Values.directory).remote).address) }}
+        plugins:
+          {{- with .Values.directory.edge.sync }}
+          aserto_edge:
+            addr: {{ .address }}
+            apikey: {{ include "topaz.edgeKey" . | default "" }}
+            enabled: true
+            insecure: {{ .skipTLSVerification | default false | toString }}
+            sync_interval: {{ .intervalMinutes | default "1" }}
+            timeout: {{ .timeoutSeconds | default "5" }}
+          {{- end }}
+      {{- end }}
