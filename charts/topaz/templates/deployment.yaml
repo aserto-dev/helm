@@ -86,6 +86,7 @@ spec:
             {{- if (.Values.certs).https }}
               readOnly: true
             {{- end }}
+            {{- include "topaz.remoteDirectoryCertVolumeMount" . | nindent 12 }}
             {{- with .Values.volumeMounts }}
               {{- toYaml . | nindent 12 }}
             {{- end }}

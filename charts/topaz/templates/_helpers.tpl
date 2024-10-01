@@ -96,7 +96,22 @@ headers:
 {{- else if (.caCertSecret).name -}}
 - name: remote-certs
   secret:
-    secretName: {{ $name }}
+    secretName: {{ .caCertSecret.name }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{- define "topaz.remoteDirectoryCertVolumeMount" -}}
+{{- with (.Values.directory).remote -}}
+{{- if .caCert | or (.caCertSecret).name -}}
+- name: remote-certs
+  mountPath: /directory-certs
+  readOnly: true
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{/*
 {{- end }}
 {{- end }}
 {{- end }}
