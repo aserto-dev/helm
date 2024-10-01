@@ -57,11 +57,6 @@ stringData:
     api:
       health:
         listen_address: 0.0.0.0:{{ include "aserto-lib.healthPort" . }}
-        certs:
-          tls_key_path: /https-certs/tls.key
-          tls_cert_path: /https-certs/tls.crt
-          tls_ca_cert_path: /https-certs/ca.crt
-
       {{- if (.Values.metrics).enabled }}
       metrics:
         {{- include "aserto-lib.metricsService" . | nindent 8 }}

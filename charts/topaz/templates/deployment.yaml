@@ -51,7 +51,10 @@ spec:
               containerPort: {{ (.Values.ports).metrics | default "8585" }}
               protocol: TCP
             {{- end }}
-          {{/*
+          startupProbe:
+            grpc:
+              port: {{ (.Values.ports).health | default "8484" }}
+            {{- toYaml .Values.startupProbe | nindent 12 }}
           livenessProbe:
             grpc:
               port: {{ (.Values.ports).health | default "8484" }}
@@ -60,7 +63,6 @@ spec:
             grpc:
               port: {{ (.Values.ports).health | default "8484" }}
             {{- toYaml .Values.readinessProbe | nindent 12 }}
-          */}}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           {{- include "topaz.apiKeysEnv" . | nindent 10 }}
