@@ -63,6 +63,7 @@ spec:
           */}}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          {{- include "topaz.apiKeysEnv" . | nindent 10 }}
           volumeMounts:
             - name: config
               mountPath: /config
@@ -124,7 +125,6 @@ spec:
         {{- else }}
           emptyDir: {}
         {{- end }}
-        {{- include "topaz.apiKeyVolumes" . | nindent 8 }}
       {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}

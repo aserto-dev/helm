@@ -105,26 +105,35 @@ headers:
 Topaz API key configuration
 */}}
 {{- define "topaz.apiKeys" -}}
+{{- $keys := list }}
 {{- range (.Values.auth).apiKeys }}
-{{- if .key -}}
-"{{ .key }}": root-key
-{{- else if .secretName -}}
-{{- $secretKey := .secretKey | default "api-key" }}
-{{- $varName := printf "${API_KEY_%s_%s}" .secretName $secretKey | upper | replace "-" "_" }}
-"{{ $varName }}": root-key
-{{- end}}
+  {{- if .key -}}
+    {{- $keys = append $keys .key }}
+  {{- else if .secretName -}}
+    {{- $secretKey := .secretKey | default "api-key" }}
+    {{- $varName := printf "${API_KEY_%s_%s}" .secretName $secretKey | upper | replace "-" "_" }}
+    {{- $keys = append $keys $varName }}
+  {{- end}}
 {{- end }}
+{{- $keys | toYaml }}
 {{- end }}
 
-{{- define "topaz.apiKeyVolumes" -}}
+{{- define "topaz.apiKeysEnv" -}}
+{{- $keys := list }}
 {{- range (.Values.auth).apiKeys -}}
-{{- if .secretName -}}
-{{- $secretKey := .secretKey | default "api-key" -}}
-- name: {{ printf "API_KEY_%s_%s" .secretName $secretKey | upper | replace "-" "_" }}
-  valueFrom:
-    secretKeyRef:
-      name: {{ .secretName }}
-      key: {{ $secretKey }}
+  {{- if .secretName -}}
+    {{- $keys = append $keys . }}
+  {{- end -}}
+{{- end -}}
+{{- if $keys -}}
+env:
+{{- range $keys }}
+{{- $secretKey := .secretKey | default "api-key" }}
+  - name: {{ printf "API_KEY_%s_%s" .secretName $secretKey | upper | replace "-" "_" }}
+    valueFrom:
+      secretKeyRef:
+        name: {{ .secretName }}
+        key: {{ $secretKey }}
 {{- end }}
 {{- end }}
 {{- end }}
