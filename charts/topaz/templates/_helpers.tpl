@@ -114,12 +114,10 @@ headers:
 {{- end }}
 
 {{- define "topaz.remoteDirectoryCertVolumeMount" -}}
-{{- with (.Values.directory).remote -}}
 {{- if .caCert | or (.caCertSecret).name -}}
 - name: remote-certs
   mountPath: /directory-certs
   readOnly: true
-{{- end }}
 {{- end }}
 {{- end }}
 
@@ -284,4 +282,61 @@ idle_timeout: {{ $cfg.idleTimeout | default "30s" }}
   {{- $services = append $services "console" }}
 {{- end }}
 {{- $services | toJson }}
+{{- end }}
+
+{{- define "topaz.decisionLogger" -}}
+{{- with .Values.decisionLogs -}}
+{{- if .file -}}
+type: file
+config:
+  log_file_path: /decisions/decisions.log
+  max_file_size_mb: {{ .file.maxFileSizeMB | default "50" }}
+  max_file_count: {{ .file.maxFileCount | default "2" }}
+{{- else if .remote -}}
+type: self
+config:
+  store_directory: "/decisions"
+  port: {{ .remote.natsPort | default "4222" }}
+  shipper:
+    {{- with .remote.shipper | default dict }}
+    max_bytes: {{ .maxSpoolSizeMB | default 100 | mul 1024 | mul 1024 }}
+    max_batch_size: {{ .maxBatchSize | default "512" }}
+    publish_timeout_seconds: {{ .publishTimeoutSec | default "10"}}
+    max_inflight_batches: {{ .maxInflightBatches | default "10" }}
+    delete_stream_on_done: {{ .deleteStreamOnDone | default "false" }}
+    {{- end }}
+  scribe:
+    {{- with .remote.scribe | default dict }}
+    address: {{ .address | default "ems.prod.aserto.com:8443" }}
+    {{- if not (.mtlsCert | or .mtlsKey | or .mtlsCertSecretName) }}
+      {{ fail "decisionLogs.remote.scribe must contain either mtlsCertSecretName or mtlsCert and mtlsKey" }}
+    {{- end }}
+    client_cert_path: /scribe-cert/tls.crt
+    client_key_path: /scribe-cert/tls.key
+    ack_wait_seconds: {{ .ackWaitSec | default "60" }}
+    {{- if .skipTLSVerification }}
+    insecure: true
+    {{- end }}
+    headers:
+      Aserto-Tenant-Id: {{ .tenantID | required "decisionLogs.remote.scribe.tenantID is required" }}
+    {{- end }}
+{{- else -}}
+{{- fail "either decisionLogs.file or decisionLogs.remote must be set" }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+
+{{- define "topaz.scribeCertVolume" -}}
+{{- with ((.Values.decisionLogs).remote).scribe | required "missing required decisionLogs.remote.scribe configuration" -}}
+- name: scribe-cert
+  secret:
+  {{- if .mtlsCert | and .mtlsKey }}
+    secretName: {{ include "topaz.fullname" $ }}-scribe-client-cert
+  {{- else if .mtlsCertSecretName }}
+    secretName: {{ .mtlsCertSecretName }}
+  {{- else }}
+    {{- fail "decisionLogs.remote.scribe must contain either mtlsCertSecretName or mtlsCert and mtlsKey" }}
+  {{- end }}
+{{- end }}
 {{- end }}

@@ -95,6 +95,65 @@ directory:
     # additionalHeaders:
     #   "header-name": header-value
 
+decisionLogs:
+  enabled: true
+  # The 'file' and 'remote' options are mutually exclusive.
+  file: {}
+  #   # Write decision logs to a local file.
+  #   # The logs are written to the spool directory (/decisions) and rotated when they reach the maximum size.
+  #   maxFileSizeMB: 50
+  #   maxFileCount: 2
+  remote: {}
+  #   # Send decision logs to a remote scribe.
+  #   natsPort: 4222
+  #   shipper:
+  #     # [Optional] Maximum size of the local spool directory in MB.
+  #     maxSpoolSizeMB: 100
+  #     # [Optional] Maximum number of decisions in a batch.
+  #     maxBatchSize: 512
+  #     # [Optional] Maximum time to wait for a batch to fill up.
+  #     # If the batch is not full, it will be sent after this time.
+  #     publishTimeoutSec: 10
+  #     # [Optional] Maximum number of batches to send concurrently.
+  #     maxInFlightBatches: 10
+  #     # [Optional] If true, clear the spool directory on shutdown.
+  #     deleteOnShutdown: false
+  #   scribe:
+  #     # [Optional] Scribe server address.
+  #     address: ems.prod.aserto.com:8443
+  #     # [Required] ID of the tenant that owns the policy.
+  #     tenantID: ""
+  #     # mTLS configuration. Either mtlsCertSecretName or mtlsCert and mtlsKey must be provided.
+  #     # [Optional] mTLS client certificate.
+  #     mtlsCert: |
+  #       -----BEGIN CERTIFICATE-----
+  #       ...
+  #       -----END CERTIFICATE-----
+  #     # [Optional] mTLS client private key.
+  #     mtlsKey: |
+  #       -----BEGIN RSA PRIVATE KEY-----
+  #       ...
+  #       -----END RSA PRIVATE KEY-----
+  #     # [Optional] Kubernetes secret containing the mTLS client certificate and private key.
+  #     # Must be a secret of type kubernetes.io/tls.
+  #     mtlsCertSecretName: ""
+  #     # Skip verification of remote TLS certificate
+  #     skipTLSVerification: false
+  #     # headers:
+  #     #   "header-name": header-value
+  #     # [Optional] Duration to wait for a batch of decisions to be acknowledged by the server.
+  #     # If the server does not acknowledge the batch within this time, the batch is resent.
+  #     ackWaitSec: 60
+  persistence:
+    enabled: false
+    # PersistentVolumeClaim options.
+    # See https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims
+    # storage: 100Mi
+    # storageClassName: ""
+    # selector:
+    #   matchLabels:
+    #     release: "stable"
+
 # Acceptable clock skew for JWT validation.
 jwtAcceptableSkewSeconds: 5
 
@@ -207,7 +266,7 @@ opa:
 
     # Run policy from an OCI registry.
     oci: {}
-    #   # OCI registry URL.
+    #   # oci registry url.
     #   registry: https://ghcr.io
     #   # Policy image URI.
     #   image: "ghcr.io/aserto-policies/policy-rebac:latest"

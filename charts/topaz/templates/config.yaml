@@ -84,8 +84,16 @@ stringData:
               tls_ca_cert_path: /https-certs/ca.crt
         {{- end }}
 
+    {{- if (.Values.decisionLogs).enabled -}}
+      {{- if (.Values.decisionLogs).file | and (.Values.decisionLogs).remote -}}
+        {{- fail "decisionLogs.file and decisionLogs.remote are mutually exclusive" }}
+      {{- end }}
+    decision_logger:
+      {{- include "topaz.decisionLogger" . | nindent 6 }}
+    {{ end -}}
+
     opa:
-      instance_id: {{ ((.Values.policy).discovery).tenantID | default (quote "-") }}
+      instance_id: {{ (((.Values.opa).policy).discovery).tenantID | default (quote "-") }}
       graceful_shutdown_period_seconds: {{ (.Values.opa).gracefuShutdownPeriodSeconds | default "2" }}
       max_plugin_wait_time_seconds: {{ (.Values.opa).maxPluginWaitTimeSeconds | default "30" }}
       local_bundles:
@@ -109,7 +117,7 @@ stringData:
                 scheme: basic
                 token: {{ include "topaz.ociCredentials" . }}
           {{- end }}
-            {{- .serviceConfig | default dict | toYaml | nindent 12 }}
+            {{- .serviceConfig | default (dict "response_header_timeout_seconds" 5) | toYaml | nindent 12 }}
         bundles:
           topaz_policy:
             service: oci

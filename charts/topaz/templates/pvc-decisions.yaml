@@ -1,15 +1,15 @@
-{{- with (.Values.opa).persistence }}
-{{- if .enabled }}
+{{- with (.Values.decisionLogs).persistence -}}
+{{- if .enabled | and ($.Values.decisionLogs).enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "topaz.fullname" $ }}-pvc-policy
+  name: {{ include "topaz.fullname" $ }}-pvc-decisions
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: {{ .storage | default "10Mi" }}
+      storage: {{ .storage | default "100Mi" }}
   {{- if .storageClassName }}
   storageClassName: {{ .storageClassName }}
   {{- end }}
