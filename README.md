@@ -1,5 +1,10 @@
 # Aserto Helm Charts
 
+> [!NOTE]
+> The documentation below discusses self-hosted deployment of the Aserto backend services.
+> [See here](https://github.com/aserto-dev/helm/tree/main/charts/topaz) if you are
+> looking to deploy a [topaz](https://www.topaz.sh) authorizer in your Kubernetes cluster.
+
 [Aserto](https://www.aserto.com) is a cloud-native authorization service that provides
 fine-grained access control for your applications.
 
