@@ -95,8 +95,32 @@ directory:
     # additionalHeaders:
     #   "header-name": header-value
 
+controller:
+  enabled: false
+  # # [Optional] Controller server address.
+  # address: relay.prod.aserto.com:8443
+  # # mTLS configuration. Either mtlsCertSecretName or mtlsCert and mtlsKey must be provided.
+  # # [Optional] mTLS client certificate.
+  # mtlsCert: |
+  #   -----BEGIN CERTIFICATE-----
+  #   ...
+  #   -----END CERTIFICATE-----
+  # # [Optional] mTLS client private key.
+  # mtlsKey: |
+  #   -----BEGIN RSA PRIVATE KEY-----
+  #   ...
+  #   -----END RSA PRIVATE KEY-----
+  # # [Optional] Kubernetes secret containing the mTLS client certificate and private key.
+  # # Must be a secret of type kubernetes.io/tls.
+  # mtlsCertSecretName: ""
+  # # Skip verification of server certificate
+  # skipTLSVerification: false
+  # # [Optional] Additional headers to include in requests to the controller.
+  # additionalHeaders:
+  #   "header-name": header-value
+
 decisionLogs:
-  enabled: true
+  enabled: false
   # The 'file' and 'remote' options are mutually exclusive.
   file: {}
   #   # Write decision logs to a local file.
@@ -137,15 +161,15 @@ decisionLogs:
   #     # [Optional] Kubernetes secret containing the mTLS client certificate and private key.
   #     # Must be a secret of type kubernetes.io/tls.
   #     mtlsCertSecretName: ""
-  #     # Skip verification of remote TLS certificate
+  #     # Skip verification of server certificate
   #     skipTLSVerification: false
-  #     # headers:
+  #     # additionslHeaders:
   #     #   "header-name": header-value
   #     # [Optional] Duration to wait for a batch of decisions to be acknowledged by the server.
   #     # If the server does not acknowledge the batch within this time, the batch is resent.
   #     ackWaitSec: 60
   persistence:
-    enabled: false
+    enabled: true
     # PersistentVolumeClaim options.
     # See https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims
     # storage: 100Mi

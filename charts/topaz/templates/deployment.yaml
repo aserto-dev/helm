@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: StatefulSet
+kind: {{ include "topaz.appKind" . }}
 metadata:
   name: {{ include "topaz.fullname" . }}
   labels:
@@ -65,13 +65,6 @@ spec:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          env:
-            - name: TOPAZ_CFG_DIR
-              value: /config
-            {{ include "topaz.remoteDirectoryKeyEnv" . | nindent 12 }}
-            {{ include "topaz.apiKeysEnv" . | nindent 12 }}
-            {{ include "topaz.edgeKeyEnv" . | nindent 12 }}
-            {{ include "topaz.discoveryKeyEnv" . | nindent 12 }}
           volumeMounts:
             - name: config
               mountPath: /config
@@ -102,9 +95,20 @@ spec:
             - name: scribe-cert
               mountPath: /scribe-cert
           {{- end }}
+          {{- if (.Values.controller).enabled }}
+            - name: controller-cert
+              mountPath: /controller-cert
+          {{- end }}
             {{- with .Values.volumeMounts }}
               {{- toYaml . | nindent 12 }}
             {{- end }}
+          env:
+            - name: TOPAZ_CFG_DIR
+              value: /config
+            {{ include "topaz.remoteDirectoryKeyEnv" . | nindent 12 }}
+            {{ include "topaz.apiKeysEnv" . | nindent 12 }}
+            {{ include "topaz.edgeKeyEnv" . | nindent 12 }}
+            {{ include "topaz.discoveryKeyEnv" . | nindent 12 }}
       volumes:
         - name: config
           secret:
@@ -152,6 +156,9 @@ spec:
         {{- end }}
       {{- if (.Values.decisionLogs).remote -}}
         {{- include "topaz.scribeCertVolume" . | nindent 8 }}
+      {{- end -}}
+      {{- if (.Values.controller).enabled -}}
+        {{- include "topaz.controllerCertVolume" .| nindent 8 }}
       {{- end -}}
       {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}

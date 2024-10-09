@@ -61,6 +61,17 @@ Create the name of the service account to use
 {{- end }}
 {{- end }}
 
+
+{{- define "topaz.appKind" -}}
+{{- if (((.Values.directory).edge).persistence).enabled |
+    or ((.Values.decisionLogs).persistence).enabled |
+    or ((.Values.opa).persistence).enabled -}}
+StatefulSet
+{{- else -}}
+Deployment
+{{- end }}
+{{- end }}
+
 {{/*
 Remote directory configuration
 */}}
@@ -81,12 +92,13 @@ insecure: true
 {{- if not (empty .caCert | and (empty .caCertSecret)) }}
 ca_cert_path: /directory-certs/{{ (.caCertSecret).key | default "tls.crt" }}
 {{- end }}
-{{- if not (empty .additionalHeaders) }}
+{{-  with .additionalHeaders }}
 headers:
-  {{- toYaml .additionalHeaders | toYaml | nindent 2 }}
+  {{- toYaml . | toYaml | nindent 2 }}
 {{- end }}
 {{- end }}
 {{- end }}
+
 
 {{- define "topaz.remoteDirectoryKeyEnv" -}}
 {{- with ((.Values.directory).remote).apiKeySecret -}}
@@ -97,6 +109,7 @@ headers:
       key: {{ .key | default "api-key" }}
 {{- end }}
 {{- end }}
+
 
 {{- define "topaz.remoteDirectoryCertVolume" -}}
 {{- $name := printf "%s-remote-ca" (include "topaz.fullname" .) -}}
@@ -113,16 +126,12 @@ headers:
 {{- end }}
 {{- end }}
 
+
 {{- define "topaz.remoteDirectoryCertVolumeMount" -}}
 {{- if .caCert | or (.caCertSecret).name -}}
 - name: remote-certs
   mountPath: /directory-certs
   readOnly: true
-{{- end }}
-{{- end }}
-
-{{/*
-{{- end }}
 {{- end }}
 {{- end }}
 
@@ -143,6 +152,7 @@ Topaz API key configuration
 {{- $keys | toYaml }}
 {{- end }}
 
+
 {{- define "topaz.apiKeysEnv" -}}
 {{- $keys := list }}
 {{- range (.Values.auth).apiKeys }}
@@ -160,6 +170,7 @@ Topaz API key configuration
 {{- end }}
 {{- end -}}
 
+
 {{- define "topaz.discoveryKey" -}}
 {{- if .apiKey -}}
 {{- .apiKey }}
@@ -169,6 +180,7 @@ Topaz API key configuration
 {{ fail "either apiKey or apiKeySecret must be set in opa.policy.discovery" }}
 {{- end }}
 {{- end }}
+
 
 {{- define "topaz.discoveryKeyEnv" -}}
 {{- with (((.Values.opa).policy).discovery).apiKeySecret -}}
@@ -199,6 +211,7 @@ Topaz API key configuration
 {{- end }}
 {{- end }}
 
+
 {{- define "topaz.ociCredentials" -}}
 {{- if (.apiKeySecret).name -}}
 "${REGISTRY_API_KEY}"
@@ -208,6 +221,7 @@ Topaz API key configuration
 {{ .apiKey }}
 {{- end }}
 {{- end }}
+
 
 {{- define "topaz.svcDependencies" -}}
 {{- $deps := dict "reader" "model" "writer" "model" "importer" "model" "authorizer" "reader" "console" "authorizer" -}}
@@ -220,6 +234,7 @@ needs:
   - {{ $dep }}
 {{- end }}
 {{- end }}
+
 
 {{- define "topaz.grpcService" -}}
 {{- $values := first . -}}
@@ -268,9 +283,11 @@ write_timeout: {{ $cfg.writeTimeout | default "2s" }}
 idle_timeout: {{ $cfg.idleTimeout | default "30s" }}
 {{- end }}
 
+
 {{- define "topaz.discoveryResource" -}}
 {{- printf "%s/%s/opa" .policyName .policyName }}
 {{- end }}
+
 
 {{- define "topaz.enabledServices" -}}
 {{- $services := list "authorizer" -}}
@@ -283,6 +300,7 @@ idle_timeout: {{ $cfg.idleTimeout | default "30s" }}
 {{- end }}
 {{- $services | toJson }}
 {{- end }}
+
 
 {{- define "topaz.decisionLogger" -}}
 {{- with .Values.decisionLogs -}}
@@ -306,8 +324,9 @@ config:
     delete_stream_on_done: {{ .deleteStreamOnDone | default "false" }}
     {{- end }}
   scribe:
-    {{- with .remote.scribe | default dict }}
+  {{- with .remote.scribe | default dict }}
     address: {{ .address | default "ems.prod.aserto.com:8443" }}
+    tenant_id: {{ .tenantID | required "decisionLogs.remote.scribe.tenantID is required" }}
     {{- if not (.mtlsCert | or .mtlsKey | or .mtlsCertSecretName) }}
       {{ fail "decisionLogs.remote.scribe must contain either mtlsCertSecretName or mtlsCert and mtlsKey" }}
     {{- end }}
@@ -317,9 +336,11 @@ config:
     {{- if .skipTLSVerification }}
     insecure: true
     {{- end }}
+    {{- with .additionalHeaders }}
     headers:
-      Aserto-Tenant-Id: {{ .tenantID | required "decisionLogs.remote.scribe.tenantID is required" }}
+      {{- toYaml . | toYaml | nindent 6 }}
     {{- end }}
+  {{- end }}
 {{- else -}}
 {{- fail "either decisionLogs.file or decisionLogs.remote must be set" }}
 {{- end }}
@@ -337,6 +358,39 @@ config:
     secretName: {{ .mtlsCertSecretName }}
   {{- else }}
     {{- fail "decisionLogs.remote.scribe must contain either mtlsCertSecretName or mtlsCert and mtlsKey" }}
+  {{- end }}
+{{- end }}
+{{- end }}
+
+
+{{- define "topaz.controller" -}}
+enabled: true
+server:
+  {{- with .Values.controller }}
+  address: {{ .address | default "relay.prod.aserto.com:8443" }}
+  client_cert_path: /controller-cert/tls.crt
+  client_key_path: /controller-cert/tls.key
+  {{- if .skipTLSVerification }}
+  insecure: true
+  {{- end }}
+  {{- with .additionalHeaders }}
+  headers:
+    {{- toYaml . | toYaml | nindent 4 }}
+  {{- end }}
+  {{- end }}
+{{- end }}
+
+
+{{- define "topaz.controllerCertVolume" -}}
+{{- with .Values.controller -}}
+- name: controller-cert
+  secret:
+  {{- if .mtlsCert | and .mtlsKey }}
+    secretName: {{ include "topaz.fullname" $ }}-controller-client-cert
+  {{- else if .mtlsCertSecretName }}
+    secretName: {{ .mtlsCertSecretName }}
+  {{- else }}
+    {{- fail "controller must contain either mtlsCertSecretName or mtlsCert and mtlsKey" }}
   {{- end }}
 {{- end }}
 {{- end }}

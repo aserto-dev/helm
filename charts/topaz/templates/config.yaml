@@ -57,17 +57,17 @@ stringData:
     api:
       health:
         listen_address: 0.0.0.0:{{ include "aserto-lib.healthPort" . }}
-      {{- if (.Values.metrics).enabled }}
+    {{- if (.Values.metrics).enabled }}
       metrics:
         {{- include "aserto-lib.metricsService" . | nindent 8 }}
         certs:
           tls_key_path: /https-certs/tls.key
           tls_cert_path: /https-certs/tls.crt
           tls_ca_cert_path: /https-certs/ca.crt
-      {{- end }}
+    {{- end }}
 
       services:
-        {{- range (include "topaz.enabledServices" . | fromJsonArray) }}
+      {{- range (include "topaz.enabledServices" . | fromJsonArray) }}
         {{ . }}:
           {{- include "topaz.svcDependencies" (dict "service" . "remote" (($.Values.directory).remote).address) | nindent 10 }}
           grpc:
@@ -82,16 +82,20 @@ stringData:
               tls_key_path: /https-certs/tls.key
               tls_cert_path: /https-certs/tls.crt
               tls_ca_cert_path: /https-certs/ca.crt
-        {{- end }}
-
-    {{- if (.Values.decisionLogs).enabled -}}
-      {{- if (.Values.decisionLogs).file | and (.Values.decisionLogs).remote -}}
-        {{- fail "decisionLogs.file and decisionLogs.remote are mutually exclusive" }}
       {{- end }}
+
+  {{- if (.Values.decisionLogs).enabled -}}
+    {{- if (.Values.decisionLogs).file | and (.Values.decisionLogs).remote -}}
+      {{- fail "decisionLogs.file and decisionLogs.remote are mutually exclusive" }}
+    {{- end }}
     decision_logger:
       {{- include "topaz.decisionLogger" . | nindent 6 }}
-    {{ end -}}
+  {{ end }}
 
+    {{ if (.Values.controller).enabled -}}
+    controller:
+      {{- include "topaz.controller" . | nindent 6 }}
+    {{- end }}
     opa:
       instance_id: {{ (((.Values.opa).policy).discovery).tenantID | default (quote "-") }}
       graceful_shutdown_period_seconds: {{ (.Values.opa).gracefuShutdownPeriodSeconds | default "2" }}
