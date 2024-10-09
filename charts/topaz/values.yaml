@@ -122,11 +122,11 @@ controller:
 decisionLogs:
   enabled: false
   # The 'file' and 'remote' options are mutually exclusive.
-  file: {}
-  #   # Write decision logs to a local file.
-  #   # The logs are written to the spool directory (/decisions) and rotated when they reach the maximum size.
-  #   maxFileSizeMB: 50
-  #   maxFileCount: 2
+  file:
+    # Write decision logs to a local file.
+    # The logs are written to the spool directory (/decisions) and rotated when they reach the maximum size.
+    maxFileSizeMB: 50
+    maxFileCount: 2
   remote: {}
   #   # Send decision logs to a remote scribe.
   #   natsPort: 4222

@@ -304,13 +304,7 @@ idle_timeout: {{ $cfg.idleTimeout | default "30s" }}
 
 {{- define "topaz.decisionLogger" -}}
 {{- with .Values.decisionLogs -}}
-{{- if .file -}}
-type: file
-config:
-  log_file_path: /decisions/decisions.log
-  max_file_size_mb: {{ .file.maxFileSizeMB | default "50" }}
-  max_file_count: {{ .file.maxFileCount | default "2" }}
-{{- else if .remote -}}
+{{- if .remote -}}
 type: self
 config:
   store_directory: "/decisions"
@@ -341,6 +335,12 @@ config:
       {{- toYaml . | toYaml | nindent 6 }}
     {{- end }}
   {{- end }}
+{{- else if .remote -}}
+type: file
+config:
+  log_file_path: /decisions/decisions.log
+  max_file_size_mb: {{ .file.maxFileSizeMB | default "50" }}
+  max_file_count: {{ .file.maxFileCount | default "2" }}
 {{- else -}}
 {{- fail "either decisionLogs.file or decisionLogs.remote must be set" }}
 {{- end }}
