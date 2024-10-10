@@ -1,0 +1,10 @@
+{{- if ((.Values.directory).remote).caCert }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "topaz.fullname" . }}-remote-ca
+data:
+  tls.crt: |
+    {{- .Values.directory.remote.caCert | nindent 4 }}
+{{- end }}

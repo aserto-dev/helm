@@ -1,0 +1,18 @@
+To access the service using the topaz CLI:
+1. Forward the gRPC port to your local machine:
+   export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "topaz.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+   export GRPC_PORT=$(kubectl get pod --namespace {{ .Release.Namespace }} $POD_NAME -o jsonpath="{.spec.containers[0].ports[?(@.name=='grpc')].containerPort}")
+   kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8282:$GRPC_PORT
+2. Use the topaz CLI with the `-i -H localhost:8282 --no-check` options. For example, to set a directory manifest:
+   topaz ds set manifest -i --no-check -H localhost:8282 manifest.yaml
+
+
+To access the topaz web console:
+1. Forward the HTTP port to your local machine:
+   export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "topaz.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+   export HTTP_PORT=$(kubectl get pod --namespace {{ .Release.Namespace }} $POD_NAME -o jsonpath="{.spec.containers[0].ports[?(@.name=='http')].containerPort}")
+   kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8383:$HTTP_PORT
+2. Download the topaz self-signed certificate:
+   openssl s_client -showcerts -connect localhost:8383 </dev/null 2>/dev/null | openssl x509 -text > topaz-gw.crt
+3. Add 'topaz-gw.crt' to your system's trusted certificates.
+4. Open your browser and navigate to https://localhost:8383

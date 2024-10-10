@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "topaz.fullname" . }}
+  labels:
+    {{- include "topaz.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ (.Values.ports).grpc | default "8282" }}
+      targetPort: grpc
+      protocol: TCP
+      name: grpc
+    - port: {{ (.Values.ports).https | default "8383" }}
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: {{ (.Values.ports).health | default "8484" }}
+      targetPort: health
+      protocol: TCP
+      name: health
+    {{- if (.Values.metrics).enabled }}
+    - port: {{ (.Values.ports).metrics | default "8585" }}
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+    {{- end }}
+  selector:
+    {{- include "topaz.selectorLabels" . | nindent 4 }}
