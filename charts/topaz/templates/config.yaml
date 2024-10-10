@@ -84,10 +84,7 @@ stringData:
               tls_ca_cert_path: /https-certs/ca.crt
       {{- end }}
 
-  {{- if (.Values.decisionLogs).enabled -}}
-    {{- if (.Values.decisionLogs).file | and (.Values.decisionLogs).remote -}}
-      {{- fail "decisionLogs.file and decisionLogs.remote are mutually exclusive" }}
-    {{- end }}
+  {{- if (.Values.decisionLogs).enabled }}
     decision_logger:
       {{- include "topaz.decisionLogger" . | nindent 6 }}
   {{ end }}

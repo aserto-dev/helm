@@ -121,7 +121,7 @@ controller:
 
 decisionLogs:
   enabled: false
-  # The 'file' and 'remote' options are mutually exclusive.
+  # The 'file' and 'remote' options are mutually exclusive. If both are specified, 'remote' is used.
   file:
     # Write decision logs to a local file.
     # The logs are written to the spool directory (/decisions) and rotated when they reach the maximum size.
