@@ -64,7 +64,7 @@ directory:
       # timeoutSeconds: 5
 
   # Use a remote directory instead running a local edge.
-  # If remote is specified, edge configuration is ignored.
+  # If remote is specified, the directory.edge configuration section is ignored.
   remote: {}
     # # Remote directory address (e.g. directory.prod.aserto.com:8443)
     # address: ""

@@ -22,6 +22,48 @@ follow Helm's [instructions](https://helm.sh/docs/topics/registries/) on how to 
 registries.
 
 
+## Usage
+
+Create a `values.yaml` file with your configuration. The [default values](https://github.com/aserto-dev/helm/blob/main/charts/topaz/values.yaml)
+provide a good starting point. A minimal configuration that deploys a Topaz instance using a policy from a publicly
+accessible OCI repository is shown below:
+
+```yaml
+opa:
+  policy:
+    oci:
+      registry: https://ghcr.io
+      image: ghcr.io/aserto-policies/policy-rebac:latest
+```
+
+To deploy the chart to a `topaz` namespace in your Kubernetes cluster creating the namespace if it doesn't exist, run:
+
+```shell
+helm install topaz oci://ghcr.io/aserto-dev/helm/topaz -f values.yaml --namespace topaz --create-namespace
+```
+
+To use the Topaz chart as a subchart within your own parent chart, add it as a dependency in your `Chart.yaml`:
+
+```yaml
+dependencies:
+  - name: topaz
+    version: ~0.1.0
+    repository: oci://ghcr.io/aserto-dev/helm
+```
+
+Configuring Topaz in the parent chart's `values.yaml` is similar to standalone configuration with one difference:
+all configuration elements are nested under the `topaz` key:
+
+```yaml
+topaz:
+  opa:
+    policy:
+      oci:
+        registry: https://ghcr.io
+        image: ghcr.io/aserto-policies/policy-rebac:latest
+```
+
+
 ## Configuration
 
 The default [values.yaml](https://github.com/aserto-dev/helm/blob/main/charts/topaz/values.yaml)
@@ -32,8 +74,23 @@ for dynamic configuration.
 
 The following sections describe the various configuration options available in the chart.
 
+* [Policy Configuration](#policy-configuration)
+  * [Policy Image](#policy-image)
+  * [Discovery](#discovery)
+  * [Persistence](#persistence)
+* [Directory](#directory)
+  * [Edge Directory](#edge-directory)
+  * [Edge Sync](#edge-sync)
+  * [Remote Directory](#remote-directory)
+* [Controller](#controller)
+* [Decision Logs](#decision-logs)
+  * [Local File](#local-file)
+  * [Remote](#remote)
+* [Service Ports](#service-ports)
+* [Authentication](#authentication)
 
-## OPA Policy
+
+## Policy Configuration
 
 Topaz is built on top of the [Open Policy Agent](https://www.openpolicyagent.org) (OPA) and uses
 it to evaluate authorization poicies. The `opa` section of `values.yaml` is used to configure OPA.
