@@ -103,33 +103,7 @@ stringData:
       config:
         persistence_directory: "/opa-persistence"
         services:
-        {{- if ((.Values.opa).policy).discovery | and ((.Values.opa).policy).oci }}
-          {{- fail "opa.policy.discovery and opa.policy.oci are mutually exclusive" }}
-        {{- end }}
-
-        {{- if ((.Values.opa).policy).oci }}
-          {{- with ((.Values.opa).policy).oci }}
-          oci:
-            type: oci
-            url: {{ .registry | required "opa.policy.oci.registry is required" }}
-          {{- if (.apiKey | or (.apiKeySecret).name) }}
-            credentials:
-              bearer:
-                scheme: basic
-                token: {{ include "topaz.ociCredentials" . }}
-          {{- end }}
-            {{- .serviceConfig | default (dict "response_header_timeout_seconds" 5) | toYaml | nindent 12 }}
-        bundles:
-          topaz_policy:
-            service: oci
-            resource: {{ .image | required "opa.policy.oci.image is required" }}
-            persist: {{ $.Values.opa.persistence.enabled | default "false" }}
-            {{- if .bundleConfig }}
-            config:
-              {{- .bundleConfig | toYaml | nindent 14 }}
-            {{- end }}
-          {{- end }}
-        {{- else if ((.Values.opa).policy).discovery }}
+        {{- if ((.Values.opa).policy).discovery }}
           {{- with ((.Values.opa).policy).discovery }}
           discovery:
             url: {{ .url | default "https://discovery.prod.aserto.com/api/v2/discovery" }}
@@ -152,7 +126,27 @@ stringData:
           persist: {{ $.Values.opa.persistence.enabled | default "false" }}
           {{- end }}
         {{- else }}
-          {{- fail "either opa.policy.discovery or opa.policy.oci must be set"}}
+          {{- with ((.Values.opa).policy).oci }}
+          oci:
+            type: oci
+            url: {{ .registry | required "opa.policy.oci.registry is required" }}
+          {{- if (.apiKey | or (.apiKeySecret).name) }}
+            credentials:
+              bearer:
+                scheme: basic
+                token: {{ include "topaz.ociCredentials" . }}
+          {{- end }}
+            {{- .serviceConfig | default (dict "response_header_timeout_seconds" 5) | toYaml | nindent 12 }}
+        bundles:
+          topaz_policy:
+            service: oci
+            resource: {{ .image | required "opa.policy.oci.image is required" }}
+            persist: {{ $.Values.opa.persistence.enabled | default "false" }}
+            {{- if .bundleConfig }}
+            config:
+              {{- .bundleConfig | toYaml | nindent 14 }}
+            {{- end }}
+          {{- end }}
         {{- end }}
       {{- if (((.Values.directory).edge).sync).address | and (empty ((.Values.directory).remote).address) }}
         plugins:

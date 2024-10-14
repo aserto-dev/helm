@@ -286,14 +286,14 @@ opa:
     #     release: "stable"
   policy:
     # The 'oci' and 'discovery' fields are mutually exclusive.
-    # Exactly one of them must be specified.
+    # If both are specified, 'discovery' is used.
 
     # Run policy from an OCI registry.
-    oci: {}
-    #   # oci registry url.
-    #   registry: https://ghcr.io
-    #   # Policy image URI.
-    #   image: "ghcr.io/aserto-policies/policy-rebac:latest"
+    oci:
+      # oci registry url.
+      registry: https://ghcr.io
+      # Policy image URI.
+      image: "ghcr.io/aserto-policies/policy-rebac:latest"
     #   # [Optional] OCI registry user name.
     #   # Note: Some registries including ghcr.io require that the user name is left empty
     #   # when using a personal access token as the API key.

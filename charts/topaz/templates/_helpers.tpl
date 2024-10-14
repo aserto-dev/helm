@@ -335,7 +335,7 @@ config:
       {{- toYaml . | toYaml | nindent 6 }}
     {{- end }}
   {{- end }}
-{{- else if .remote -}}
+{{- else if .file -}}
 type: file
 config:
   log_file_path: /decisions/decisions.log
