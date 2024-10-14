@@ -101,8 +101,8 @@ There are two ways to specify the poilcy to use:
    plugins.
 
 > [!IMPORTANT]
-> Explicitly specifying a policy image and using a discovery service are mutually exclusive. You must
-> provide configuration for one or the other, but not both.
+> Explicitly specifying a policy image and using a discovery service are mutually exclusive. If discovery
+> configuration is provided, the `oci` section is ignored.
 
 ### Policy Image
 
