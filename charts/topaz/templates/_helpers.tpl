@@ -174,7 +174,7 @@ Topaz API key configuration
 {{- define "topaz.discoveryKey" -}}
 {{- if .apiKey -}}
 {{- .apiKey }}
-{{- else if (.apiKeySecret | and .apiKeySecret.name) -}}
+{{- else if (.apiKeySecret | and (.apiKeySecret).name) -}}
 "${DISCOVERY_API_KEY}"
 {{- else }}
 {{ fail "either apiKey or apiKeySecret must be set in opa.policy.discovery" }}
@@ -196,7 +196,7 @@ Topaz API key configuration
 {{- define "topaz.edgeKey" -}}
 {{- if .apiKey -}}
 {{- .apiKey -}}
-{{- else if (.apiKeySecret | and .apiKeySecret.name) -}}
+{{- else if (.apiKeySecret | and (.apiKeySecret).name) -}}
 "${EDGE_API_KEY}"
 {{- end }}
 {{- end }}
@@ -285,6 +285,9 @@ idle_timeout: {{ $cfg.idleTimeout | default "30s" }}
 
 
 {{- define "topaz.discoveryResource" -}}
+{{- if empty .policyName }}
+  {{- fail "opa.policy.discovery.policyName is required" }}
+{{- end }}
 {{- printf "%s/%s/opa" .policyName .policyName }}
 {{- end }}
 
@@ -393,4 +396,13 @@ server:
     {{- fail "controller must contain either mtlsCertSecretName or mtlsCert and mtlsKey" }}
   {{- end }}
 {{- end }}
+{{- end }}
+
+{{- define "topaz.tenantID" -}}
+{{- $discoID := (((.Values.opa).policy).discovery).tenantID }}
+{{- $edgeID := (((.Values.directory).edge).sync).tenantID }}
+{{- if $discoID | and $edgeID | and (eq $discoID $edgeID | not) }}
+  {{ fail "opa.policy.discovery.tenantID and directory.edge.sync.tenantID must match" }}
+{{- end }}
+{{- $discoID | or $edgeID | default "-" }}
 {{- end }}

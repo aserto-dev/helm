@@ -94,7 +94,7 @@ stringData:
       {{- include "topaz.controller" . | nindent 6 }}
     {{- end }}
     opa:
-      instance_id: {{ (((.Values.opa).policy).discovery).tenantID | default (quote "-") }}
+      instance_id: {{ include "topaz.tenantID" . }}
       graceful_shutdown_period_seconds: {{ (.Values.opa).gracefuShutdownPeriodSeconds | default "2" }}
       max_plugin_wait_time_seconds: {{ (.Values.opa).maxPluginWaitTimeSeconds | default "30" }}
       local_bundles:
@@ -153,7 +153,9 @@ stringData:
           {{- with .Values.directory.edge.sync }}
           aserto_edge:
             addr: {{ .address }}
-            apikey: {{ include "topaz.edgeKey" . | default "" }}
+            {{- with include "topaz.edgeKey" . }}
+            apikey: {{ . }}
+            {{- end }}
             enabled: true
             insecure: {{ .skipTLSVerification | default false | toString }}
             sync_interval: {{ .intervalMinutes | default "1" }}

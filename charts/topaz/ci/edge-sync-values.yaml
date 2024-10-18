@@ -1,0 +1,14 @@
+directory:
+  edge:
+    sync:
+      address: "directory.prod.aserto.com:8443"
+      tenantID: c102dc4a-f66d-432f-bfa6-b1919dc4fff7
+
+opa:
+  policy:
+    discovery:
+      policyName: "my-policy"
+      url: https://discovery.prod.aserto.com/api/v2/discovery
+      tenantID: c102dc4a-f66d-432f-bfa6-b1919dc4fff7
+      apiKey: "1234567890"
+
