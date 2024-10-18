@@ -90,7 +90,7 @@ spec:
             {{- end }}
           {{- with (.Values.directory).remote -}}
             {{ include "topaz.remoteDirectoryCertVolumeMount" . | nindent 12 }}
-          {{- end -}}
+          {{- end }}
           {{- if (.Values.decisionLogs).remote }}
             - name: scribe-cert
               mountPath: /scribe-cert
@@ -99,16 +99,24 @@ spec:
             - name: controller-cert
               mountPath: /controller-cert
           {{- end }}
-            {{- with .Values.volumeMounts }}
-              {{- toYaml . | nindent 12 }}
+            {{- with .Values.volumeMounts -}}
+              {{ toYaml . | nindent 12 }}
             {{- end }}
           env:
             - name: TOPAZ_CFG_DIR
               value: /config
+          {{- with ((.Values.directory).remote).apiKeySecret -}}
             {{ include "topaz.remoteDirectoryKeyEnv" . | nindent 12 }}
+          {{- end }}
+          {{- with (.Values.auth).apiKeys -}}
             {{ include "topaz.apiKeysEnv" . | nindent 12 }}
+          {{- end }}
+          {{- with (((.Values.directory).edge).sync).apiKeySecret -}}
             {{ include "topaz.edgeKeyEnv" . | nindent 12 }}
+          {{- end }}
+          {{- with (((.Values.opa).policy).discovery).apiKeySecret -}}
             {{ include "topaz.discoveryKeyEnv" . | nindent 12 }}
+          {{- end }}
       volumes:
         - name: config
           secret:

@@ -10,13 +10,12 @@ stringData:
     # yaml-language-server: $schema=https://topaz.sh/schema/config.json
     ---
     version: 2
-
     logging:
       prod: true
       log_level: {{ .Values.logLevel | default "info" }}
       grpc_log_level: {{ .Values.grpcLogLevel | default "info" }}
 
-    {{ if empty ((.Values.directory).remote).address -}}
+    {{- if empty ((.Values.directory).remote).address }}
     directory:
       db_path: /db/directory.db
       request_timeout: {{ ((.Values.directory).edge).openTimeout | default "5s" }}
@@ -69,7 +68,10 @@ stringData:
       services:
       {{- range (include "topaz.enabledServices" . | fromJsonArray) }}
         {{ . }}:
-          {{- include "topaz.svcDependencies" (dict "service" . "remote" (($.Values.directory).remote).address) | nindent 10 }}
+          {{- with (include "topaz.svcDependencies" (dict "service" . "remote" (($.Values.directory).remote).address)) }}
+          needs:
+            - {{ . }}
+          {{- end }}
           grpc:
             {{- include "topaz.grpcService" (list $.Values .) | nindent 12 }}
             certs:
@@ -87,12 +89,12 @@ stringData:
   {{- if (.Values.decisionLogs).enabled }}
     decision_logger:
       {{- include "topaz.decisionLogger" . | nindent 6 }}
-  {{ end }}
+  {{- end }}
 
-    {{ if (.Values.controller).enabled -}}
+  {{- if (.Values.controller).enabled }}
     controller:
       {{- include "topaz.controller" . | nindent 6 }}
-    {{- end }}
+  {{- end }}
     opa:
       instance_id: {{ include "topaz.tenantID" . }}
       graceful_shutdown_period_seconds: {{ (.Values.opa).gracefuShutdownPeriodSeconds | default "2" }}

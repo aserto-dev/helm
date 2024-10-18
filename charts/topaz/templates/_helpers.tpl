@@ -101,13 +101,11 @@ headers:
 
 
 {{- define "topaz.remoteDirectoryKeyEnv" -}}
-{{- with ((.Values.directory).remote).apiKeySecret -}}
 - name: DIRECTORY_API_KEY
   valueFrom:
     secretKeyRef:
       name: {{ .name }}
       key: {{ .key | default "api-key" }}
-{{- end }}
 {{- end }}
 
 
@@ -155,7 +153,7 @@ Topaz API key configuration
 
 {{- define "topaz.apiKeysEnv" -}}
 {{- $keys := list }}
-{{- range (.Values.auth).apiKeys }}
+{{- range . }}
   {{- if .secretName -}}
     {{- $keys = append $keys . }}
   {{- end }}
@@ -183,13 +181,11 @@ Topaz API key configuration
 
 
 {{- define "topaz.discoveryKeyEnv" -}}
-{{- with (((.Values.opa).policy).discovery).apiKeySecret -}}
 - name: DISCOVERY_API_KEY
   valueFrom:
     secretKeyRef:
       name: {{ .name }}
       key: {{ .key | default "api-key" }}
-{{- end }}
 {{- end }}
 
 
@@ -202,13 +198,11 @@ Topaz API key configuration
 {{- end }}
 
 {{- define "topaz.edgeKeyEnv" -}}
-{{- with (((.Values.directory).edge).sync).apiKeySecret -}}
 - name: EDGE_API_KEY
   valueFrom:
     secretKeyRef:
       name: {{ .name }}
       key: {{ .key | default "api-key" }}
-{{- end }}
 {{- end }}
 
 
@@ -224,15 +218,11 @@ Topaz API key configuration
 
 
 {{- define "topaz.svcDependencies" -}}
-{{- $deps := dict "reader" "model" "writer" "model" "importer" "model" "authorizer" "reader" "console" "authorizer" -}}
+{{- $deps := dict "reader" "model" "writer" "model" "importer" "model" "authorizer" "reader" "console" "authorizer" }}
 {{- if $.remote }}
   {{- $deps = unset $deps "authorizer" }}
 {{- end }}
-{{- $dep := get $deps .service -}}
-{{- if $dep -}}
-needs:
-  - {{ $dep }}
-{{- end }}
+{{- get $deps .service }}
 {{- end }}
 
 
