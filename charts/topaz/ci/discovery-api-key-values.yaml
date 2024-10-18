@@ -1,0 +1,9 @@
+opa:
+  policy:
+    discovery:
+      policyName: "my-policy"
+      tenantID: c102dc4a-f66d-432f-bfa6-b1919dc4fff7
+      apiKey: 84eeee6256e94434aebeea166c99065e
+
+  persistence:
+    enabled: true

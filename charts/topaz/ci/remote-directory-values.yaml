@@ -1,0 +1,5 @@
+directory:
+  remote:
+    apiKeySecret:
+      name: "my-secret"
+      key: "my-key"

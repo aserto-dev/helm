@@ -10,13 +10,12 @@ stringData:
     # yaml-language-server: $schema=https://topaz.sh/schema/config.json
     ---
     version: 2
-
     logging:
       prod: true
       log_level: {{ .Values.logLevel | default "info" }}
       grpc_log_level: {{ .Values.grpcLogLevel | default "info" }}
 
-    {{ if empty ((.Values.directory).remote).address -}}
+    {{- if empty ((.Values.directory).remote).address }}
     directory:
       db_path: /db/directory.db
       request_timeout: {{ ((.Values.directory).edge).openTimeout | default "5s" }}
@@ -24,7 +23,7 @@ stringData:
     remote_directory:
       address: 0.0.0.0:{{ (.Values.ports).grpc | default "8282" }}
       {{- if (.Values.auth).apiKeys }}
-      api_key: {{ include "topaz.apiKeys" . | fromYaml | keys | first }}
+      api_key: {{ include "topaz.apiKeys" . | fromYamlArray | first }}
       {{- end }}
       ca_cert_path: /grpc-certs/grpc-ca.crt
       timeout_in_seconds: {{ ((.Values.directory).remote).timeoutSeconds | default "5" }}
@@ -69,7 +68,10 @@ stringData:
       services:
       {{- range (include "topaz.enabledServices" . | fromJsonArray) }}
         {{ . }}:
-          {{- include "topaz.svcDependencies" (dict "service" . "remote" (($.Values.directory).remote).address) | nindent 10 }}
+          {{- with (include "topaz.svcDependencies" (dict "service" . "remote" (($.Values.directory).remote).address)) }}
+          needs:
+            - {{ . }}
+          {{- end }}
           grpc:
             {{- include "topaz.grpcService" (list $.Values .) | nindent 12 }}
             certs:
@@ -87,14 +89,14 @@ stringData:
   {{- if (.Values.decisionLogs).enabled }}
     decision_logger:
       {{- include "topaz.decisionLogger" . | nindent 6 }}
-  {{ end }}
+  {{- end }}
 
-    {{ if (.Values.controller).enabled -}}
+  {{- if (.Values.controller).enabled }}
     controller:
       {{- include "topaz.controller" . | nindent 6 }}
-    {{- end }}
+  {{- end }}
     opa:
-      instance_id: {{ (((.Values.opa).policy).discovery).tenantID | default (quote "-") }}
+      instance_id: {{ include "topaz.tenantID" . }}
       graceful_shutdown_period_seconds: {{ (.Values.opa).gracefuShutdownPeriodSeconds | default "2" }}
       max_plugin_wait_time_seconds: {{ (.Values.opa).maxPluginWaitTimeSeconds | default "30" }}
       local_bundles:
@@ -119,7 +121,7 @@ stringData:
             {{- if $headers }}
               {{- $headers | toYaml | nindent 14 }}
             {{- end }}
-            {{- $cfg | default dict | toYaml | nindent 12 }}
+            {{- $cfg | default (dict "response_header_timeout_seconds" 5) | toYaml | nindent 12 }}
         discovery:
           service: discovery
           resource: {{ include "topaz.discoveryResource" . }}
@@ -153,7 +155,9 @@ stringData:
           {{- with .Values.directory.edge.sync }}
           aserto_edge:
             addr: {{ .address }}
-            apikey: {{ include "topaz.edgeKey" . | default "" }}
+            {{- with include "topaz.edgeKey" . }}
+            apikey: {{ . }}
+            {{- end }}
             enabled: true
             insecure: {{ .skipTLSVerification | default false | toString }}
             sync_interval: {{ .intervalMinutes | default "1" }}

@@ -101,13 +101,11 @@ headers:
 
 
 {{- define "topaz.remoteDirectoryKeyEnv" -}}
-{{- with ((.Values.directory).remote).apiKeySecret -}}
 - name: DIRECTORY_API_KEY
   valueFrom:
     secretKeyRef:
       name: {{ .name }}
       key: {{ .key | default "api-key" }}
-{{- end }}
 {{- end }}
 
 
@@ -155,7 +153,7 @@ Topaz API key configuration
 
 {{- define "topaz.apiKeysEnv" -}}
 {{- $keys := list }}
-{{- range (.Values.auth).apiKeys }}
+{{- range . }}
   {{- if .secretName -}}
     {{- $keys = append $keys . }}
   {{- end }}
@@ -174,7 +172,7 @@ Topaz API key configuration
 {{- define "topaz.discoveryKey" -}}
 {{- if .apiKey -}}
 {{- .apiKey }}
-{{- else if (.apiKeySecret | and .apiKeySecret.name) -}}
+{{- else if (.apiKeySecret | and (.apiKeySecret).name) -}}
 "${DISCOVERY_API_KEY}"
 {{- else }}
 {{ fail "either apiKey or apiKeySecret must be set in opa.policy.discovery" }}
@@ -183,32 +181,28 @@ Topaz API key configuration
 
 
 {{- define "topaz.discoveryKeyEnv" -}}
-{{- with (((.Values.opa).policy).discovery).apiKeySecret -}}
 - name: DISCOVERY_API_KEY
   valueFrom:
     secretKeyRef:
       name: {{ .name }}
       key: {{ .key | default "api-key" }}
 {{- end }}
-{{- end }}
 
 
 {{- define "topaz.edgeKey" -}}
 {{- if .apiKey -}}
 {{- .apiKey -}}
-{{- else if (.apiKeySecret | and .apiKeySecret.name) -}}
+{{- else if (.apiKeySecret | and (.apiKeySecret).name) -}}
 "${EDGE_API_KEY}"
 {{- end }}
 {{- end }}
 
 {{- define "topaz.edgeKeyEnv" -}}
-{{- with (((.Values.directory).edge).sync).apiKeySecret -}}
 - name: EDGE_API_KEY
   valueFrom:
     secretKeyRef:
       name: {{ .name }}
       key: {{ .key | default "api-key" }}
-{{- end }}
 {{- end }}
 
 
@@ -224,15 +218,11 @@ Topaz API key configuration
 
 
 {{- define "topaz.svcDependencies" -}}
-{{- $deps := dict "reader" "model" "writer" "model" "importer" "model" "authorizer" "reader" "console" "authorizer" -}}
+{{- $deps := dict "reader" "model" "writer" "model" "importer" "model" "authorizer" "reader" "console" "authorizer" }}
 {{- if $.remote }}
   {{- $deps = unset $deps "authorizer" }}
 {{- end }}
-{{- $dep := get $deps .service -}}
-{{- if $dep -}}
-needs:
-  - {{ $dep }}
-{{- end }}
+{{- get $deps .service }}
 {{- end }}
 
 
@@ -253,7 +243,7 @@ connection_timeout_seconds: {{ $cfg.connectionTimeoutSec | default "2" }}
 listen_address: 0.0.0.0:{{ ($values.ports).https | default "8383" }}
 
 {{- if $cfg.domain }}
-fdqn: {{ $cfg.domain }}
+fqdn: {{ $cfg.domain }}
 {{- end }}
 
 {{- if $cfg.allowedHeaders }}
@@ -275,7 +265,7 @@ allowed_origins:
 {{- $origins | toYaml | nindent 2 }}
 
 {{- if $cfg.noTLS }}
-http: false
+http: true
 {{- end }}
 read_timeout: {{ $cfg.readTimeout | default "2s" }}
 read_header_timeout: {{ $cfg.readHeaderTimeout | default "2s" }}
@@ -285,6 +275,9 @@ idle_timeout: {{ $cfg.idleTimeout | default "30s" }}
 
 
 {{- define "topaz.discoveryResource" -}}
+{{- if empty .policyName }}
+  {{- fail "opa.policy.discovery.policyName is required" }}
+{{- end }}
 {{- printf "%s/%s/opa" .policyName .policyName }}
 {{- end }}
 
@@ -393,4 +386,13 @@ server:
     {{- fail "controller must contain either mtlsCertSecretName or mtlsCert and mtlsKey" }}
   {{- end }}
 {{- end }}
+{{- end }}
+
+{{- define "topaz.tenantID" -}}
+{{- $discoID := (((.Values.opa).policy).discovery).tenantID }}
+{{- $edgeID := (((.Values.directory).edge).sync).tenantID }}
+{{- if $discoID | and $edgeID | and (eq $discoID $edgeID | not) }}
+  {{ fail "opa.policy.discovery.tenantID and directory.edge.sync.tenantID must match" }}
+{{- end }}
+{{- $discoID | or $edgeID | default "-" }}
 {{- end }}
