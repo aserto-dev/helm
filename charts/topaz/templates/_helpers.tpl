@@ -253,7 +253,7 @@ connection_timeout_seconds: {{ $cfg.connectionTimeoutSec | default "2" }}
 listen_address: 0.0.0.0:{{ ($values.ports).https | default "8383" }}
 
 {{- if $cfg.domain }}
-fdqn: {{ $cfg.domain }}
+fqdn: {{ $cfg.domain }}
 {{- end }}
 
 {{- if $cfg.allowedHeaders }}
