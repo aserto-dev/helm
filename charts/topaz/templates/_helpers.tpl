@@ -275,7 +275,7 @@ allowed_origins:
 {{- $origins | toYaml | nindent 2 }}
 
 {{- if $cfg.noTLS }}
-http: false
+http: true
 {{- end }}
 read_timeout: {{ $cfg.readTimeout | default "2s" }}
 read_header_timeout: {{ $cfg.readHeaderTimeout | default "2s" }}
