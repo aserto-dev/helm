@@ -24,7 +24,7 @@ stringData:
     remote_directory:
       address: 0.0.0.0:{{ (.Values.ports).grpc | default "8282" }}
       {{- if (.Values.auth).apiKeys }}
-      api_key: {{ include "topaz.apiKeys" . | fromYaml | keys | first }}
+      api_key: {{ include "topaz.apiKeys" . | fromYamlArray | first }}
       {{- end }}
       ca_cert_path: /grpc-certs/grpc-ca.crt
       timeout_in_seconds: {{ ((.Values.directory).remote).timeoutSeconds | default "5" }}
@@ -119,7 +119,7 @@ stringData:
             {{- if $headers }}
               {{- $headers | toYaml | nindent 14 }}
             {{- end }}
-            {{- $cfg | default dict | toYaml | nindent 12 }}
+            {{- $cfg | default (dict "response_header_timeout_seconds" 5) | toYaml | nindent 12 }}
         discovery:
           service: discovery
           resource: {{ include "topaz.discoveryResource" . }}
