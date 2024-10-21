@@ -394,5 +394,5 @@ server:
 {{- if $discoID | and $edgeID | and (eq $discoID $edgeID | not) }}
   {{ fail "opa.policy.discovery.tenantID and directory.edge.sync.tenantID must match" }}
 {{- end }}
-{{- $discoID | or $edgeID | default "-" }}
+{{- $discoID | or $edgeID | default "-" | quote }}
 {{- end }}
