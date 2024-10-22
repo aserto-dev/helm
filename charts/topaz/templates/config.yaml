@@ -59,16 +59,13 @@ stringData:
     {{- if (.Values.metrics).enabled }}
       metrics:
         {{- include "aserto-lib.metricsService" . | nindent 8 }}
-        certs:
-          tls_key_path: /https-certs/tls.key
-          tls_cert_path: /https-certs/tls.crt
-          tls_ca_cert_path: /https-certs/ca.crt
     {{- end }}
 
       services:
       {{- range (include "topaz.enabledServices" . | fromJsonArray) }}
         {{ . }}:
-          {{- with (include "topaz.svcDependencies" (dict "service" . "remote" (($.Values.directory).remote).address)) }}
+          {{- with (include "topaz.svcDependencies"
+                     (dict "service" . "remote" (($.Values.directory).remote).address)) }}
           needs:
             - {{ . }}
           {{- end }}
