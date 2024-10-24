@@ -147,17 +147,14 @@ stringData:
             {{- end }}
           {{- end }}
         {{- end }}
-      {{- if (((.Values.directory).edge).sync).address | and (empty ((.Values.directory).remote).address) }}
+      {{- $edgePlugin := include "topaz.edgePlugin" . -}}
+      {{- $decisionLogPlugin := include "topaz.decisionLogPlugin" . -}}
+      {{- if $edgePlugin | or $decisionLogPlugin }}
         plugins:
-          {{- with .Values.directory.edge.sync }}
-          aserto_edge:
-            addr: {{ .address }}
-            {{- with include "topaz.edgeKey" . }}
-            apikey: {{ . }}
-            {{- end }}
-            enabled: true
-            insecure: {{ .skipTLSVerification | default false | toString }}
-            sync_interval: {{ .intervalMinutes | default "1" }}
-            timeout: {{ .timeoutSeconds | default "5" }}
-          {{- end }}
+        {{- with $edgePlugin -}}
+          {{ . | nindent 10 }}
+        {{- end }}
+        {{- with $decisionLogPlugin -}}
+          {{ . | nindent 10 }}
+        {{- end }}
       {{- end }}
