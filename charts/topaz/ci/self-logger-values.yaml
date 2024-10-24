@@ -1,0 +1,14 @@
+---
+decisionLogs:
+  enabled: true
+  remote:
+    scribe:
+      tenantID: c102dc4a-f66d-432f-bfa6-b1919dc4fff7
+      mtlsCert: |
+        -----BEGIN CERTIFICATE-----
+        ...
+        -----END CERTIFICATE-----
+      mtlsKey: |
+        -----BEGIN RSA PRIVATE KEY-----
+        ...
+        -----END RSA PRIVATE KEY-----

@@ -396,3 +396,28 @@ server:
 {{- end }}
 {{- $discoID | or $edgeID | default "-" | quote }}
 {{- end }}
+
+
+{{- define "topaz.edgePlugin" -}}
+{{- with ((.Values.directory).edge).sync -}}
+{{- if .address | and (empty (($.Values.directory).remote).address) -}}
+aserto_edge:
+  addr: {{ .address }}
+{{- with include "topaz.edgeKey" . }}
+  apikey: {{ . }}
+{{- end }}
+  enabled: true
+  insecure: {{ .skipTLSVerification | default false | toString }}
+  sync_interval: {{ .intervalMinutes | default "1" }}
+  timeout: {{ .timeoutSeconds | default "5" }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+
+{{- define "topaz.decisionLogPlugin" -}}
+{{- if (.Values.decisionLogs).enabled -}}
+aserto_decision_log:
+  enabled: true
+{{- end }}
+{{- end }}
