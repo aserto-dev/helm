@@ -313,12 +313,11 @@ Decision logs can be written to a local file or shipped to a remote service.
 
 ### Local File
 
-To log decisions to a local file, set the `decisionLogs.file` section in `values.yaml`.
+To log decisions to a local file, set the `decisionLogs.enabled` section in `values.yaml`.
 
 ```yaml
 decisionLogs:
-  file:
-    enabled: true
+  enabled: true
 ```
 
 Logs are written to the `/decisions` directory in the topaz pod. The directory is backed by a
