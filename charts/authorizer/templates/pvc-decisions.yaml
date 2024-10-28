@@ -1,0 +1,22 @@
+{{- with (.Values.decisionLogs).persistence -}}
+{{- if .enabled | and ($.Values.decisionLogs).enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "authorizer.fullname" $ }}-pvc-decisions
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .storage | default "100Mi" }}
+  {{- if .storageClassName }}
+  storageClassName: {{ .storageClassName }}
+  {{- end }}
+  {{- if .selector }}
+  selector:
+    {{- .selector | toYaml | nindent 4 }}
+  {{- end }}
+{{- end }}
+{{- end }}
+

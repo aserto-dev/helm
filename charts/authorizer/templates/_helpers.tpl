@@ -96,3 +96,13 @@ tls:
 allowed_headers:
 {{- $cfg.allowed_headers | default (list "Aserto-Tenant-Id" "Authorization" "Content-Type" "Depth") | toYaml | nindent 2 }}
 {{- end }}
+
+{{- define "authorizer.decisionLogger" -}}
+{{- with .Values.decisionLogs -}}
+type: file
+config:
+  log_file_path: /decisions/decisions.log
+  max_file_size_mb: {{ .file.maxFileSizeMB | default "50" }}
+  max_file_count: {{ .file.maxFileCount | default "2" }}
+{{- end }}
+{{- end }}

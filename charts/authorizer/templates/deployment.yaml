@@ -40,6 +40,13 @@ spec:
           emptyDir: {}
           {{- end }}
           {{- end }}
+        - name: decisions
+        {{- if (.Values.decisionLogs).enabled | and ((.Values.decisionLogs).persistence).enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "topaz.fullname" . }}-pvc-decisions
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
         - name: https-certs
           {{- with (include "aserto-lib.httpsConfig" . | fromYaml) }}
           {{- if .certSecret }}
@@ -94,6 +101,9 @@ spec:
               readOnly: true
             - name: grpc-certs
               mountPath: /grpc-certs
+            - name: decisions
+              mountPath: /decisions
+              readOnly: false
             {{- if (include "aserto-lib.grpcConfig" . | fromYaml).certSecret  }}
               readOnly: true
             {{- end }}

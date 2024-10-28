@@ -15,4 +15,4 @@ dependencies:
   repository: oci://ghcr.io/aserto-dev/helm
   version: 0.1.4
 digest: sha256:62f06ef22f89eab79e44787a57c9377faf11d5fb14cf799f0ff63c1dcf127798
-generated: "2024-10-24T12:12:29.438424-04:00"
+generated: "2024-10-30T15:49:21.069483+02:00"
