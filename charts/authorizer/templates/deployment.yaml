@@ -43,7 +43,7 @@ spec:
         - name: decisions
         {{- if (.Values.decisionLogs).enabled | and ((.Values.decisionLogs).persistence).enabled }}
           persistentVolumeClaim:
-            claimName: {{ include "topaz.fullname" . }}-pvc-decisions
+            claimName: {{ include "authorizer.fullname" . }}-pvc-decisions
         {{- else }}
           emptyDir: {}
         {{- end }}
