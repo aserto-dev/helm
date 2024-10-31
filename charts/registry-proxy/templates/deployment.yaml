@@ -1,0 +1,120 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "registry-proxy.fullname" . }}
+  labels:
+    {{- include "registry-proxy.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "registry-proxy.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "registry-proxy.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- include "aserto-lib.imagePullSecrets" . | nindent 6 }}
+      serviceAccountName: {{ include "registry-proxy.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+        - name: config
+          secret:
+            secretName: {{ include "registry-proxy.fullname" . }}-config
+            items:
+              - key: config.yaml
+                path: config.yaml
+        - name: grpc-certs
+          {{- with include "aserto-lib.grpcConfig" . | fromYaml }}
+          {{- if .certSecret  }}
+          secret:
+            secretName: {{ .certSecret }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+          {{- end }}
+        - name: https-certs
+          {{- with (include "aserto-lib.httpsConfig" . | fromYaml) }}
+          {{- if .certSecret }}
+          secret:
+            secretName: {{ .certSecret }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+          {{- end }}
+
+        {{- with (include "aserto-lib.rootDirectoryCfg" . | fromYaml) }}
+        {{- if .grpcCertSecret }}
+        - name: root-ds-grpc-certs
+          secret:
+            secretName: {{ .grpcCertSecret }}
+            items:
+              - key: ca.crt
+                path: ca.crt
+        {{- end }}
+        {{- end }}
+
+        {{- with (include "aserto-lib.discoveryCfg" . | fromYaml) }}
+        {{- if .httpsCertSecret }}
+        - name: discovery-https-certs
+          secret:
+            secretName: {{ .httpsCertSecret }}
+            items:
+              - key: ca.crt
+                path: ca.crt
+        {{- end }}
+        {{- end }}
+
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          args: ["run", "--config-file", "/config/config.yaml"]
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            {{- with (include "aserto-lib.selfPorts" . | fromYaml )}}
+            - name: https
+              containerPort: {{ .https }}            
+            - name: metrics
+              containerPort: {{ .metrics }}
+            {{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: /config
+              readOnly: true
+            - name: https-certs
+              mountPath: /https-certs
+            {{- if (include "aserto-lib.httpsConfig" . | fromYaml).certSecret  }}
+              readOnly: true
+            {{- end }}
+          
+          {{- with (include "aserto-lib.selfPorts" . | fromYaml )}}
+          livenessProbe:
+            grpc:
+              port: {{ .health }}
+          readinessProbe:
+            grpc:
+              port: {{ .health }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
