@@ -46,6 +46,4 @@ jobs:
       -
         name: Lint
         run: |
-          ct lint --config ct.yaml \
-            --target-branch ${{ github.event.repository.default_branch }} \
-            --helm-repo-extra-args "aserto-helm=-u gh -p ${READ_WRITE_TOKEN}"
+          ct lint --config ct.yaml --helm-repo-extra-args "aserto-helm=-u gh -p ${READ_WRITE_TOKEN}"
