@@ -1,6 +1,5 @@
 ---
 rootDirectory:
-  tenantID: root-tenant-id
   database:
     host: root-db-host
 tenantDirectory:

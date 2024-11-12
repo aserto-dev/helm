@@ -1,8 +1,7 @@
+---
 oidc:
   domain: oidc_domain
   audience: oidc_audience
-rootDirectory:
-  tenantID: root-tenant-id
 registries:
   ghcr.io:
     scheme: bearer

@@ -32,7 +32,7 @@ global:
       # [REQUIRED] Specify the ingress address of the
       # conosle service.
       allowed_origins:
-        # - https://console.aserto.example.com
+      # - https://console.aserto.example.com
 
 
     # # Metrics configuration.
@@ -46,8 +46,6 @@ global:
     rootDirectory:
       # Disable TLS verification on
       disableTLSVerification: true
-      # Tenant ID of the root directory.
-      tenantID: 06e1fdac-0676-11ef-b77e-0005a79d9368
 
     directory:
       disableTLSVerification: true

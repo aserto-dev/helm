@@ -28,9 +28,6 @@ oidc:
 
 rootDirectory:
   runService: true
-  # REQUIRED: root directory tenant ID
-  tenantID: ""
-
   database:
     # REQUIRED: root directory database hostname
     host: ""
