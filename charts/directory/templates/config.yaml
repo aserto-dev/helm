@@ -109,13 +109,15 @@ stringData:
     authentication:
       authenticators_enabled:
         root_key: true
+        {{- with .Values.oidc }}
         oidc: true
+        {{- end }}
         {{- if (.Values.authentication).machineAccounts }}
         machine_account: true
         {{- end }}
 
       root_keys:
-        {{- if .Values.tenantDirectory.runService }}
+      {{- if .Values.tenantDirectory.runService }}
         keys:
           - key: ${DIRECTORY_DS_WRITE_KEY}
             account: root-key-directory-writer@aserto.com
@@ -124,21 +126,27 @@ stringData:
           - key: ${DIRECTORY_ROOT_DS_CLIENT_API_KEY}
             account: root-key-directory-store-writer@aserto.com
 
-        {{- if .Values.rootDirectory.runService }}
+        {{ if .Values.rootDirectory.runService -}}
         tenant_overrides:
           {{ include "aserto-lib.rootDirectoryTenantID" .}}:
             - key: ${DIRECTORY_ROOT_DS_CLIENT_API_KEY}
               account: "root-ds"
+        {{- range .Values.tenants }}
+          {{ .id | required "all tenants must have an id." }}:
+            {{- include "directory.tenantKeys" . | nindent 12 }}
+        {{- end }}
         {{- end }}
 
-        {{- else }}
+      {{- else }}
         keys:
           - key: ${DIRECTORY_ROOT_DS_CLIENT_API_KEY}
             account: "root-ds"
-        {{- end }}
+      {{- end }}
 
+      {{- with .Values.oidc -}}
       oidc:
         {{- include "aserto-lib.oidcConfig" . | nindent 8 }}
+      {{- end }}
 
       override:
         - methods:

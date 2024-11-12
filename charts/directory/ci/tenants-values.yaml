@@ -1,0 +1,22 @@
+---
+rootDirectory:
+  tenantID: root-tenant-id
+  database:
+    host: root-db-host
+tenantDirectory:
+  database:
+    host: tenant-db-host
+sshAdminKeys: |
+  ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDf6
+tenants:
+  - name: staging
+    id: 3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1
+    keysSecret:
+      name: staging-keys
+      writerKey: writerKey
+      readerKey: readerKey
+  - name: prod
+    id: 8b6152d2-9d19-11ef-98b6-00a83bc65178
+    keys:
+      writer: fb634e791176409a8c5dd6776435fb0b
+      reader: 39fa2ac0eb0f45fdb9234bb69436940f

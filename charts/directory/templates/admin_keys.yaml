@@ -5,5 +5,5 @@ metadata:
   name: {{ include "directory.fullname" . }}-admin-keys
 data:
   authorized_keys: |
-    {{- .Values.sshAdminKeys | default "" | nindent 4 }}
+    {{- .Values.sshAdminKeys | required  "sshAdminKeys is required" | nindent 4 }}
 

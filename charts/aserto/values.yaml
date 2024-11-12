@@ -1,3 +1,4 @@
+---
 global:
   # Configuration shared by all services.
   aserto:
@@ -62,7 +63,7 @@ directory:
   #   tag: x.y.z
   #   pullPolicy: IfNotPresent
 
-  # Control access to the directory's management service.
+  # Required: Provide one or more SSH public keys to be granted admin access.
   # sshAdminKeys: |
   #   # Add your authorized SSH public keys here
   #   ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDf6

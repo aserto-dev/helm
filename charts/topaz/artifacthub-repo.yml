@@ -1,0 +1,9 @@
+---
+# Artifact Hub repository metadata file
+repositoryID: 43be4ce9-998c-4efb-8a2d-01f1ce615b4c
+owners:  # (used to claim repository ownership)
+  - name: ronenh
+    email: github@ronen.hilewi.cz
+ignore:  # (pre-releases should not be indexed by Artifact Hub)
+  - name: topaz
+    version: beta # Regular expression (when omitted, all versions are ignored)

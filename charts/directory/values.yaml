@@ -1,24 +1,26 @@
 # Default values for directory.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-
+---
 image:
   repository: ghcr.io/aserto-dev/directory
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   # tag: x.y.z
 
+# Optional: override default ports.
 # ports:
-  # grpc: 8282
-  # https: 8383
-  # health: 8484
-  # metrics: 8585
+#   grpc: 8282
+#   https: 8383
+#   health: 8484
+#   metrics: 8585
 
-# REQUIRED: specify and OIDC domain and audience
-# oidc:
+# Optional: OpenID Connect domain and audience.
+oidc:
 #   domain: ""
 #   audience: ""
 
+# Required: Provide one or more SSH public keys to be granted admin access.
 # sshAdminKeys: |
 #   # Add your authorized SSH public keys here
 #   ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDf6
@@ -79,6 +81,21 @@ tenantDirectory:
         max_idle_conns: 25
         conn_max_lifetime: 5
         query_timeout_seconds: 5
+
+# Optional: list of predefined tenants.
+tenants:
+#   - name: my-tenant
+#     id: 3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1
+#     # Read-only and read-write API keys for the tenant.
+#     keys:
+#       writer: fb634e791176409a8c5dd6776435fb0b
+#       reader: 39fa2ac0eb0f45fdb9234bb69436940f
+#     # Kubernetes secret containing API keys for the tenant.
+#     # If 'keysSecret' is provided, 'keys' is ignored.
+#     keysSecret:
+#       name: my-tenant-keys
+#       writerKey: writer
+#       readerKey: reader
 
 
 # Set the service log level (trace/debug/info/warn/error)
