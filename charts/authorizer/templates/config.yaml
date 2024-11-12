@@ -55,6 +55,11 @@ stringData:
         - key: ${AUTHORIZER_ROOT_KEY}
           account: root-key-authorizer@aserto.com
 
+  {{- if (.Values.decisionLogs).enabled }}
+    decision_logger:
+      {{- include "authorizer.decisionLogger" . | nindent 6 }}
+  {{- end }}
+
     opa:
       instance_id: "-"
       graceful_shutdown_period_seconds: 2
