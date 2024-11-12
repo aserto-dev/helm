@@ -17,7 +17,11 @@ Args: [scope, config, service]
 {{- tpl $addr $scope }}
 {{- else }}
 {{- $port := include "aserto-lib.ports" (list $scope $cfg) | fromYaml | dig $portType ""  | toYaml }}
+{{- if contains $svc $scope.Release.Name }}
+{{- printf "%s.%s.svc.cluster.local:%s" $scope.Release.Name $scope.Release.Namespace $port }}
+{{- else }}
 {{- printf "%s-%s.%s.svc.cluster.local:%s" $scope.Release.Name $svc $scope.Release.Namespace $port }}
+{{- end }}
 {{- end }}
 {{- end }}
 

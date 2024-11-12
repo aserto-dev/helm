@@ -31,5 +31,5 @@ Root directory tenant ID
 */}}
 {{- define "aserto-lib.rootDirectoryTenantID" -}}
 {{- (include "aserto-lib.rootDirectoryCfg" . | fromYaml).tenantID |
-	required ".Values.rootDirectory.tenantID or .Values.global.aserto.rootDirectory.tenantID must be set" -}}
+	default "00000000-0000-11ef-0000-000000000000" -}}
 {{- end }}

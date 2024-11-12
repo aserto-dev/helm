@@ -1,3 +1,4 @@
+---
 # Default values for directory.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
@@ -18,7 +19,6 @@ oidc:
   audience: ""
 
 rootDirectory:
-  tenantID: "06e1fdac-0676-11ef-b77e-0005a79d9368"
   disableTLSVerification: false
   grpcCertSecret: ""
   # address: "{{ .Release.Name }}-aserto-directory.aserto.svc.cluster.local:8282"

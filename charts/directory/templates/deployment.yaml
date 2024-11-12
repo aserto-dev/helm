@@ -13,8 +13,10 @@ spec:
       {{- include "directory.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/config.yaml") . | sha256sum }}
+        checksum/admin_keys: {{ include (print $.Template.BasePath "/admin_keys.yaml") . | sha256sum }}
+      {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
@@ -174,6 +176,22 @@ spec:
                   key: password
             {{- end }}
             {{- end }}
+
+          {{- range $_, $tenant := .Values.tenants -}}
+            {{- with $tenant.keysSecret }}
+            - name: {{ printf "TENANT_%s_WRITER_KEY" (replace "." "_" $tenant.name | upper) }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .name | required "tenants[].keysSecret.name is required" }}
+                  key: {{ .writerKey | default "writer" }}
+            - name: {{ printf "TENANT_%s_READER_KEY" (replace "." "_" $tenant.name | upper) }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .name | required "tenants[].keysSecret.name is required" }}
+                  key: {{ .readerKey | default "reader" }}
+            {{- end }}
+          {{- end }}
+
           {{- with (include "aserto-lib.selfPorts" . | fromYaml )}}
           livenessProbe:
             grpc:

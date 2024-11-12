@@ -1,5 +1,6 @@
+---
 # See https://github.com/helm/chart-testing#configuration
 remote: origin
-target-branch: main
+target-branch: published
 chart-repos:
   - aserto-helm=oci://ghcr.io/aserto-dev/helm

@@ -1,3 +1,4 @@
+---
 global:
   # Configuration shared by all services.
   aserto:
@@ -31,7 +32,7 @@ global:
       # [REQUIRED] Specify the ingress address of the
       # conosle service.
       allowed_origins:
-        # - https://console.aserto.example.com
+      # - https://console.aserto.example.com
 
 
     # # Metrics configuration.
@@ -45,8 +46,6 @@ global:
     rootDirectory:
       # Disable TLS verification on
       disableTLSVerification: true
-      # Tenant ID of the root directory.
-      tenantID: 06e1fdac-0676-11ef-b77e-0005a79d9368
 
     directory:
       disableTLSVerification: true
@@ -62,7 +61,7 @@ directory:
   #   tag: x.y.z
   #   pullPolicy: IfNotPresent
 
-  # Control access to the directory's management service.
+  # Required: Provide one or more SSH public keys to be granted admin access.
   # sshAdminKeys: |
   #   # Add your authorized SSH public keys here
   #   ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDf6

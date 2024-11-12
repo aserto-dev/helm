@@ -1,11 +1,13 @@
+---
 global:
   aserto:
     imagePullSecrets:
       - name: ghcr-creds
 rootDirectory:
-  tenantID: root-tenant-id
   database:
     host: root-db-host
 tenantDirectory:
   database:
     host: tenant-db-host
+sshAdminKeys: |
+  ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDf6

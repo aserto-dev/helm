@@ -1,3 +1,4 @@
+---
 global:
   aserto:
     oidc:
@@ -13,9 +14,10 @@ discovery:
       tokenSecretName: ghcr-token-secret
 directory:
   rootDirectory:
-    tenantID: root-tenant-id
     database:
       host: root-db-host
   tenantDirectory:
     database:
       host: tenant-db-host
+  sshAdminKeys: |
+    ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDf6

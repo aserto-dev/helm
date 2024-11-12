@@ -1,5 +1,4 @@
-rootDirectory:
-  tenantID: root-tenant-id
+---
 oidc:
   domain: oidc_domain
   audience: oidc_audience

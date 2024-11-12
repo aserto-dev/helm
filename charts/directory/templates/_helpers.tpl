@@ -60,3 +60,22 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{- define "directory.tenantKeys" -}}
+{{- if empty .name -}}
+	{{- fail "tenants[].name is require" }}
+{{- end -}}
+{{- if .keysSecret -}}
+- key: {{ printf "${TENANT_%s_WRITER_KEY}" (replace "." "_" .name | upper) }}
+  account: directory-client-writer@{{ .id }}.aserto.com
+- key: {{ printf "${TENANT_%s_READER_KEY}" (replace "." "_" .name | upper) }}
+  account: directory-client-reader@{{ .id }}.aserto.com
+{{- else if .keys -}}
+- key: {{ .keys.writer | required "tenants[].keys.writer is required" }}
+  account: directory-client-writer@{{ .id }}.aserto.com
+- key: {{ .keys.reader | required "tenants[].keys.reader is required" }}
+  account: directory-client-reader@{{ .id }}.aserto.com
+{{- else -}}
+  {{ fail "all tenants must include either 'keys' or 'keysSecret'" }}
+{{- end }}
+{{- end}}
