@@ -89,7 +89,7 @@ stringData:
 
     cache:
       {{- $cache := .Values.cache | default dict }}
-      cache_size_mb: {{ $cache.sizeMB | default 25 }}
+      cache_size_mb: {{ $cache.sizeMB | default 128 }}
       cache_invalidation_time_seconds: {{ $cache.ttlSeconds | default 1800 }}
       clean_window_seconds: {{ $cache.cleanWindowSeconds | default 10 }}
 
