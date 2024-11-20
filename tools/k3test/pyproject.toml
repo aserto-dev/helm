@@ -1,0 +1,17 @@
+[project]
+name = "k3test"
+version = "0.1.0"
+description = "Runs chart tests in k3s"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "kubernetes>=31.0.0",
+    "python-retry>=0.0.1",
+]
+
+[dependency-groups]
+dev = [
+    "black>=24.10.0",
+    "kubernetes-typed>=18.20.2",
+    "pylint>=3.3.1",
+]

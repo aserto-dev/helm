@@ -1,0 +1,38 @@
+---
+image:
+  tag: 0.33.2-cac7c06f-arm64
+
+imagePullSecrets:
+  - name: ghcr-creds
+
+rootDirectory:
+  database:
+    host: host.k3d.internal
+    dbName: test-root-ds
+    sslMode: disable
+    admin:
+      credentialsSecret: pg-credentials
+    reader:
+      credentialsSecret: pg-root-reader-credentials
+
+tenantDirectory:
+  database:
+    host: host.k3d.internal
+    dbName: test-ds
+    sslMode: disable
+    admin:
+      credentialsSecret: pg-credentials
+    reader:
+      credentialsSecret: pg-tenant-reader-credentials
+
+cache:
+  sizeMB: 100
+
+sshAdminKeys: |
+  ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMEAOAWPotrmDRxyLRSswrectb8NJ4pH/i09N91Hd4Lj ronen@hilewi.cz
+
+tenants:
+  - name: test
+    id: 3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1
+    keysSecret:
+      name: test-tenant-keys

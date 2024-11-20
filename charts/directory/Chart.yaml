@@ -32,4 +32,5 @@ appVersion: "0.33.1"
 dependencies:
   - name: aserto-lib
     version: ~0.1.5
-    repository: oci://ghcr.io/aserto-dev/helm
+    # repository: oci://ghcr.io/aserto-dev/helm
+    repository: file:///Users/ronenhilewicz/aserto-dev/helm/charts/aserto-lib

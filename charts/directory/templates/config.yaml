@@ -74,7 +74,7 @@ stringData:
 
     root_ds:
       client:
-        {{- include "aserto-lib.rootDirectoryClient" . | nindent 8 }}
+        {{- include "directory.rootClient" . | nindent 8 }}
 
       {{- if and .Values.rootDirectory.runService .Values.rootDirectory.manifest }}
       root_manifest: {{ .Values.rootDirectory.manifest }}

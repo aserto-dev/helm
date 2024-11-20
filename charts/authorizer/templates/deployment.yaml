@@ -50,11 +50,11 @@ spec:
           {{- end }}
           {{- end }}
 
-        {{- with (include "aserto-lib.rootDirectoryCfg" . | fromYaml) }}
-        {{- if .grpcCertSecret }}
+        {{- with (include "aserto-lib.rootClientCfg" . | fromYaml) }}
+        {{- if .caCertSecret }}
         - name: root-ds-grpc-certs
           secret:
-            secretName: {{ .grpcCertSecret }}
+            secretName: {{ .caCertSecret }}
             items:
               - key: ca.crt
                 path: ca.crt
@@ -80,14 +80,14 @@ spec:
           args: ["run", "--config-file", "/config/config.yaml"]
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            {{- with (include "aserto-lib.selfPorts" . | fromYaml )}}
+          {{- with (include "aserto-lib.selfPorts" . | fromYaml )}}
             - name: https
               containerPort: {{ .https }}
             - name: grpc
               containerPort: {{ .grpc }}
             - name: metrics
               containerPort: {{ .metrics }}
-            {{- end }}
+          {{- end }}
           volumeMounts:
             - name: config
               mountPath: /config
@@ -103,66 +103,61 @@ spec:
               readOnly: true
             {{- end }}
 
-            {{- if (include "aserto-lib.rootDirectoryCfg" . | fromYaml).grpcCertSecret }}
+          {{- if (include "aserto-lib.rootClientCfg" . | fromYaml).caCertSecret }}
             - name: root-ds-grpc-certs
               mountPath: /root-ds-grpc-certs
               readOnly: true
-            {{- end }}
+          {{- end }}
 
-            {{- if (include "aserto-lib.discoveryCfg" . | fromYaml).httpsCertSecret }}
+          {{- if (include "aserto-lib.discoveryCfg" . | fromYaml).httpsCertSecret }}
             - name: discovery-https-certs
               mountPath: /discovery-https-certs
               readOnly: true
-            {{- end }}
+          {{- end }}
           env:
-            {{- with .Values.apiKey }}
+            - name: AUTHORIZER_DS0_API_KEY
+              {{ include "aserto-lib.rootApiKeyEnv" . | nindent 14 }}
+          {{- with .Values.apiKey }}
             - name: AUTHORIZER_ROOT_KEY
               valueFrom:
                 secretKeyRef:
                   name: {{ .secretName }}
                   key: {{ .secretKey }}
-            {{- end }}
+          {{- end }}
 
-            {{- with (include "aserto-lib.rootDirectoryApiKey" . | fromYaml) }}
-            - name: AUTHORIZER_DS0_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .secretName }}
-                  key: {{ .secretKey }}
-            {{- end }}
-            {{- with (include "aserto-lib.directoryApiKeys" . | fromYaml) }}
+          {{- with (include "aserto-lib.directoryApiKeys" . | fromYaml) }}
             - name: AUTHORIZER_REMOTE_DIRECTORY_API_KEY
               valueFrom:
                 secretKeyRef:
                   name: {{ .secretName }}
                   key: {{ .readerSecretKey }}
-            {{- end }}
-            {{- with (include "aserto-lib.discoveryApiKey" . | fromYaml) }}
+          {{- end }}
+          {{- with (include "aserto-lib.discoveryApiKey" . | fromYaml) }}
             - name: AUTHORIZER_DISCOVERY_ROOT_KEY
               valueFrom:
                 secretKeyRef:
                   name: {{ .secretName }}
                   key: {{ .secretKey }}
-            {{- end }}
-          {{- with (include "aserto-lib.selfPorts" . | fromYaml )}}
+          {{- end }}
+        {{- with (include "aserto-lib.selfPorts" . | fromYaml )}}
           livenessProbe:
             grpc:
               port: {{ .health }}
           readinessProbe:
             grpc:
               port: {{ .health }}
-          {{- end }}
+        {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-      {{- with .Values.nodeSelector }}
+    {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
+    {{- end }}
+    {{- with .Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
+    {{- end }}
+    {{- with .Values.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+    {{- end }}

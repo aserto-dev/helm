@@ -1,0 +1,22 @@
+{{- if .Values.rootDirectory.runService }}
+{{- $cfg := include "aserto-lib.rootClientCfg" . | fromYaml -}}
+{{- $secretName := ($cfg.apiKeySecret).name | default "root-ds-keys" -}}
+{{- $secretKey := ($cfg.apiKeySecret).key | default "api-key" -}}
+
+{{- $apiKey := $cfg.apiKey -}}
+{{- if empty $apiKey -}}
+  {{- $current :=  (lookup "v1" "Secret" $.Release.Namespace $secretName).data }}
+  {{- if $current }}
+    {{- $apiKey = get $current $secretKey }}
+  {{- else -}}
+    {{- $apiKey = randAlphaNum 32 | b64enc }}
+  {{- end }}
+{{- end -}}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ $secretName }}
+data:
+  {{ $secretKey }}: {{ $apiKey }}
+{{- end }}
