@@ -15,9 +15,19 @@ tests:
       - chart: directory
         values: directory.values.yaml
         ports:
-          - 2222
-          - 8282
+          2222: 2222
+          8282: 8282
     run:
-      - "ssh -p 2222 localhost provision root-keys"
-      - "ssh -p 2222 localhost provision tenant test --id 3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1"
-      - "topaz ds get manifest -H localhost:8282 --tenant-id 3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1 -k {read_key} --stdout --plaintext"
+      - >
+        ssh -p 2222 -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR
+        localhost provision root-keys
+      - >
+        ssh -p 2222 -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR
+        localhost provision tenant test --id 3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1
+      - >
+        ${TOPAZ:-topaz} ds get manifest -H localhost:8282 --tenant-id 3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1
+        -k apikey_tenant_reader --stdout --plaintext
+    cleanup:
+      - >
+        ssh -p 2222 -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR
+        localhost provision tenant test --id 3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1 --delete

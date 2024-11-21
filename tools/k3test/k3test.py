@@ -2,192 +2,142 @@
 """Test Helm Charts in k3s"""
 
 import logging
-import random
-import signal
-import string
 import subprocess
-import time
-from contextlib import contextmanager
-from functools import lru_cache
-from typing import Iterator, Mapping
+from contextlib import contextmanager, ExitStack
+from os import path
+from typing import Iterator
 
-from kubernetes import client, config
-from kubernetes.client.rest import ApiException
+import click
+import git
+import yaml
+
+from kubernetes import config
+
+from model import Spec, Test
+from namespace import Namespace
 
 logger = logging.getLogger("k3stest")
 
-TOPAZ = "~/aserto-dev/topaz/dist/topaz_darwin_arm64/topaz"
-TENANT_ID = "3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1"
-TENANT_NAME = "test"
+COLOR_HARNESS = "blue"
+COLOR_STEP = "magenta"
+COLOR_CLEANUP = "cyan"
 
 
-def main():
+class Runner:
+    def __init__(self, test: Test, spec_path: str):
+        self.test = test
+        self.spec_path = spec_path
+        self.git_root = git_root(__file__)
+
+    def run(self):
+        with self.new_namespace(self.test.name) as ns:
+            self.set_image_pull_secret(ns)
+
+            for secret in self.test.secrets:
+                click.echo(
+                    f"🔒 {click.style("Creating secret:", fg=COLOR_HARNESS)} {secret.name}"
+                )
+                ns.create_secret(secret)
+
+            for deployment in self.test.deployments:
+                click.echo(
+                    f"🗺️ {click.style("Installing chart:", fg=COLOR_HARNESS)} {deployment.chart}"
+                )
+                ns.helm(
+                    "install",
+                    deployment.chart,
+                    path.join(self.git_root, "charts", deployment.chart),
+                    "-f",
+                    path.join(self.spec_path, deployment.values),
+                )
+
+            for deployment in self.test.deployments:
+                ns.wait(ns.svc_pod(deployment.chart))
+
+            with ExitStack() as stack:
+                for deployment in self.test.deployments:
+                    click.echo(
+                        f"🔀 {click.style("Forwarding port(s):", fg=COLOR_HARNESS)} {deployment.chart} - {deployment.ports}"
+                    )
+                    stack.enter_context(ns.forward(deployment.chart, deployment.ports))
+
+                    click.echo(f"\n✅ Deployment complete.\n")
+                    try:
+                        self.execute_steps()
+                    finally:
+                        self.execute_cleanup()
+
+    def execute_steps(self):
+        click.echo(f"🏃 {click.style("Running tests", fg=COLOR_HARNESS)}\n")
+        for step in self.test.run:
+            click.echo(f"🧪 {click.style(step, fg=COLOR_STEP)}")
+            self.subprocess(step)
+
+    def execute_cleanup(self):
+        click.echo(f"\n🧹 {click.style("Running cleanup", fg=COLOR_HARNESS)}\n")
+        for step in self.test.cleanup:
+            click.echo(f"🧽 {click.style(step, fg=COLOR_STEP)}")
+            self.subprocess(step, check=False)
+
+    def set_image_pull_secret(self, ns: Namespace):
+        if self.test.pull_secret:
+            ns.kubectl(
+                "create",
+                "secret",
+                "docker-registry",
+                "ghcr-creds",
+                "--docker-server=https://ghcr.io",
+                "--docker-username=gh_user",
+                f"--docker-password={path.expandvars(self.test.pull_secret)}",
+            )
+
+    @staticmethod
+    def subprocess(args: str, check=True):
+        subprocess.run(
+            args=args,
+            shell=True,
+            check=check,
+        )
+
+    @staticmethod
+    @contextmanager
+    def new_namespace(name: str) -> Iterator["Namespace"]:
+        ns = Namespace(name)
+        if ns.ns_exists():
+            logger.info("namespace '%s' already exists. deleting it...", name)
+            ns.delete_ns()
+
+        click.echo(f"🐳 {click.style("Creating namespace:", fg=COLOR_HARNESS)} {name}")
+        ns.create_ns()
+
+        yield ns
+
+        click.echo(f"\n🐳 {click.style("Deleting namespace:", fg=COLOR_HARNESS)} {name}")
+        ns.delete_ns()
+
+
+@click.command()
+@click.argument("specfile", type=click.File())
+def main(specfile):
+    """Run tests in a kubernetes cluster.
+
+    SPECFILE: path to a YAML file with test definitions.
+    """
+
     init_logger(logging.DEBUG)
     config.load_kube_config()
 
-    read_key, write_key = keygen(), keygen()
+    spec = Spec(**yaml.safe_load(specfile))
+    spec_path = path.dirname(specfile.name)
 
-    with new_namespace("directory") as ns:
-        ns.run(
-            "create",
-            "secret",
-            "docker-registry",
-            "ghcr-creds",
-            "--docker-server=https://ghcr.io",
-            "--docker-username=gh_user",
-            "--docker-password=$GITHUB_TOKEN",
-        )
-
-        ns.run(
-            "create",
-            "secret",
-            "generic",
-            "pg-credentials",
-            "--from-literal=password=",
-            "--from-literal=username=postgres",
-        )
-
-        ns.run(
-            "create",
-            "secret",
-            "generic",
-            f"{TENANT_NAME}-tenant-keys",
-            f"--from-literal=reader={read_key}",
-            f"--from-literal=writer={write_key}",
-        )
-
-        ns.helm(
-            "install",
-            "directory",
-            "charts/directory",
-            "-f",
-            "test/directory/directory.values.yaml",
-        )
-
-        ns.wait(ns.svc_pod("directory"))
-
-        with ns.forward("directory", {8282: 8282, 2222: 2222}):
-            subprocess.run(
-                args="ssh -p 2222 localhost provision root-keys",
-                shell=True,
-                check=True,
-            )
-
-            subprocess.run(
-                args=f"ssh -p 2222 localhost provision tenant {TENANT_NAME} --id {TENANT_ID}",
-                shell=True,
-                check=True,
-            )
-
-            subprocess.run(
-                args=f"{TOPAZ} ds get manifest -H localhost:8282 --tenant-id {TENANT_ID} "
-                f"--api-key {read_key} --stdout --plaintext",
-                shell=True,
-                check=True,
-            )
+    for test in spec.tests:
+        click.echo(f"🏁 {click.style('Starting test:', fg=COLOR_HARNESS)} {test.name}")
+        Runner(test, spec_path).run()
 
 
-@contextmanager
-def new_namespace(name: str) -> Iterator["Namespace"]:
-    ns = Namespace(name)
-    if ns.exists():
-        logger.info("namespace '%s' already exists. deleting it...", name)
-        ns.delete()
-
-    ns.create()
-
-    yield ns
-
-
-class Namespace:
-    def __init__(self, namespace: str):
-        self.namespace = namespace
-        self.cluster = client.CoreV1Api()
-
-    def create(self):
-        self.kubectl("create", "namespace", self.namespace)
-
-    def delete(self):
-        self.kubectl("delete", "namespace", self.namespace, "--wait=true")
-
-    def exists(self):
-        try:
-            self.cluster.read_namespace(self.namespace)
-            return True
-        except ApiException as e:
-            print("read ns error:", e)
-
-        return False
-
-    def run(self, *args):
-        self.kubectl(*args, "-n", self.namespace)
-
-    def wait(self, pod: str):
-        self.run(
-            "wait",
-            "--for=condition=ready",
-            "--timeout=30s",
-            "pod",
-            pod,
-        )
-
-    @contextmanager
-    def forward(self, svc: str, ports: Mapping[int, int]):
-        pod = self.svc_pod(svc)
-        port_mapping = tuple(f"{k}:{v}" for k, v in ports.items())
-        logger.debug("port-mapping: %s", port_mapping)
-        args = " ".join(
-            ("kubectl", "-n", self.namespace, "port-forward", pod) + port_mapping
-        )
-        logger.debug("port-forward: %s", args)
-        proc = subprocess.Popen(
-            args=args,
-            shell=True,
-        )
-
-        time.sleep(1.5)
-
-        try:
-            yield proc
-        finally:
-            logger.debug("terminating port-forward")
-            proc.send_signal(signal.SIGINT)
-            proc.wait()
-            logger.debug("port-forward terminated")
-
-    @lru_cache(maxsize=32)
-    def svc_pod(self, svc: str) -> str:
-        proc = self.kubectl(
-            "get",
-            "pods",
-            "--namespace",
-            "directory",
-            "-l",
-            f"app.kubernetes.io/name={svc},app.kubernetes.io/instance={svc}",
-            "-o",
-            "jsonpath='{.items[0].metadata.name}'",
-            capture_output=True,
-        )
-
-        if proc.returncode != 0:
-            proc.check_returncode()
-
-        return proc.stdout.decode()
-
-    def helm(self, *args, check=True):
-        args = ("helm", "-n", self.namespace) + args
-        return subprocess.run(args=" ".join(args), shell=True, check=check)
-
-    @staticmethod
-    def kubectl(*args, check: bool = True, capture_output: bool = False):
-        args = ("kubectl",) + args
-        return subprocess.run(
-            args=" ".join(args), check=check, shell=True, capture_output=capture_output
-        )
-
-
-def keygen() -> str:
-    return "".join(random.choices(string.ascii_letters + string.digits, k=32))
+def git_root(from_path: str) -> str:
+    repo = git.Repo(from_path, search_parent_directories=True)
+    return repo.git.rev_parse("--show-toplevel")
 
 
 def init_logger(level=logging.INFO):

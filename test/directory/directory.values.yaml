@@ -1,6 +1,6 @@
 ---
 image:
-  tag: 0.33.2-cac7c06f-arm64
+  tag: 0.33.2-3e32438c-arm64
 
 imagePullSecrets:
   - name: ghcr-creds

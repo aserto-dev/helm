@@ -1,3 +1,6 @@
 .ext/
 /charts/*/build/
 /charts/*/charts/
+
+# python
+**/__pycache__/
