@@ -1,7 +1,7 @@
 [project]
-name = "k3test"
+name = "ktest"
 version = "0.1.0"
-description = "Runs chart tests in k3s"
+description = "Runs chart tests in kubernetes"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [

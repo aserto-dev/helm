@@ -57,13 +57,16 @@ class Runner:
             with ExitStack() as stack:
                 for deployment in self.test.deployments:
                     click.echo(
-                        f"🔀 {click.style("Forwarding port(s):", fg=COLOR_HARNESS)} {deployment.chart} - {deployment.ports}"
+                        f"🔀 {click.style("Forwarding port(s):", fg=COLOR_HARNESS)} "
+                        f"{deployment.chart} - {deployment.ports}"
                     )
                     stack.enter_context(ns.forward(deployment.chart, deployment.ports))
 
-                    click.echo(f"\n✅ Deployment complete.\n")
+                    click.echo("\n✅ Deployment complete.\n")
                     try:
                         self.execute_steps()
+
+                        click.echo("\n✅ Tests complete.\n")
                     finally:
                         self.execute_cleanup()
 
@@ -112,7 +115,9 @@ class Runner:
 
         yield ns
 
-        click.echo(f"\n🐳 {click.style("Deleting namespace:", fg=COLOR_HARNESS)} {name}")
+        click.echo(
+            f"\n🐳 {click.style("Deleting namespace:", fg=COLOR_HARNESS)} {name}"
+        )
         ns.delete_ns()
 
 
