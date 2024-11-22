@@ -1,13 +1,13 @@
 ---
 image:
-  tag: 0.33.2-3e32438c-arm64
+  tag: 0.33.2-3e32438c-amd64
 
 imagePullSecrets:
   - name: ghcr-creds
 
 rootDirectory:
   database:
-    host: host.k3d.internal
+    host: postgresql.postgres.svc.cluster.local
     dbName: test-root-ds
     sslMode: disable
     admin:
@@ -17,7 +17,7 @@ rootDirectory:
 
 tenantDirectory:
   database:
-    host: host.k3d.internal
+    host: postgresql.postgres.svc.cluster.local
     dbName: test-ds
     sslMode: disable
     admin:

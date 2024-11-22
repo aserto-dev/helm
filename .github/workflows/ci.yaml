@@ -6,23 +6,17 @@ on:
   pull_request:
 
 env:
+  GH_TOKEN: ${{ github.token }}
   HELM_VERSION: v3.14.4
   PYTHON_VERSION: 3.13
+  POSTGRES_PASSWORD: postgres
   UV_VERSION: 0.5.3
+  TOPAZ_VERSION: 0.32.36
 
 jobs:
-  test:
+  lint:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Read Configuration
-        uses: hashicorp/vault-action@v3
-        id: vault
-        with:
-          url: https://vault.eng.aserto.com/
-          token: ${{ secrets.VAULT_TOKEN }}
-          secrets: |
-            kv/data/github  "READ_WRITE_TOKEN"    | READ_WRITE_TOKEN;
       -
         uses: actions/checkout@v4
         with:
@@ -46,7 +40,32 @@ jobs:
       -
         name: Lint
         run: |
-          ct lint --config ct.yaml --helm-repo-extra-args "aserto-helm=-u gh -p ${READ_WRITE_TOKEN}"
+          ct lint --config ct.yaml --helm-repo-extra-args "aserto-helm=-u gh -p ${{ secrets.GITHUB_TOKEN }}"
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        uses: actions/checkout@v4
+      -
+        name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: ${{ env.HELM_VERSION }}
+      -
+        name: Install topaz CLI
+        run: |
+          gh release download v${{env.TOPAZ_VERSION}} --repo aserto-dev/topaz --pattern "topaz_linux_x86_64.zip" \
+            --output ./ext/topaz.zip --clobber
+          unzip ./ext/topaz.zip -d bin
+          chmod +x ./bin/topaz
+          ./bin/topaz version
+          echo "TOPAZ=$(realpath ./bin/topaz)" >> "$GITHUB_ENV"
+      -
+        name: Install topazd container
+        run: |
+          ${TOPAZ} install --container-tag=${{ env.TOPAZ_VERSION }}
+          ${TOPAZ} version
       -
         name: Install uv package manager
         uses: astral-sh/setup-uv@v3
@@ -57,19 +76,42 @@ jobs:
         name: Create k8s cluster
         with:
           cluster-name: "test"
-          args: --agents 1
+          args: >
+            --agents 1
+            --k3s-arg "--disable=metrics-server@server:*"
+      -
+        name: Deploy Postgres
+        run: |
+          helm install postgresql oci://registry-1.docker.io/bitnamicharts/postgresql \
+            --namespace postgres --create-namespace \
+            --set auth.postgresPassword=${{ env.POSTGRES_PASSWORD }}
+      -
+        name: Wait for Postgres
+        run: |
+          echo "Waiting for postgres to be ready"
+          kubectl wait pods --selector app.kubernetes.io/name=postgresql \
+            --for condition=Ready --namespace postgres --timeout=60s
       -
         name: Generate admin ssh key
         id: sshkey
         run: |
-          ssh-keygen -t ed25519 -N "" -f ~/.ssh/admin_ed25519
-          echo "public_key=~/.ssh/admin_ed25519.pub" >> $GITHUB_OUTPUT
-          echo "private_key=~/.ssh/admin_ed25519" >> $GITHUB_OUTPUT
+          ssh-keygen -t ed25519 -N "" -f ${HOME}/.ssh/admin_ed25519
+          echo "public_key=${HOME}/.ssh/admin_ed25519.pub" >> "$GITHUB_OUTPUT"
+          echo "private_key=${HOME}/.ssh/admin_ed25519" >> "$GITHUB_OUTPUT"
+
+          cat << EOF > ${HOME}/.ssh/config
+          Host localhost
+            StrictHostKeyChecking no
+          EOF
+
+          chmod 400 ~/.ssh/config
       -
         name: Test Directory
+        timeout-minutes: 10
         env:
-          SSH_PUBLIC_KEY: ${{ steps.sshkey.public_key }}
-          SSH_PRIVATE_KEY: ${{ steps.sshkey.private_key }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SSH_PUBLIC_KEY: ${{ steps.sshkey.outputs.public_key }}
+          SSH_PRIVATE_KEY: ${{ steps.sshkey.outputs.private_key }}
         run: |
           cd tools/ktest
           uv run ktest.py ../../test/directory/tests.yaml

@@ -7,6 +7,14 @@ tests:
         values:
           username: postgres
           password: $POSTGRES_PASSWORD
+      - name: pg-root-reader-credentials
+        values:
+          username: root_reader
+          password: root_reader
+      - name: pg-tenant-reader-credentials
+        values:
+          username: tenant_reader
+          password: tenant_reader
       - name: test-tenant-keys
         values:
           reader: apikey_tenant_reader

@@ -1,6 +1,6 @@
 dependencies:
 - name: aserto-lib
-  repository: file:///Users/ronenhilewicz/aserto-dev/helm/charts/aserto-lib
+  repository: file://../aserto-lib
   version: 0.1.5
-digest: sha256:d4b6380105553ea5153be1973c56dcf386900d68679a53c987a163760ca8bacd
-generated: "2024-11-15T16:05:15.959277-05:00"
+digest: sha256:26ffec3faa8dafcb519fd066e04d0d6c33dffaf8aa4052a39166500fb0343b66
+generated: "2024-11-22T09:31:01.633697-05:00"
