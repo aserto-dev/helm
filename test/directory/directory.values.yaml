@@ -28,8 +28,10 @@ tenantDirectory:
 cache:
   sizeMB: 100
 
-sshAdminKeys: |
-  ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMEAOAWPotrmDRxyLRSswrectb8NJ4pH/i09N91Hd4Lj ronen@hilewi.cz
+sshAdminKeys:
+  configMap:
+    name: directory-admin-keys
+    key: authorized_keys
 
 tenants:
   - name: test

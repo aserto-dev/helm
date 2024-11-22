@@ -11,7 +11,7 @@ from typing import Mapping
 from kubernetes import client
 from kubernetes.client.rest import ApiException
 
-from model import Secret
+from model import ConfigMap, Secret
 
 logger = logging.getLogger("namespace")
 
@@ -48,6 +48,13 @@ class Namespace:
             secret.name,
             *keys,
         )
+
+    def create_config_map(self, config_map: ConfigMap):
+        keys = (
+            f"--from-file={key.name}={path.expandvars(key.file)}"
+            for key in config_map.keys
+        )
+        self.kubectl("create", "configmap", config_map.name, *keys)
 
     def kubectl(self, *args):
         kubectl(*args, "-n", self.namespace)

@@ -39,6 +39,12 @@ class Runner:
                 )
                 ns.create_secret(secret)
 
+            for config_map in self.test.config_maps:
+                click.echo(
+                    f"📋 {click.style("Creating sconfig map", fg=COLOR_HARNESS)} {config_map.name}"
+                )
+                ns.create_config_map(config_map)
+
             for deployment in self.test.deployments:
                 click.echo(
                     f"🗺️ {click.style("Installing chart:", fg=COLOR_HARNESS)} {deployment.chart}"
@@ -54,6 +60,8 @@ class Runner:
             for deployment in self.test.deployments:
                 ns.wait(ns.svc_pod(deployment.chart))
 
+            click.echo("\n✅ Deployment complete.\n")
+
             with ExitStack() as stack:
                 for deployment in self.test.deployments:
                     click.echo(
@@ -62,7 +70,6 @@ class Runner:
                     )
                     stack.enter_context(ns.forward(deployment.chart, deployment.ports))
 
-                    click.echo("\n✅ Deployment complete.\n")
                     try:
                         self.execute_steps()
 
@@ -71,7 +78,7 @@ class Runner:
                         self.execute_cleanup()
 
     def execute_steps(self):
-        click.echo(f"🏃 {click.style("Running tests", fg=COLOR_HARNESS)}\n")
+        click.echo(f"\n🏃 {click.style("Running tests", fg=COLOR_HARNESS)}\n")
         for step in self.test.run:
             click.echo(f"🧪 {click.style(step, fg=COLOR_STEP)}")
             self.subprocess(step)

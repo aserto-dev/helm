@@ -21,10 +21,16 @@ oidc:
 #   audience: ""
 
 # Required: Provide one or more SSH public keys to be granted admin access.
-# sshAdminKeys: |
-#   # Add your authorized SSH public keys here
-#   ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDf6
-#   ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDa7
+# sshAdminKeys:
+#   # Keys can be provided inline as a multi-line string under keys:
+#   keys: |
+#     # Add your authorized SSH public keys here
+#     ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDf6
+#     ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDa7
+#   # Keys can also be provided in a ConfigMap
+#   configMap:
+#     name: directory-admin-keys
+#     key: authorized_keys
 
 rootDirectory:
   runService: true

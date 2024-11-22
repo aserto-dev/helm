@@ -112,3 +112,13 @@ valueFrom:
     key: api-key
 {{- end }}
 {{- end }}
+
+{{- define "directory.adminKeysConfigMapName" -}}
+{{ ((.Values.sshAdminKeys).configMap).name | default
+	(printf "%s-admin-keys" (include "directory.fullname" .)) }}
+{{- end }}
+
+{{- define "directory.adminKeysConfigMapKey" -}}
+{{ ((.Values.sshAdminKeys).configMap).key | default "authorized_keys" }}
+{{- end }}
+

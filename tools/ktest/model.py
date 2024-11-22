@@ -3,6 +3,18 @@ from pydantic import BaseModel
 
 
 @dataclass
+class ConfigMapKey:
+    name: str
+    file: str
+
+
+@dataclass
+class ConfigMap:
+    name: str
+    keys: list[ConfigMapKey]
+
+
+@dataclass
 class Secret:
     name: str
     values: dict[str, str]
@@ -20,6 +32,7 @@ class Test:
     name: str
     pull_secret: str
     secrets: list[Secret]
+    config_maps: list[ConfigMap]
     deployments: list[Deployment]
     run: list[str]
     cleanup: list[str]

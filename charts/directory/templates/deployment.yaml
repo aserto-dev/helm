@@ -35,7 +35,7 @@ spec:
                 path: config.yaml
         - name: admin-keys
           configMap:
-            name: {{ include "directory.fullname" . }}-admin-keys
+            name: {{ include "directory.adminKeysConfigMapName" . }}
         {{- with (include "aserto-lib.grpcConfig" . | fromYaml).certSecret }}
         - name: grpc-certs
           secret:

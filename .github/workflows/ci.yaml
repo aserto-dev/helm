@@ -7,10 +7,11 @@ on:
 
 env:
   HELM_VERSION: v3.14.4
-  PYTHON_VERSION: 3.x
+  PYTHON_VERSION: 3.13
+  UV_VERSION: 0.5.3
 
 jobs:
-  lint:
+  test:
     runs-on: ubuntu-latest
     steps:
       -
@@ -21,7 +22,6 @@ jobs:
           url: https://vault.eng.aserto.com/
           token: ${{ secrets.VAULT_TOKEN }}
           secrets: |
-            kv/data/github  "USERNAME"            | DOCKER_USERNAME;
             kv/data/github  "READ_WRITE_TOKEN"    | READ_WRITE_TOKEN;
       -
         uses: actions/checkout@v4
@@ -47,3 +47,29 @@ jobs:
         name: Lint
         run: |
           ct lint --config ct.yaml --helm-repo-extra-args "aserto-helm=-u gh -p ${READ_WRITE_TOKEN}"
+      -
+        name: Install uv package manager
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: ${{ env.UV_VERSION }}
+      -
+        uses: AbsaOSS/k3d-action@v2
+        name: Create k8s cluster
+        with:
+          cluster-name: "test"
+          args: --agents 1
+      -
+        name: Generate admin ssh key
+        id: sshkey
+        run: |
+          ssh-keygen -t ed25519 -N "" -f ~/.ssh/admin_ed25519
+          echo "public_key=~/.ssh/admin_ed25519.pub" >> $GITHUB_OUTPUT
+          echo "private_key=~/.ssh/admin_ed25519" >> $GITHUB_OUTPUT
+      -
+        name: Test Directory
+        env:
+          SSH_PUBLIC_KEY: ${{ steps.sshkey.public_key }}
+          SSH_PRIVATE_KEY: ${{ steps.sshkey.private_key }}
+        run: |
+          cd tools/ktest
+          uv run ktest.py ../../test/directory/tests.yaml

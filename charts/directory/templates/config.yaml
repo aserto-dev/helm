@@ -22,7 +22,7 @@ stringData:
       metrics:
         {{- include "aserto-lib.metricsService" . | nindent 8 }}
       admin:
-        authorized_keys_path: /admin-keys/authorized_keys
+        authorized_keys_path: /admin-keys/{{ include "directory.adminKeysConfigMapKey" . }}
 
     {{ if .Values.rootDirectory.runService }}
     {{- with .Values.rootDirectory.database -}}
