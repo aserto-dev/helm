@@ -38,15 +38,19 @@ class Namespace:
         return False
 
     def create_secret(self, secret: Secret):
-        keys = (
+        literals = (
             f"--from-literal={k}={path.expandvars(v)}" for k, v in secret.values.items()
+        )
+        files = (
+            f"--from-file={k}={path.expandvars(v)}" for k, v in secret.files.items()
         )
         self.kubectl(
             "create",
             "secret",
             "generic",
             secret.name,
-            *keys,
+            *literals,
+            *files,
         )
 
     def create_config_map(self, config_map: ConfigMap):

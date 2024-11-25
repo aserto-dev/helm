@@ -184,8 +184,13 @@ def git_root(from_path: str) -> str:
     repo = git.Repo(from_path, search_parent_directories=True)
     return repo.git.rev_parse("--show-toplevel")
 
+
 def init_logging(level=logging.INFO):
-    loggers = (logging.getLogger(name) for name in logging.root.manager.loggerDict if name.startswith("k3test"))
+    loggers = (
+        logging.getLogger(name)
+        for name in logging.root.manager.loggerDict
+        if name.startswith("k3test")
+    )
     for logger in loggers:
         init_logger(logger, level)
 
@@ -198,7 +203,9 @@ def init_logger(logger: logging.Logger, level=logging.INFO):
     ch.setLevel(logging.DEBUG)
 
     # create formatter
-    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(name)s - %(message)s")
+    formatter = logging.Formatter(
+        "%(asctime)s - %(levelname)s - %(name)s - %(message)s"
+    )
 
     # add formatter to ch
     ch.setFormatter(formatter)

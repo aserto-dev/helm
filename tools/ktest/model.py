@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from pydantic import BaseModel
+from typing import Optional
+from pydantic import BaseModel, Field
 
 
 @dataclass
@@ -14,10 +15,10 @@ class ConfigMap:
     keys: list[ConfigMapKey]
 
 
-@dataclass
-class Secret:
+class Secret(BaseModel):
     name: str
-    values: dict[str, str]
+    values: dict[str, str] = Field(default_factory=lambda: {})
+    files: dict[str, str] = Field(default_factory=lambda: {})
 
 
 @dataclass
