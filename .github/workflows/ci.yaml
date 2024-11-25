@@ -84,6 +84,13 @@ jobs:
             --agents 1
             --k3s-arg "--disable=metrics-server@server:*"
       -
+        name: Test Topaz
+        timeout-minutes: 10
+        env:
+          TOPAZ_CERTS_DIR: ${{ env.TOPAZ_CERTS_DIR }}
+        run: |
+          uv run --project tools/ktest tools/ktest/ktest.py charts/topaz/test/tests.yaml
+      -
         name: Deploy Postgres
         run: |
           helm install postgresql oci://registry-1.docker.io/bitnamicharts/postgresql \
