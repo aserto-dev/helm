@@ -16,7 +16,7 @@ from kubernetes import config
 from model import Deployment, Spec, Test
 from namespace import Namespace
 
-logger = logging.getLogger("k3stest")
+logger = logging.getLogger(__name__)
 
 COLOR_HARNESS = "blue"
 COLOR_STEP = "magenta"
@@ -120,8 +120,8 @@ class Runner:
             echo("🧹", step, cl=COLOR_STEP)
             try:
                 self.subprocess(step)
-            except:
-                pass
+            except Exception as e:
+                logger.error("cleanup failed: %s", e)
 
     def set_image_pull_secret(self, ns: Namespace):
         if self.test.pull_secret:
@@ -186,32 +186,9 @@ def git_root(from_path: str) -> str:
 
 
 def init_logging(level=logging.INFO):
-    loggers = (
-        logging.getLogger(name)
-        for name in logging.root.manager.loggerDict
-        if name.startswith("k3test")
+    logging.basicConfig(
+        format="%(asctime)s - %(levelname)s - %(name)s - %(message)s", level=level
     )
-    for logger in loggers:
-        init_logger(logger, level)
-
-
-def init_logger(logger: logging.Logger, level=logging.INFO):
-    logger.setLevel(level)
-
-    # create console handler and set level to debug
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
-
-    # create formatter
-    formatter = logging.Formatter(
-        "%(asctime)s - %(levelname)s - %(name)s - %(message)s"
-    )
-
-    # add formatter to ch
-    ch.setFormatter(formatter)
-
-    # add ch to logger
-    logger.addHandler(ch)
 
 
 if __name__ == "__main__":

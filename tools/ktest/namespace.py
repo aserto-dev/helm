@@ -13,7 +13,7 @@ from kubernetes.client.rest import ApiException
 
 from model import ConfigMap, Secret
 
-logger = logging.getLogger("k3test.namespace")
+logger = logging.getLogger(__name__)
 
 
 class Namespace:
@@ -96,13 +96,24 @@ class Namespace:
             yield proc
         finally:
             logger.debug("terminating port-forward: %s", svc)
-            proc.terminate()
-            try:
-                proc.wait(1)
-            except subprocess.TimeoutExpired:
-                logger.info("timeout expired. killing port-forward: %s", svc)
-                proc.kill()
-            logger.debug("port-forward terminated: %s", svc)
+            for stop in (proc.terminate, proc.kill):
+                logger.debug("attempting to '%s' port-forward: %s", stop.__name__, svc)
+                stop()
+                try:
+                    proc.communicate(timeout=3)
+                    logger.debug("port-forward exited: %s", svc)
+                    # wait for the port to become available again
+                    time.sleep(3)
+                    break
+                except subprocess.TimeoutExpired:
+                    logger.info("timeout expired waiting for: %s", svc)
+
+            if proc.returncode is None:
+                logger.debug("unable to stop port-forwarding: %s", svc)
+            else:
+                logger.debug(
+                    "port-forward terminated: %s. exit code: %d", svc, proc.returncode
+                )
 
     @lru_cache(maxsize=32)
     def svc_pod(self, svc: str) -> str:
