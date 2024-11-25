@@ -198,13 +198,12 @@ ports:
   health: 8484
   metrics: 8585
 
-# [Optional] cutsom TLS certificates for the gRPC and HTTPS servers.
-# If not provided, topaz generates self-signed certificates.
-# To use your own certificates provide the names of secrets
-# of type kubernetes.io/tls
-certs: {}
-  # grpc: topaz-grpc-cert
-  # https: topaz-https-cert
+# TLS configuration.
+# To run topaz with TLS, provide the names of Kuebernetes secrets of type kubernetes.io/tls
+# If not provided, topaz runs without TLS.
+# tls:
+#   grpc: topaz-grpc-cert
+#   https: topaz-https-cert
 
 # Metrics configuration
 metrics:
@@ -225,8 +224,6 @@ http:
   # if specified, the domain will automatically be added to the allowedOrigins list.
   # e.g. 'domain: https://topaz.example.com:8383'
   domain: ""
-  # if true, services are exposed over HTTP instead of HTTPS.
-  noTLS: false
   # HTTP server timeouts.
   # See https://golang.org/pkg/net/http/#Server
   readTimeout: 2s

@@ -1,0 +1,32 @@
+---
+tests:
+  - name: topaz-no-tls
+    deployments:
+      - chart: topaz
+        ports:
+          8282: 8282
+          8383: 8383
+    run:
+      - ${TOPAZ:-topaz} ds get manifest -H localhost:8282 --stdout --plaintext
+      - curl -s http://localhost:8383/api/v2/policies > /dev/null
+
+  - name: topaz-tls
+    secrets:
+      - name: grpc-cert
+        files:
+          tls.crt: $TOPAZ_CERTS_DIR/grpc.crt
+          tls.key: $TOPAZ_CERTS_DIR/grpc.key
+          ca.crt: $TOPAZ_CERTS_DIR/grpc-ca.crt
+      - name: gateway-cert
+        files:
+          tls.crt: $TOPAZ_CERTS_DIR/gateway.crt
+          tls.key: $TOPAZ_CERTS_DIR/gateway.key
+    deployments:
+      - chart: topaz
+        values: tls.values.yaml
+        ports:
+          8282: 8282
+          8383: 8383
+    run:
+      - ${TOPAZ:-topaz} ds get manifest -H localhost:8282 --stdout --insecure --no-check
+      - curl -ks https://localhost:8383/api/v2/policies > /dev/null

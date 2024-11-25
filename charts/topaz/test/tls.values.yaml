@@ -1,0 +1,4 @@
+---
+tls:
+  grpc: grpc-cert
+  https: gateway-cert

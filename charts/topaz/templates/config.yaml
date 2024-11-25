@@ -71,16 +71,8 @@ stringData:
           {{- end }}
           grpc:
             {{- include "topaz.grpcService" (list $.Values .) | nindent 12 }}
-            certs:
-              tls_key_path: /grpc-certs/tls.key
-              tls_cert_path: /grpc-certs/tls.crt
-              tls_ca_cert_path: /grpc-certs/ca.crt
           gateway:
             {{- include "topaz.gatewayService" (list $.Values .) | nindent 12 }}
-            certs:
-              tls_key_path: /https-certs/tls.key
-              tls_cert_path: /https-certs/tls.crt
-              tls_ca_cert_path: /https-certs/ca.crt
       {{- end }}
 
   {{- if (.Values.decisionLogs).enabled }}

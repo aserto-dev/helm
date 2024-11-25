@@ -81,12 +81,16 @@ class Runner:
     def deploy_chart(self, deployment: Deployment, ns: Namespace):
         chart_path = path.join(self.git_root, "charts", deployment.chart)
         ns.helm("dep", "build", chart_path)
+        values = (
+            ["-f", path.join(self.spec_path, deployment.values)]
+            if deployment.values
+            else []
+        )
         ns.helm(
             "install",
             deployment.chart,
             chart_path,
-            "-f",
-            path.join(self.spec_path, deployment.values),
+            *values,
         )
 
     def wait_for_deployments(self, deployments: Sequence[Deployment], ns: Namespace):

@@ -44,6 +44,7 @@ tests:
       - >
         ssh -i ${SSH_PRIVATE_KEY:-$(ls -1 ~/.ssh/id_* | head -1)} -p 2222 -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR
         localhost provision tenant test --id 3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1 --delete
+
   - name: directory-tls
     pull_secret: $GITHUB_TOKEN
     secrets:
