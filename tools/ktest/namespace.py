@@ -80,13 +80,10 @@ class Namespace:
         pod = self.svc_pod(svc)
         port_mapping = tuple(f"{k}:{v}" for k, v in ports.items())
         logger.debug("port-mapping: %s", port_mapping)
-        args = " ".join(
-            ("kubectl", "-n", self.namespace, "port-forward", pod) + port_mapping
-        )
+        args = (kctl_path(), "-n", self.namespace, "port-forward", pod) + port_mapping
         logger.debug("port-forward: %s", args)
         proc = subprocess.Popen(
             args=args,
-            shell=True,
             stdout=subprocess.DEVNULL,
         )
 
@@ -96,14 +93,16 @@ class Namespace:
             yield proc
         finally:
             logger.debug("terminating port-forward: %s", svc)
-            for stop in (proc.terminate, proc.kill):
+
+            def ctrl_c():
+                proc.send_signal(signal.SIGINT)
+
+            for stop in (ctrl_c, proc.terminate, proc.kill):
                 logger.debug("attempting to '%s' port-forward: %s", stop.__name__, svc)
                 stop()
                 try:
-                    proc.communicate(timeout=3)
+                    proc.wait(timeout=15)
                     logger.debug("port-forward exited: %s", svc)
-                    # wait for the port to become available again
-                    time.sleep(3)
                     break
                 except subprocess.TimeoutExpired:
                     logger.info("timeout expired waiting for: %s", svc)
@@ -132,15 +131,27 @@ class Namespace:
         if proc.returncode != 0:
             proc.check_returncode()
 
-        return proc.stdout.decode()
+        return proc.stdout.decode().strip("''")
 
     def helm(self, *args, check=True):
         args = ("helm", "-n", self.namespace) + args
         return subprocess.run(args=" ".join(args), shell=True, check=check)
 
 
-def kubectl(*args, check: bool = True, capture_output: bool = False):
-    args = ("kubectl",) + args
-    return subprocess.run(
-        args=" ".join(args), check=check, shell=True, capture_output=capture_output
+@lru_cache(maxsize=1)
+def kctl_path():
+    return (
+        subprocess.run(
+            args="which kubectl",
+            shell=True,
+            check=True,
+            capture_output=True,
+        )
+        .stdout.decode()
+        .strip()
     )
+
+
+def kubectl(*args, check: bool = True, capture_output: bool = False):
+    args = (kctl_path(),) + args
+    return subprocess.run(args=args, check=check, capture_output=capture_output)
