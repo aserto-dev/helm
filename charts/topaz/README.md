@@ -68,9 +68,6 @@ topaz:
 
 The default [values.yaml](https://github.com/aserto-dev/helm/blob/main/charts/topaz/values.yaml)
 is a good starting point for configuring topaz.
-The only required configuration element that does not have a default value is `opa.poilcy` that
-must either specify a policy image to load from an OCI registry, or point to a discovery service
-for dynamic configuration.
 
 The following sections describe the various configuration options available in the chart.
 
@@ -427,4 +424,17 @@ can list all policy modules using:
 
 ```shell
 curl -k -H "Authorization: Basic <api-key>" https://localhost:8383/api/v2/policies
+```
+
+## TLS
+
+By default, the topaz gRPC and HTTP services run without TLS. To enable TLS you must provide certificates
+for the services.
+Certificates are read from Kubernetes secrets of type `kubernetes.io/tls` defined in the `tls` section
+of `values.yaml`:
+
+```yaml
+tls:
+  grpc: "<name of secret with gRPC certificate>"
+  https: "<name of secret with HTTPS certificate>"
 ```
