@@ -6,6 +6,7 @@ metadata:
   labels:
     {{- include "topaz.labels" . | nindent 4 }}
 spec:
+  serviceName: {{ include "topaz.fullname" . }}
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
