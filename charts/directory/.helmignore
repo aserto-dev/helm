@@ -23,3 +23,5 @@
 .vscode/
 
 build/
+ci/
+test/

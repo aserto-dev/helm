@@ -21,10 +21,16 @@ oidc:
 #   audience: ""
 
 # Required: Provide one or more SSH public keys to be granted admin access.
-# sshAdminKeys: |
-#   # Add your authorized SSH public keys here
-#   ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDf6
-#   ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDa7
+# sshAdminKeys:
+#   # Keys can be provided inline as a multi-line string under keys:
+#   keys: |
+#     # Add your authorized SSH public keys here
+#     ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDf6
+#     ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDa7
+#   # Keys can also be provided in a ConfigMap
+#   configMap:
+#     name: directory-admin-keys
+#     key: authorized_keys
 
 rootDirectory:
   runService: true
@@ -54,9 +60,6 @@ rootDirectory:
 
 tenantDirectory:
   runService: true
-  rootDS:
-    grpcCertSecret: ""
-
   database:
     host: ""
     port: 5432
@@ -79,6 +82,28 @@ tenantDirectory:
         conn_max_lifetime: 5
         query_timeout_seconds: 5
 
+# rootDS:
+#   # Address and port of the root directory's gRPC service.
+#   # Default: directory.<namespace>.svc.cluster.local:8282
+#   address: ""
+#   # [Optional] API key for the remote directory
+#   apiKey: ""
+#   # [Optional] Kubernetes secret containing the API key for the remote directory
+#   apiKeySecret:
+#     # Secret name
+#     name: ""
+#     # Secret key
+#     key: "api-key"
+#   # [Optional] Kubernetes secret containing the CA certificate of the root directory.
+#   caCertSecret:
+#     name: ""
+#     key: ""
+#   # Skip verification of remote TLS certificate
+#   noVerify: false
+#   # Connect over a plain-text connection.
+#   # INSECURE: credentials are sent unencrypted within the cluster.
+#   noTLS: false
+
 # Optional: list of predefined tenants.
 tenants:
 #   - name: my-tenant
@@ -95,12 +120,20 @@ tenants:
 #       readerKey: reader
 
 
-# Set the service log level (trace/debug/info/warn/error)
+# Set the service log level (trace/debug/info/warn/error).
+# The default is 'info'.
 # logLevel: info
 
-# Set the service's gRPC connection timeout (in seconds)
+# gRPC configuration.
 grpc:
+  # Set the service's gRPC connection timeout (in seconds)
   connectionTimeoutSec: 2
+  # Optional: name of a Kubernetes secret of type kubernetes.io/tls.
+  # If specified, the gRPC server uses TLS with the provided certificate.
+  # Otherwise, ther server runs without TLS.
+  # Note: clients will not send credentials without TLS. If the service
+  # runs without it, you must configure TLS at the ingress or gateway.
+  certSecret:
 
 # https:
 #   allowed_origins:

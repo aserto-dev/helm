@@ -19,7 +19,7 @@ global:
 
     rootDirectory:
       address: ""
-      grpcCertSecret: ""
+      caCertSecret: ""
 
 port: 8080
 
@@ -44,7 +44,7 @@ port: 8080
 
 rootDirectory:
   disableTLSVerification: false
-  grpcCertSecret: ""
+  caCertSecret: ""
   # address: "{{ .Release.Name }}-aserto-directory.aserto.svc.cluster.local:8282"
 
 

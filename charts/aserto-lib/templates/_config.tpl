@@ -1,5 +1,5 @@
-{{- define "aserto-lib.rootDirectoryCfg" }}
-{{- include "aserto-lib.mergeGlobal" (list . "rootDirectory") }}
+{{- define "aserto-lib.rootClientCfg" }}
+{{- include "aserto-lib.mergeGlobal" (list . "rootDS") }}
 {{- end }}
 
 {{- define "aserto-lib.directoryCfg" }}
@@ -10,9 +10,17 @@
 {{- include "aserto-lib.mergeGlobal" (list . "discovery") }}
 {{- end }}
 
-{{- define "aserto-lib.rootDirectoryApiKey" }}
-{{- (include "aserto-lib.rootDirectoryCfg" . | fromYaml).apiKey |
-  default (dict "secretName" "root-ds-keys" "secretKey" "api-key") | toYaml -}}
+{{- define "aserto-lib.rootApiKeyEnv" }}
+{{- with include "aserto-lib.rootClientCfg" . | fromYaml -}}
+{{- if .apiKey -}}
+value: {{ .apiKey }}
+{{- else -}}
+valueFrom:
+  secretKeyRef:
+    name: {{ (.apiKeySecret).name | default "root-ds-keys" }}
+    key: {{ (.apiKeySecret).key | default "api-key" }}
+{{- end }}
+{{- end }}
 {{- end }}
 
 {{- define "aserto-lib.directoryApiKeys" }}
@@ -30,6 +38,6 @@
 Root directory tenant ID
 */}}
 {{- define "aserto-lib.rootDirectoryTenantID" -}}
-{{- (include "aserto-lib.rootDirectoryCfg" . | fromYaml).tenantID |
+{{- (include "aserto-lib.rootClientCfg" . | fromYaml).tenantID |
 	default "00000000-0000-11ef-0000-000000000000" -}}
 {{- end }}

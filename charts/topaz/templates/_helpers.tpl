@@ -233,6 +233,12 @@ Topaz API key configuration
 {{- $cfg := merge (dig $svc "grpc" dict $values.serviceOverrides) $values.grpc -}}
 listen_address: 0.0.0.0:{{ ($values.ports).grpc | default "8282" }}
 connection_timeout_seconds: {{ $cfg.connectionTimeoutSec | default "2" }}
+{{- with ($values.tls).grpc }}
+certs:
+  tls_key_path: /grpc-certs/tls.key
+  tls_cert_path: /grpc-certs/tls.crt
+  tls_ca_cert_path: /grpc-certs/ca.crt
+{{- end }}
 {{- end }}
 
 
@@ -264,13 +270,16 @@ allowed_methods:
 allowed_origins:
 {{- $origins | toYaml | nindent 2 }}
 
-{{- if $cfg.noTLS }}
-http: true
-{{- end }}
 read_timeout: {{ $cfg.readTimeout | default "2s" }}
 read_header_timeout: {{ $cfg.readHeaderTimeout | default "2s" }}
 write_timeout: {{ $cfg.writeTimeout | default "2s" }}
 idle_timeout: {{ $cfg.idleTimeout | default "30s" }}
+{{- with ($values.tls).https }}
+certs:
+  tls_key_path: /https-certs/tls.key
+  tls_cert_path: /https-certs/tls.crt
+  tls_ca_cert_path: /https-certs/ca.crt
+{{- end }}
 {{- end }}
 
 

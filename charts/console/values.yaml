@@ -20,7 +20,7 @@ oidc:
 
 rootDirectory:
   disableTLSVerification: false
-  grpcCertSecret: ""
+  caCertSecret: ""
   # address: "{{ .Release.Name }}-aserto-directory.aserto.svc.cluster.local:8282"
 
 # Set the service log level (trace/debug/info/warn/error)

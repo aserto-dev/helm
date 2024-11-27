@@ -1,0 +1,100 @@
+---
+tests:
+  - name: directory-no-tls
+    pull_secret: $GITHUB_TOKEN
+    secrets:
+      - name: pg-credentials
+        values:
+          username: postgres
+          password: $POSTGRES_PASSWORD
+      - name: pg-root-reader-credentials
+        values:
+          username: root_reader
+          password: root_reader
+      - name: pg-tenant-reader-credentials
+        values:
+          username: tenant_reader
+          password: tenant_reader
+      - name: test-tenant-keys
+        values:
+          reader: apikey_tenant_reader
+          writer: apikey_tenant_writer
+    config_maps:
+      - name: directory-admin-keys
+        keys:
+          - name: authorized_keys
+            file: $SSH_PUBLIC_KEY
+    deployments:
+      - chart: directory
+        values: no-tls.values.yaml
+        ports:
+          2222: 2222
+          8282: 8282
+    run:
+      - >
+        ssh -i ${SSH_PRIVATE_KEY:-$(ls -1 ~/.ssh/id_* | head -1)} -p 2222 -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR
+        localhost provision root-keys
+      - >
+        ssh -i ${SSH_PRIVATE_KEY:-$(ls -1 ~/.ssh/id_* | head -1)} -p 2222 -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR
+        localhost provision tenant test --id 3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1
+      - >
+        ${TOPAZ:-topaz} ds get manifest -H localhost:8282 --tenant-id 3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1
+        -k apikey_tenant_reader --stdout --plaintext
+    cleanup:
+      - >
+        ssh -i ${SSH_PRIVATE_KEY:-$(ls -1 ~/.ssh/id_* | head -1)} -p 2222 -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR
+        localhost provision tenant test --id 3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1 --delete
+
+  - name: directory-tls
+    pull_secret: $GITHUB_TOKEN
+    secrets:
+      - name: pg-credentials
+        values:
+          username: postgres
+          password: $POSTGRES_PASSWORD
+      - name: pg-root-reader-credentials
+        values:
+          username: root_reader
+          password: root_reader
+      - name: pg-tenant-reader-credentials
+        values:
+          username: tenant_reader
+          password: tenant_reader
+      - name: test-tenant-keys
+        values:
+          reader: apikey_tenant_reader
+          writer: apikey_tenant_writer
+      - name: grpc-cert
+        files:
+          tls.crt: $TOPAZ_CERTS_DIR/grpc.crt
+          tls.key: $TOPAZ_CERTS_DIR/grpc.key
+          ca.crt: $TOPAZ_CERTS_DIR/grpc-ca.crt
+      - name: gateway-cert
+        files:
+          tls.crt: $TOPAZ_CERTS_DIR/gateway.crt
+          tls.key: $TOPAZ_CERTS_DIR/gateway.key
+    config_maps:
+      - name: directory-admin-keys
+        keys:
+          - name: authorized_keys
+            file: $SSH_PUBLIC_KEY
+    deployments:
+      - chart: directory
+        values: tls.values.yaml
+        ports:
+          2222: 2222
+          8282: 8282
+    run:
+      - >
+        ssh -i ${SSH_PRIVATE_KEY:-$(ls -1 ~/.ssh/id_* | head -1)} -p 2222 -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR
+        localhost provision root-keys
+      - >
+        ssh -i ${SSH_PRIVATE_KEY:-$(ls -1 ~/.ssh/id_* | head -1)} -p 2222 -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR
+        localhost provision tenant test --id 3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1
+      - >
+        ${TOPAZ:-topaz} ds get manifest -H localhost:8282 --tenant-id 3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1
+        -k apikey_tenant_reader --stdout --insecure
+    cleanup:
+      - >
+        ssh -i ${SSH_PRIVATE_KEY:-$(ls -1 ~/.ssh/id_* | head -1)} -p 2222 -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR
+        localhost provision tenant test --id 3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1 --delete

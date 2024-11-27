@@ -79,3 +79,46 @@ Create the name of the service account to use
   {{ fail "all tenants must include either 'keys' or 'keysSecret'" }}
 {{- end }}
 {{- end}}
+
+
+{{- define "directory.rootClient" -}}
+{{- if not (.Values.rootDirectory).runService | and (not .Values.rootDS) -}}
+  {{- fail "roodDS configuration is required when running a standalone directory with the root in another deployment."}}
+{{- end }}
+{{- if .Values.rootDS }}
+{{ include "aserto-lib.rootDirectoryClient" . }}
+{{- else -}}
+address: localhost:{{ include "aserto-lib.grpcPort" . }}
+tenant_id: {{ include "aserto-lib.rootDirectoryTenantID" . }}
+{{- if (include "aserto-lib.grpcConfig" . | fromYaml).certSecret }}
+ca_cert_path: /grpc-certs/ca.crt
+{{- else }}
+no_tls: true
+{{- end }}
+{{- end }}
+{{- end }}
+
+
+{{- define "directory.rootApiKeyEnv" -}}
+{{- if not (.Values.rootDirectory).runService | and (not .Values.rootDS) -}}
+  {{- fail "roodDS configuration is required when running a standalone directory with the root in another deployment." -}}
+{{- end -}}
+{{- if .Values.rootDS -}}
+{{ include "aserto-lib.rootApiKeyEnv" . }}
+{{- else -}}
+valueFrom:
+  secretKeyRef:
+    name: root-ds-keys
+    key: api-key
+{{- end }}
+{{- end }}
+
+{{- define "directory.adminKeysConfigMapName" -}}
+{{ ((.Values.sshAdminKeys).configMap).name | default
+	(printf "%s-admin-keys" (include "directory.fullname" .)) }}
+{{- end }}
+
+{{- define "directory.adminKeysConfigMapKey" -}}
+{{ ((.Values.sshAdminKeys).configMap).key | default "authorized_keys" }}
+{{- end }}
+

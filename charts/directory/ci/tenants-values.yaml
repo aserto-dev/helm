@@ -5,8 +5,9 @@ rootDirectory:
 tenantDirectory:
   database:
     host: tenant-db-host
-sshAdminKeys: |
-  ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDf6
+sshAdminKeys:
+  keys: |
+    ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDf6
 tenants:
   - name: staging
     id: 3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1

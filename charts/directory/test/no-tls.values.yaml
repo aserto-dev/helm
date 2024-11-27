@@ -1,0 +1,40 @@
+---
+image:
+  tag: 0.33.2-3e32438c-amd64
+
+imagePullSecrets:
+  - name: ghcr-creds
+
+rootDirectory:
+  database:
+    host: postgresql.postgres.svc.cluster.local
+    dbName: test-root-ds
+    sslMode: disable
+    admin:
+      credentialsSecret: pg-credentials
+    reader:
+      credentialsSecret: pg-root-reader-credentials
+
+tenantDirectory:
+  database:
+    host: postgresql.postgres.svc.cluster.local
+    dbName: test-ds
+    sslMode: disable
+    admin:
+      credentialsSecret: pg-credentials
+    reader:
+      credentialsSecret: pg-tenant-reader-credentials
+
+cache:
+  sizeMB: 100
+
+sshAdminKeys:
+  configMap:
+    name: directory-admin-keys
+    key: authorized_keys
+
+tenants:
+  - name: test
+    id: 3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1
+    keysSecret:
+      name: test-tenant-keys

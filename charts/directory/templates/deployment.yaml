@@ -35,32 +35,24 @@ spec:
                 path: config.yaml
         - name: admin-keys
           configMap:
-            name: {{ include "directory.fullname" . }}-admin-keys
+            name: {{ include "directory.adminKeysConfigMapName" . }}
+        {{- with (include "aserto-lib.grpcConfig" . | fromYaml).certSecret }}
         - name: grpc-certs
-        {{- with (include "aserto-lib.grpcConfig" . | fromYaml) }}
-        {{- if .certSecret  }}
           secret:
-            secretName: {{ .certSecret }}
-        {{- else }}
-          emptyDir: {}
+            secretName: {{ . }}
         {{- end }}
-        {{- end }}
+        {{- with (include "aserto-lib.httpsConfig" . | fromYaml).certSecret }}
         - name: https-certs
-        {{- with (include "aserto-lib.httpsConfig" . | fromYaml) }}
-        {{- if .certSecret }}
           secret:
-            secretName: {{ .certSecret }}
-        {{- else }}
-          emptyDir: {}
-        {{- end }}
+            secretName: {{ . }}
         {{- end }}
 
-        {{- if and .Values.tenantDirectory.runService .Values.tenantDirectory.rootDS.grpcCertSecret }}
+        {{- if (.Values.tenantDirectory).runService | and ((.Values.rootDS).caCertSecret).name }}
         - name: root-ds-grpc-certs
           secret:
-            secretName: {{ .Values.tenantDirectory.rootDS.grpcCertSecret }}
+            secretName: {{ .Values.rootDS.caCertSecret.name }}
             items:
-              - key: ca.crt
+              - key: {{ .Values.rootDS.caCertSecret.name | default "ca.crt" }}
                 path: ca.crt
         {{- end }}
 
@@ -72,14 +64,14 @@ spec:
           args: ["--config", "/config/config.yaml", "run"]
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            {{- with (include "aserto-lib.selfPorts" . | fromYaml )}}
+          {{- with (include "aserto-lib.selfPorts" . | fromYaml )}}
             - name: https
               containerPort: {{ .https }}
             - name: grpc
               containerPort: {{ .grpc }}
             - name: metrics
               containerPort: {{ .metrics }}
-            {{- end }}
+          {{- end }}
             - containerPort: 2222
               name: ssh-admin
           volumeMounts:
@@ -89,29 +81,26 @@ spec:
             - name: admin-keys
               mountPath: "/admin-keys"
               readOnly: true
+          {{- with (include "aserto-lib.grpcConfig" . | fromYaml).certSecret }}
             - name: grpc-certs
               mountPath: /grpc-certs
-            {{- if (include "aserto-lib.grpcConfig" . | fromYaml).certSecret  }}
               readOnly: true
-            {{- end }}
+          {{- end }}
+          {{- with (include "aserto-lib.httpsConfig" . | fromYaml).certSecret }}
             - name: https-certs
               mountPath: /https-certs
-            {{- if (include "aserto-lib.httpsConfig" . | fromYaml).certSecret  }}
               readOnly: true
-            {{- end }}
+          {{- end }}
 
-            {{- if and .Values.tenantDirectory.runService .Values.tenantDirectory.rootDS.grpcCertSecret }}
+          {{- if and .Values.tenantDirectory.runService (.Values.rootDS).caCertSecret }}
             - name: root-ds-grpc-certs
               mountPath: /root-ds-grpc-certs
               readOnly: true
-            {{- end }}
+          {{- end }}
           env:
-            {{- with (include "aserto-lib.rootDirectoryApiKey" . | fromYaml) }}
+            {{- with include "directory.rootApiKeyEnv" . }}
             - name: DIRECTORY_ROOT_DS_CLIENT_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .secretName }}
-                  key: {{ .secretKey }}
+              {{- . | nindent 14 }}
             {{- end }}
 
             {{- if .Values.tenantDirectory.runService }}

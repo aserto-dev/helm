@@ -15,22 +15,27 @@ stringData:
       log_level: {{ .Values.logLevel | default "info" }}
       grpc_log_level: {{ .Values.grpcLogLevel | default "info" }}
 
-    {{- if empty ((.Values.directory).remote).address }}
+  {{- if empty ((.Values.directory).remote).address }}
     directory:
       db_path: /db/directory.db
       request_timeout: {{ ((.Values.directory).edge).openTimeout | default "5s" }}
 
     remote_directory:
       address: 0.0.0.0:{{ (.Values.ports).grpc | default "8282" }}
-      {{- if (.Values.auth).apiKeys }}
+    {{- if (.Values.auth).apiKeys }}
       api_key: {{ include "topaz.apiKeys" . | fromYamlArray | first }}
-      {{- end }}
-      ca_cert_path: /grpc-certs/grpc-ca.crt
+    {{- end }}
+      insecure: false
+    {{- if (.Values.tls).grpc }}
+      ca_cert_path: /grpc-certs/ca.crt
+    {{- else }}
+      no_tls: true
+    {{- end }}
       timeout_in_seconds: {{ ((.Values.directory).remote).timeoutSeconds | default "5" }}
-    {{- else -}}
+  {{- else -}}
     remote_directory:
       {{- include "topaz.remoteDirectory" . | nindent 6 }}
-    {{- end }}
+  {{- end }}
 
     jwt:
       acceptable_time_skew_seconds: {{ .Values.jwtAcceptableSkewSeconds | default "5"}}
@@ -71,16 +76,8 @@ stringData:
           {{- end }}
           grpc:
             {{- include "topaz.grpcService" (list $.Values .) | nindent 12 }}
-            certs:
-              tls_key_path: /grpc-certs/tls.key
-              tls_cert_path: /grpc-certs/tls.crt
-              tls_ca_cert_path: /grpc-certs/ca.crt
           gateway:
             {{- include "topaz.gatewayService" (list $.Values .) | nindent 12 }}
-            certs:
-              tls_key_path: /https-certs/tls.key
-              tls_cert_path: /https-certs/tls.crt
-              tls_ca_cert_path: /https-certs/ca.crt
       {{- end }}
 
   {{- if (.Values.decisionLogs).enabled }}

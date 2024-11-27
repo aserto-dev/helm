@@ -43,6 +43,28 @@ global:
     #     durations: false
     #     gateway: false
 
+    rootDS:
+      # Address and port of the root directory's gRPC service.
+      # Default: directory.<namespace>.svc.cluster.local:8282
+      address: ""
+      # [Optiona] API key for the remote directory
+      apiKey: ""
+      # [Optional] Kubernetes secret containing the API key for the remote directory
+      apiKeySecret:
+        # Secret name
+        name: ""
+        # Secret key
+        key: "api-key"
+      # [Optional] Kubernetes secret containing the CA certificate of the root directory.
+      caCertSecret:
+        name: ""
+        key: ""
+      # Skip verification of remote TLS certificate
+      noVerify: false
+      # Connect over a plain-text connection.
+      # INSECURE: credentials are sent unencrypted within the cluster.
+      noTLS: false
+
     rootDirectory:
       # Disable TLS verification on
       disableTLSVerification: true

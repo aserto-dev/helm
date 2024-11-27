@@ -1,0 +1,21 @@
+[project]
+name = "ktest"
+version = "0.1.0"
+description = "Runs chart tests in kubernetes"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "click>=8.1.7",
+    "gitpython>=3.1.43",
+    "kubernetes>=31.0.0",
+    "pydantic>=2.9.2",
+    "pyyaml>=6.0.2",
+]
+
+[dependency-groups]
+dev = [
+    "black>=24.10.0",
+    "kubernetes-typed>=18.20.2",
+    "pylint>=3.3.1",
+    "types-pyyaml>=6.0.12.20240917",
+]

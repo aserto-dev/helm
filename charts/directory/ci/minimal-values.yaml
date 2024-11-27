@@ -9,5 +9,6 @@ rootDirectory:
 tenantDirectory:
   database:
     host: tenant-db-host
-sshAdminKeys: |
-  ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDf6
+sshAdminKeys:
+  keys: |
+    ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDf6

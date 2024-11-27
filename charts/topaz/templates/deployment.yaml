@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: {{ include "topaz.appKind" . }}
 metadata:
@@ -5,6 +6,7 @@ metadata:
   labels:
     {{- include "topaz.labels" . | nindent 4 }}
 spec:
+  serviceName: {{ include "topaz.fullname" . }}
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
@@ -79,16 +81,16 @@ spec:
             - name: opa
               mountPath: /opa-persistence
               readOnly: false
+          {{- if (.Values.tls).grpc }}
             - name: grpc-certs
               mountPath: /grpc-certs
-            {{- if (.Values.certs).grpc }}
               readOnly: true
-            {{- end }}
+          {{- end }}
+          {{- if (.Values.tls).https }}
             - name: https-certs
               mountPath: /https-certs
-            {{- if (.Values.certs).https }}
               readOnly: true
-            {{- end }}
+          {{- end }}
           {{- with (.Values.directory).remote -}}
             {{ include "topaz.remoteDirectoryCertVolumeMount" . | nindent 12 }}
           {{- end }}
@@ -125,20 +127,16 @@ spec:
             items:
               - key: config.yaml
                 path: config.yaml
+      {{- with (.Values.tls).grpc }}
         - name: grpc-certs
-        {{- with (.Values.certs).grpc }}
           secret:
             secretName: {{ . }}
-        {{- else }}
-          emptyDir: {}
-        {{- end }}
+      {{- end }}
+      {{- with (.Values.tls).https }}
         - name: https-certs
-        {{- with (.Values.certs).https }}
           secret:
             secretName: {{ . }}
-        {{- else }}
-          emptyDir: {}
-        {{- end }}
+      {{- end }}
       {{- if ((.Values.directory).remote).address -}}
         {{ include "topaz.remoteDirectoryCertVolume" . | nindent 8 }}
       {{- end }}

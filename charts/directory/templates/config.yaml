@@ -22,7 +22,7 @@ stringData:
       metrics:
         {{- include "aserto-lib.metricsService" . | nindent 8 }}
       admin:
-        authorized_keys_path: /admin-keys/authorized_keys
+        authorized_keys_path: /admin-keys/{{ include "directory.adminKeysConfigMapKey" . }}
 
     {{ if .Values.rootDirectory.runService }}
     {{- with .Values.rootDirectory.database -}}
@@ -74,7 +74,7 @@ stringData:
 
     root_ds:
       client:
-        {{- include "aserto-lib.rootDirectoryClient" . | nindent 8 }}
+        {{- include "directory.rootClient" . | nindent 8 }}
 
       {{- if and .Values.rootDirectory.runService .Values.rootDirectory.manifest }}
       root_manifest: {{ .Values.rootDirectory.manifest }}
@@ -89,7 +89,7 @@ stringData:
 
     cache:
       {{- $cache := .Values.cache | default dict }}
-      cache_size_mb: {{ $cache.sizeMB | default 25 }}
+      cache_size_mb: {{ $cache.sizeMB | default 128 }}
       cache_invalidation_time_seconds: {{ $cache.ttlSeconds | default 1800 }}
       clean_window_seconds: {{ $cache.cleanWindowSeconds | default 10 }}
 
