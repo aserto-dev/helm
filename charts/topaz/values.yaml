@@ -192,17 +192,22 @@ auth:
   #     secretKey: api-key
 
 # Port configuration.
-# The grpc and http ports can be overriden per service in the serviceOverrides section below.
 ports:
+  # gRPC services.
   grpc: 8282
+  # REST services and web UI.
   https: 8383
+  # gRPC Health service (https://github.com/grpc-ecosystem/grpc-health-probe).
   health: 8484
+  # Prometheus metrics (GET /metrics).
   metrics: 8585
+  # Profiling service (GET /debug/pprof)
+  profiler: 8686
 
 # TLS configuration.
 # To run topaz with TLS, provide the names of Kuebernetes secrets of type kubernetes.io/tls
 # If not provided, topaz runs without TLS.
-# tls:
+tls:
 #   grpc: topaz-grpc-cert
 #   https: topaz-https-cert
 
@@ -210,9 +215,10 @@ ports:
 metrics:
   # Enable metrics.
   enabled: true
-  # Expose zpages UI for grpc metrics.
-  # The pages are available at /debug/tracez and /debug/rpcz.
-  zpages: true
+
+# Profiler configuration
+profiler:
+  enabled: false
 
 # Global gRPC configuration.
 # These settings can be overridden per service in serviceOverrides below.

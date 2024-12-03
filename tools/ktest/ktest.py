@@ -5,7 +5,7 @@ import logging
 import subprocess
 from contextlib import contextmanager, ExitStack
 from os import path
-from typing import Iterator, Sequence
+from typing import Iterator, Sequence, TextIO
 
 import click
 import git
@@ -36,8 +36,8 @@ class Runner:
         self.spec_path = spec_path
         self.git_root = git_root(__file__)
 
-    def run(self):
-        with self.new_namespace(self.test.name) as ns:
+    def run(self, teardown: bool = True):
+        with self.new_namespace(self.test.name, teardown) as ns:
             self.set_image_pull_secret(ns)
 
             for secret in self.test.secrets:
@@ -150,7 +150,7 @@ class Runner:
 
     @staticmethod
     @contextmanager
-    def new_namespace(name: str) -> Iterator["Namespace"]:
+    def new_namespace(name: str, teardown: bool) -> Iterator["Namespace"]:
         ns = Namespace(name)
         if ns.ns_exists():
             logger.info("namespace '%s' already exists. deleting it...", name)
@@ -161,13 +161,16 @@ class Runner:
 
         yield ns
 
-        echo("🐳", "Deleting namespace:", name)
-        ns.delete_ns()
+        if teardown:
+            echo("🐳", "Deleting namespace:", name)
+            ns.delete_ns()
 
 
 @click.command()
 @click.argument("specfile", type=click.File())
-def main(specfile):
+@click.option("--include", "-i", multiple=True, help="Only run specified test(s)")
+@click.option("--teardown/--no-teardown", default=True, show_default=True)
+def main(specfile: TextIO, include: Sequence[str], teardown: bool):
     """Run tests in a kubernetes cluster.
 
     SPECFILE: path to a YAML file with test definitions.
@@ -179,9 +182,10 @@ def main(specfile):
     spec = Spec(**yaml.safe_load(specfile))
     spec_path = path.dirname(specfile.name)
 
-    for test in spec.tests:
+    tests = spec.tests if not include else [t for t in spec.tests if t.name in include]
+    for test in tests:
         echo("🏁", "Starting test:", test.name)
-        Runner(test, spec_path).run()
+        Runner(test, spec_path).run(teardown)
 
 
 def git_root(from_path: str) -> str:

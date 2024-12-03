@@ -7,8 +7,18 @@ tests:
           8282: 8282
           8383: 8383
     run:
-      - ${TOPAZ:-topaz} ds get manifest -H localhost:8282 --stdout --plaintext
-      - curl -s http://localhost:8383/api/v2/policies > /dev/null
+      - >
+        ${TOPAZ:-topaz} ds set manifest charts/topaz/test/manifest.yaml
+        -H localhost:8282 --plaintext
+      - >
+        ${TOPAZ:-topaz} ds import --directory charts/topaz/test/data
+        -H localhost:8282 --plaintext
+      - >
+        ${TOPAZ:-topaz} ds test exec charts/topaz/test/assertions.json --summary
+        -H localhost:8282 --plaintext
+      - >
+        ${TOPAZ:-topaz} az test exec charts/topaz/test/decisions.json --summary
+        -H localhost:8282 --plaintext
 
   - name: topaz-tls
     secrets:
@@ -28,5 +38,15 @@ tests:
           8282: 8282
           8383: 8383
     run:
-      - ${TOPAZ:-topaz} ds get manifest -H localhost:8282 --stdout --insecure --no-check
-      - curl -ks https://localhost:8383/api/v2/policies > /dev/null
+      - >
+        ${TOPAZ:-topaz} ds set manifest charts/topaz/test/manifest.yaml
+        -H localhost:8282 --insecure
+      - >
+        ${TOPAZ:-topaz} ds import --directory charts/topaz/test/data
+        -H localhost:8282 --insecure
+      - >
+        ${TOPAZ:-topaz} ds test exec charts/topaz/test/assertions.json --summary
+        -H localhost:8282 --insecure
+      - >
+        ${TOPAZ:-topaz} az test exec charts/topaz/test/decisions.json --summary
+        -H localhost:8282 --insecure
