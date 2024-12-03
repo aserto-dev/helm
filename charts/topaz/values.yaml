@@ -173,7 +173,7 @@ decisionLogs:
     enabled: true
     # PersistentVolumeClaim options.
     # See https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims
-    # storage: 100Mi
+    storage: 100Mi
     # storageClassName: ""
     # selector:
     #   matchLabels:
@@ -274,7 +274,7 @@ opa:
   maxPluginWaitTimeSeconds: 30
   # Persistent volume for bundles and discovery results.
   persistence:
-    enabled: false
+    enabled: true
     # PersistentVolumeClaim options.
     # See https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims
     storage: 10Mi

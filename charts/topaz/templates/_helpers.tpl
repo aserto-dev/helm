@@ -61,17 +61,6 @@ Create the name of the service account to use
 {{- end }}
 {{- end }}
 
-
-{{- define "topaz.appKind" -}}
-{{- if (((.Values.directory).edge).persistence).enabled |
-    or ((.Values.decisionLogs).persistence).enabled |
-    or ((.Values.opa).persistence).enabled -}}
-StatefulSet
-{{- else -}}
-Deployment
-{{- end }}
-{{- end }}
-
 {{/*
 Remote directory configuration
 */}}
@@ -428,5 +417,20 @@ aserto_edge:
 {{- if (.Values.decisionLogs).enabled -}}
 aserto_decision_log:
   enabled: true
+{{- end }}
+{{- end }}
+
+{{- define "topaz.volumeClaimTemplateSpec" -}}
+accessModes:
+  - ReadWriteOnce
+resources:
+  requests:
+    storage: {{ .storage | required "persistence.storage cannot be empty" }}
+{{- if .storageClassName }}
+storageClassName: {{ .storageClassName }}
+{{- end }}
+{{- if .selector }}
+selector:
+  {{- .selector | toYaml | nindent 4 }}
 {{- end }}
 {{- end }}
