@@ -47,6 +47,13 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - run
+            - -c
+            - /config/config.yaml
+          {{- if (.Values.profiler).enabled }}
+            - --debug
+          {{- end }}
           ports:
             - name: grpc
               containerPort: {{ (.Values.ports).grpc | default "8282" }}
@@ -57,11 +64,16 @@ spec:
             - name: health
               containerPort: {{ (.Values.ports).health | default "8484" }}
               protocol: TCP
-            {{- if (.Values.metrics).enabled }}
+          {{- if (.Values.metrics).enabled }}
             - name: metrics
               containerPort: {{ (.Values.ports).metrics | default "8585" }}
               protocol: TCP
-            {{- end }}
+          {{- end }}
+          {{- if (.Values.profiler).enabled }}
+            - name: profiler
+              containerPort: {{ (.Values.ports).profiler | default "8686"}}
+              protocol: TCP
+          {{- end }}
           startupProbe:
             grpc:
               port: {{ (.Values.ports).health | default "8484" }}

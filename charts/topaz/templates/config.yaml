@@ -15,6 +15,12 @@ stringData:
       log_level: {{ .Values.logLevel | default "info" }}
       grpc_log_level: {{ .Values.grpcLogLevel | default "info" }}
 
+  {{- if (.Values.profiler).enabled }}
+    debug_service:
+      enabled: true
+      listen_address: 0.0.0.0:{{ (.Values.ports).profiler | default "8686"}}
+  {{- end }}
+
   {{- if empty ((.Values.directory).remote).address }}
     directory:
       db_path: /db/directory.db

@@ -2,3 +2,6 @@
 tls:
   grpc: grpc-cert
   https: gateway-cert
+
+profiler:
+  enabled: true

@@ -373,23 +373,25 @@ decisionLogs:
 
 ## Service Ports
 
-Topaz pods expose four ports:
+Topaz pods expose the following ports:
 
 | Protocol | Default Port | Description |
 |----------|--------------|-------------|
 | gRPC     | 8282         | gRPC services |
 | HTTPS    | 8383         | REST endpoints and web console |
 | Health   | 8484         | gRPC [health service](https://github.com/grpc/grpc/blob/master/doc/health-checking.md) |
-| Metrics  | 8585         | Prometheus metrics |
+| Metrics  | 8585         | Prometheus metrics [optional, enabled by default] |
+| Profiler | 8686         | Profiler service [optional, disabled by default] |
 
 The default ports can be overridden in `values.yaml`:
 
 ```yaml
 ports:
-  grpc: 9292
-  https: 9393
-  health: 9494
-  metrics: 9595
+  grpc: 8282
+  https: 8383
+  health: 8484
+  metrics: 8585
+  profiler: 8686
 ```
 
 The metrics service can be disabled if not needed:
@@ -397,6 +399,12 @@ The metrics service can be disabled if not needed:
 ```yaml
 metrics:
   enabled: false
+```
+
+The profiler service can be enabled using:
+```yaml
+profiler:
+  enabled: true
 ```
 
 ## Authentication
