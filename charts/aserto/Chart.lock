@@ -17,5 +17,5 @@ dependencies:
 - name: scim
   repository: file://../scim
   version: 0.1.6
-digest: sha256:d188c2319b1f908c0a8618ad44e8953a62e86230842c85ddbcd1f1966b67c4b5
-generated: "2024-11-26T12:56:40.605962-05:00"
+digest: sha256:cf562340727b49bf781073f56c582d34924260838ffe33cf4189e4a1b1bf44a2
+generated: "2024-12-17T11:43:37.275465+02:00"

@@ -36,15 +36,20 @@ dependencies:
   - name: directory
     version: 0.2.0
     repository: file://../directory
+    condition: directory.enabled
   - name: authorizer
     version: 0.1.8
     repository: file://../authorizer
+    condition: authorizer.enabled
   - name: discovery
     version: 0.1.7
     repository: file://../discovery
+    condition: discovery.enabled
   - name: console
     version: 0.1.7
     repository: file://../console
+    condition: console.enabled
   - name: scim
     version: 0.1.6
     repository: file://../scim
+    condition: scim.enabled

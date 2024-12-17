@@ -73,6 +73,7 @@ global:
       disableTLSVerification: true
 
 directory:
+  enabled: true
   # Kubernetes pull secret for private Aserto images.
   # imagePullSecrets:
   #   - name: ghcr-creds
@@ -116,6 +117,7 @@ directory:
         credentialsSecret: pg-ds-credentials
 
 discovery:
+  enabled: true
   # Kubernetes pull secret for private Aserto images.
   # imagePullSecrets:
   #   - name: ghcr-creds
@@ -133,6 +135,7 @@ discovery:
     #   tokenSecretKey: token
 
 console:
+  enabled: false
   # Kubernetes pull secret for private Aserto images.
   # imagePullSecrets:
   #   - name: ghcr-creds
@@ -154,7 +157,8 @@ console:
   # e.g. https://directory.aserto.example.com
   directoryURL: ""
 
-# authorizer:
+authorizer:
+  enabled: true
 #   # Kubernetes pull secret for private Aserto images.
 #   imagePullSecrets:
 #     - name: ghcr-creds
@@ -165,7 +169,8 @@ console:
 #     tag: x.y.z
 #     pullPolicy: IfNotPresent
 
-# scim:
+scim:
+  enabled: false
 #   # Kubernetes pull secret for private Aserto images.
 #   imagePullSecrets:
 #     - name: ghcr-creds
