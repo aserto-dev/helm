@@ -85,7 +85,7 @@ Create the name of the service account to use
 {{- if not (.Values.rootDirectory).runService | and (not .Values.rootDS) -}}
   {{- fail "roodDS configuration is required when running a standalone directory with the root in another deployment."}}
 {{- end }}
-{{- if .Values.rootDS }}
+{{- if not .Values.rootDS }}
 {{ include "aserto-lib.rootDirectoryClient" . }}
 {{- else -}}
 address: localhost:{{ include "aserto-lib.grpcPort" . }}

@@ -50,7 +50,7 @@ spec:
           {{- end }}
           {{- end }}
 
-        {{- with (include "aserto-lib.rootClientCfg" . | fromYaml).caCertSecret.name }}        
+        {{- with ((include "aserto-lib.rootClientCfg" . | fromYaml).caCertSecret).name }}        
         - name: root-ds-grpc-certs
           secret:
             secretName: {{ . }}
@@ -101,7 +101,7 @@ spec:
               readOnly: true
             {{- end }}
 
-          {{- with (include "aserto-lib.rootClientCfg" . | fromYaml).caCertSecret.name }}        
+          {{- with ((include "aserto-lib.rootClientCfg" . | fromYaml).caCertSecret).name }}        
             - name: root-ds-grpc-certs
               mountPath: /root-ds-grpc-certs
               readOnly: true

@@ -208,3 +208,6 @@ scim:
 #   groupMemberRelation: memeber
 #   groupMappings: []
 #   userMappings: []
+
+registry-proxy:
+  enabled: false

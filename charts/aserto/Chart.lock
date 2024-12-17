@@ -1,21 +1,24 @@
 dependencies:
 - name: aserto-lib
   repository: file://../aserto-lib
-  version: 0.2.0
+  version: 0.2.1
 - name: directory
   repository: file://../directory
-  version: 0.2.0
+  version: 0.2.1
 - name: authorizer
   repository: file://../authorizer
-  version: 0.1.8
+  version: 0.1.9
 - name: discovery
   repository: file://../discovery
-  version: 0.1.7
+  version: 0.1.8
 - name: console
   repository: file://../console
-  version: 0.1.7
+  version: 0.1.8
 - name: scim
   repository: file://../scim
+  version: 0.1.7
+- name: registry-proxy
+  repository: file://../registry-proxy
   version: 0.1.6
-digest: sha256:cf562340727b49bf781073f56c582d34924260838ffe33cf4189e4a1b1bf44a2
-generated: "2024-12-17T11:43:37.275465+02:00"
+digest: sha256:fd6c9b07fd08aab4b047de3f7bf62acf4192d8c905350256f1ab391e01cc1b51
+generated: "2024-12-17T16:12:49.091933+02:00"
