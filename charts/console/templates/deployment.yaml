@@ -55,12 +55,9 @@ spec:
             - name: DS0_TENANT_ID
               value: {{ .tenant_id }}
             {{- end }}
-            {{- with (include "aserto-lib.rootApiKeyEnv" . | fromYaml) }}
+            {{- with (include "aserto-lib.rootApiKeyEnv" .) }}
             - name: DS0_ROOT_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .secretName }}
-                  key: {{ .secretKey }}
+              {{ . | nindent 14 }}
             {{- end }}
           livenessProbe:
             httpGet:

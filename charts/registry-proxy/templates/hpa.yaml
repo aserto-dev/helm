@@ -2,14 +2,14 @@
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "discovery.fullname" . }}
+  name: {{ include "registry-proxy.fullname" . }}
   labels:
-    {{- include "discovery.labels" . | nindent 4 }}
+    {{- include "registry-proxy.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "discovery.fullname" . }}
+    name: {{ include "registry-proxy.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:

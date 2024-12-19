@@ -3,7 +3,7 @@
 # Declare variables to be passed into your templates.
 
 image:
-  repository: ghcr.io/aserto-dev/self-hosted-discovery
+  repository: ghcr.io/aserto-dev/registry-proxy
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   # tag: x.y.z
@@ -13,52 +13,8 @@ oidc:
   domain: ""
   audience: ""
 
-apiKey:
-  secretName: discovery-keys
-  secretKey: api-key
-
-registries:
-  # ghcr.io:
-  #   scheme: bearer
-  #   # The secret's value should be in the form "username:token"
-  #   tokenSecretName: discovery-ghcr-token
-  #   tokenSecretKey: token
-
-authorization:
-  enabled: false
-
-bundleDefaults:
-  responseHeaderTimeoutSeconds: 60
-  minDelaySeconds: 600
-  maxDelaySeconds: 1200
-
-cacheSettings:
-  type: "bigcache"
-  cacheConfig:
-    ttl: 900000000000  # 15 minutes
-
-
 # Set the service log level (trace/debug/info/warn/error)
 # logLevel: info
-
-# grpc:
-#   # The services generates self-signed certificates by default.
-#   # To use your own certificate provide the name of a secret
-#   # of type kubernetes.io/tls
-#   certSecret: discovery-grpc-cert
-
-# https:
-#   allowed_origins:
-#     - https://*.example.com
-#
-#   # The services generates self-signed certificates by default.
-#   # To use your own certificate provide the name of a secret of type kubernetes.io/tls
-#   certSecret: directory-rest-cert
-
-#   read_timeout: 2s
-#   read_header_timeout: 2s
-#   write_timeout: 2s
-#   idle_timeout: 30s
 
 replicaCount: 1
 
@@ -136,3 +92,7 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+remoteEndpointURL: "ghcr.io"
+# remoteEndpointScheme: "basic"
+# remoteEndpointToken: ""

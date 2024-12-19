@@ -1,7 +1,7 @@
 ---
 apiVersion: v2
-name: authorizer
-description: A Helm chart for the Aserto Authorizer service
+name: registry-proxy
+description: A Helm chart for the Aserto Registry Proxy service
 icon: https://www.aserto.com/images/aserto-logo.png
 
 maintainers:
@@ -21,7 +21,7 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.1.9
+version: 0.1.6
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
