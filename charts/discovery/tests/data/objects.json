@@ -1,0 +1,30 @@
+{
+    "objects": [
+      {
+        "type": "tenant",
+        "id": "4f71c224-e742-11ee-86df-00ba61ff9342"
+      },
+      {
+        "type": "tenant-name",
+        "id": "tenant-1"
+      },     
+      {
+        "type": "policy-instance",
+        "id": "4f71c224-e742-11ee-86df-00ba61ff9342/test-policy",
+        "display_name": "test policy instance",
+        "properties": {
+            "policy": {
+                "instance_label": "test-policy",
+                "name": "test-policy"
+              },
+              "registry": {
+                "host": "ghcr.io",
+                "org": "aserto-policies",
+                "repo": "policy-peoplefinder-rbac",
+                "tag": "latest"
+              }
+        }
+      }
+    ]
+  }
+  

@@ -36,6 +36,13 @@ stringData:
 
     ds0:
       {{- include "aserto-lib.rootDirectoryClient" . | nindent 6 }}
+  
+    authorization:
+      enabled: {{ .Values.authorization.enabled }}
+      ignored_methods:
+        - /grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo
+        - /grpc.reflection.v1.ServerReflection.ServerReflectionInfo
+        - /aserto.common.info.v1.Info/Info
 
     authentication:
       authenticators_enabled:

@@ -24,6 +24,8 @@ registries:
   #   tokenSecretName: discovery-ghcr-token
   #   tokenSecretKey: token
 
+authorization:
+  enabled: false
 
 bundleDefaults:
   responseHeaderTimeoutSeconds: 60
