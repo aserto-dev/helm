@@ -22,8 +22,12 @@ stringData:
         
     remote_registry:
       endpoint: {{ .Values.remoteEndpointURL | required "registry endpoint URL is required" }}
+      {{- if .Values.remoteEndpointScheme }}
       scheme: {{.Values.remoteEndpointScheme }}
+      {{- end }}
+      {{- if .Values.remoteEndpointToken }}
       token: {{.Values.remoteEndpointToken}}
+      {{- end}}
         
     nats_listener:
       enabled: false #set to true to enable manifest pushed notifications

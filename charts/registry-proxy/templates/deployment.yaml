@@ -75,7 +75,7 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          args: ["run", "--config-file", "/config/config.yaml"]
+          args: ["run", "--config", "/config/config.yaml"]
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             {{- with (include "aserto-lib.selfPorts" . | fromYaml )}}

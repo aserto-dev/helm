@@ -5,13 +5,9 @@
 image:
   repository: ghcr.io/aserto-dev/registry-proxy
   pullPolicy: IfNotPresent
+  tag: 0.0.2
   # Overrides the image tag whose default is the chart appVersion.
   # tag: x.y.z
-
-# REQUIRED: specify and OIDC domain and audience
-oidc:
-  domain: ""
-  audience: ""
 
 # Set the service log level (trace/debug/info/warn/error)
 # logLevel: info
@@ -53,20 +49,14 @@ ingress:
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
-    - host: directory.example.com
+    - host: registry-proxy.example.com
       port: https
-    - host: grpc.directory.example.com
+    - host: grpc.registry-proxy.example.com
       port: grpc
       paths:
         - path: /
           pathType: Prefix
   tls: []
-  #  - secretName: directory-example-com-tls
-  #    hosts:
-  #      - directory.example.com
-  #  - secretName: grpc-directory-example-com-tls
-  #    hosts:
-  #      - grpc.directory.example.com
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
