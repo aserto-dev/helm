@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "scim.fullname" . }}
+  name: {{ include "registry-proxy.fullname" . }}
   labels:
-    {{- include "scim.labels" . | nindent 4 }}
+    {{- include "registry-proxy.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "scim.selectorLabels" . | nindent 6 }}
+      {{- include "registry-proxy.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,19 +18,28 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "scim.selectorLabels" . | nindent 8 }}
+        {{- include "registry-proxy.selectorLabels" . | nindent 8 }}
     spec:
       {{- include "aserto-lib.imagePullSecrets" . | nindent 6 }}
-      serviceAccountName: {{ include "scim.serviceAccountName" . }}
+      serviceAccountName: {{ include "registry-proxy.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       volumes:
         - name: config
           secret:
-            secretName: {{ include "scim.fullname" . }}-config
+            secretName: {{ include "registry-proxy.fullname" . }}-config
             items:
               - key: config.yaml
                 path: config.yaml
+        - name: grpc-certs
+          {{- with include "aserto-lib.grpcConfig" . | fromYaml }}
+          {{- if .certSecret  }}
+          secret:
+            secretName: {{ .certSecret }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+          {{- end }}
         - name: https-certs
           {{- with (include "aserto-lib.httpsConfig" . | fromYaml) }}
           {{- if .certSecret }}
@@ -50,6 +59,17 @@ spec:
                 path: ca.crt        
         {{- end }}
 
+        {{- with (include "aserto-lib.discoveryCfg" . | fromYaml) }}
+        {{- if .httpsCertSecret }}
+        - name: discovery-https-certs
+          secret:
+            secretName: {{ .httpsCertSecret }}
+            items:
+              - key: ca.crt
+                path: ca.crt
+        {{- end }}
+        {{- end }}
+
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -58,8 +78,12 @@ spec:
           args: ["run", "--config", "/config/config.yaml"]
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
+            {{- with (include "aserto-lib.selfPorts" . | fromYaml )}}
             - name: https
-              containerPort: {{ include "scim.port" . }}
+              containerPort: {{ .https }}            
+            - name: metrics
+              containerPort: {{ .metrics }}
+            {{- end }}
           volumeMounts:
             - name: config
               mountPath: /config
@@ -69,27 +93,20 @@ spec:
             {{- if (include "aserto-lib.httpsConfig" . | fromYaml).certSecret  }}
               readOnly: true
             {{- end }}
-
             {{- with ((include "aserto-lib.rootClientCfg" . | fromYaml).caCertSecret).name }}        
             - name: root-ds-grpc-certs
               mountPath: /root-ds-grpc-certs
               readOnly: true
             {{- end }}
-          env:
-            - name: ASERTO_SCIM_SERVER_AUTH_BASIC_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "scim.auth.secretName" . }}
-                  key: {{ include "scim.auth.secretKey" . }}
-            - name: ASERTO_SCIM_SERVER_AUTH_BEARER_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "scim.auth.secretName" . }}
-                  key: {{ include "scim.auth.secretKey" . }}
-            {{- with (include "aserto-lib.rootApiKeyEnv" . | fromYaml) }}
-            - name: ASERTO_SCIM_DIRECTORY_API_KEY
-              {{ . | toYaml | nindent 14 }}    
-            {{- end }}
+          
+          {{- with (include "aserto-lib.selfPorts" . | fromYaml )}}
+          livenessProbe:
+            grpc:
+              port: {{ .health }}
+          readinessProbe:
+            grpc:
+              port: {{ .health }}
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
