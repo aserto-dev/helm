@@ -447,3 +447,5 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+sidecars: []
