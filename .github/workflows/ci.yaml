@@ -126,3 +126,10 @@ jobs:
           TOPAZ_CERTS_DIR: ${{ env.TOPAZ_CERTS_DIR }}
         run: |
           uv run --project tools/ktest tools/ktest/ktest.py charts/directory/test/tests.yaml
+      -
+        name: Test Discovery
+        timeout-minutes: 10
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          uv run --project tools/ktest tools/ktest/ktest.py charts/discovery/test/tests.yaml
