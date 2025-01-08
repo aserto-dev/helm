@@ -67,14 +67,14 @@ Create the name of the service account to use
 {{- end -}}
 {{- if .keysSecret -}}
 - key: {{ printf "${TENANT_%s_WRITER_KEY}" (replace "." "_" .name | upper) }}
-  account: directory-client-writer@{{ .id }}.aserto.com
+  account: ma:{{ .id }}:directory-client-writer
 - key: {{ printf "${TENANT_%s_READER_KEY}" (replace "." "_" .name | upper) }}
-  account: directory-client-reader@{{ .id }}.aserto.com
+  account: ma:{{ .id }}:directory-client-reader
 {{- else if .keys -}}
 - key: {{ .keys.writer | required "tenants[].keys.writer is required" }}
-  account: directory-client-writer@{{ .id }}.aserto.com
+  account: ma:{{ .id }}:directory-client-writer
 - key: {{ .keys.reader | required "tenants[].keys.reader is required" }}
-  account: directory-client-reader@{{ .id }}.aserto.com
+  account: ma:{{ .id }}:directory-client-reader
 {{- else -}}
   {{ fail "all tenants must include either 'keys' or 'keysSecret'" }}
 {{- end }}
@@ -85,7 +85,7 @@ Create the name of the service account to use
 {{- if not (.Values.rootDirectory).runService | and (not .Values.rootDS) -}}
   {{- fail "roodDS configuration is required when running a standalone directory with the root in another deployment."}}
 {{- end }}
-{{- if not .Values.rootDS }}
+{{- if .Values.rootDS }}
 {{ include "aserto-lib.rootDirectoryClient" . }}
 {{- else -}}
 address: localhost:{{ include "aserto-lib.grpcPort" . }}

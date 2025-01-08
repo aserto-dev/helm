@@ -1,6 +1,6 @@
 ---
 image:
-  tag: 0.33.2-3e32438c-amd64
+  tag: 0.33.5
 
 imagePullSecrets:
   - name: ghcr-creds
