@@ -1,3 +1,4 @@
+.dev/
 .ext/
 /charts/*/build/
 /charts/*/charts/

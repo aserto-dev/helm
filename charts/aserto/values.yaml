@@ -72,8 +72,9 @@ global:
     directory:
       disableTLSVerification: true
 
-directory:
+rootds:
   enabled: true
+
   # Kubernetes pull secret for private Aserto images.
   # imagePullSecrets:
   #   - name: ghcr-creds
@@ -102,6 +103,25 @@ directory:
       admin:
         # Kubernetes secret containing credentials for the root database's owner.
         credentialsSecret: pg-ds-credentials
+
+directory:
+  enabled: true
+
+  # Kubernetes pull secret for private Aserto images.
+  # imagePullSecrets:
+  #   - name: ghcr-creds
+
+  # Override the directory image and tag.
+  # image:
+  #   repository: ghcr.io/aserto-dev/directory
+  #   tag: x.y.z
+  #   pullPolicy: IfNotPresent
+
+  # Required: Provide one or more SSH public keys to be granted admin access.
+  # sshAdminKeys: |
+  #   # Add your authorized SSH public keys here
+  #   ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDf6
+  #   ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDa7
 
   # Configuration for the tenant directory.
   tenantDirectory:
