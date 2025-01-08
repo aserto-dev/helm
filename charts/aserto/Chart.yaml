@@ -42,7 +42,7 @@ dependencies:
     repository: file://../authorizer
     condition: authorizer.enabled
   - name: discovery
-    version: 0.1.8
+    version: 0.1.9
     repository: file://../discovery
     condition: discovery.enabled
   - name: console

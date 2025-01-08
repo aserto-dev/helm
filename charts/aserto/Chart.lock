@@ -10,7 +10,7 @@ dependencies:
   version: 0.1.9
 - name: discovery
   repository: file://../discovery
-  version: 0.1.8
+  version: 0.1.9
 - name: console
   repository: file://../console
   version: 0.1.8
@@ -20,5 +20,5 @@ dependencies:
 - name: registry-proxy
   repository: file://../registry-proxy
   version: 0.1.6
-digest: sha256:cff6d0558b7b5a592e221357863372cddc36b825e965786da73c022222060bf4
-generated: "2025-01-08T17:32:53.371635-05:00"
+digest: sha256:aa36828e3a9be09c32aca35e76785be6fea7a9cce866cf929effed6c38216635
+generated: "2025-01-08T18:26:30.831721-05:00"
