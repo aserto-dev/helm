@@ -36,7 +36,7 @@ stringData:
 
     ds0:
       {{- include "aserto-lib.rootDirectoryClient" . | nindent 6 }}
-  
+
     authorization:
       enabled: {{ .Values.authorization.enabled }}
       ignored_methods:
@@ -47,10 +47,14 @@ stringData:
     authentication:
       authenticators_enabled:
         root_key: true
+        {{- with .Values.oidc }}
         oidc: true
+        {{- end }}
 
+      {{- with .Values.oidc -}}
       oidc:
         {{- include "aserto-lib.oidcConfig" . | nindent 8 }}
+      {{- end }}
 
       root_keys:
         keys:

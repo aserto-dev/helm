@@ -1,3 +1,4 @@
+---
 # Default values for directory.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
@@ -8,10 +9,10 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   # tag: x.y.z
 
-# REQUIRED: specify and OIDC domain and audience
+# Optional: OpenID Connect domain and audience.
 oidc:
-  domain: ""
-  audience: ""
+#   domain: ""
+#   audience: ""
 
 apiKey:
   secretName: discovery-keys
