@@ -36,6 +36,11 @@ dependencies:
   - name: directory
     version: 0.2.2
     repository: file://../directory
+    condition: rootds.enabled
+    alias: rootds
+  - name: directory
+    version: 0.2.0
+    repository: file://../directory
     condition: directory.enabled
   - name: authorizer
     version: 0.1.9
