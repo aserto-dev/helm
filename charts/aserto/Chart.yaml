@@ -34,7 +34,7 @@ dependencies:
     version: 0.2.1
     repository: file://../aserto-lib
   - name: directory
-    version: 0.2.1
+    version: 0.2.2
     repository: file://../directory
     condition: directory.enabled
   - name: authorizer

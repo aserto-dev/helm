@@ -4,7 +4,7 @@ dependencies:
   version: 0.2.1
 - name: directory
   repository: file://../directory
-  version: 0.2.1
+  version: 0.2.2
 - name: authorizer
   repository: file://../authorizer
   version: 0.1.9
@@ -20,5 +20,5 @@ dependencies:
 - name: registry-proxy
   repository: file://../registry-proxy
   version: 0.1.6
-digest: sha256:fd6c9b07fd08aab4b047de3f7bf62acf4192d8c905350256f1ab391e01cc1b51
-generated: "2024-12-17T16:12:49.091933+02:00"
+digest: sha256:cff6d0558b7b5a592e221357863372cddc36b825e965786da73c022222060bf4
+generated: "2025-01-08T17:32:53.371635-05:00"
