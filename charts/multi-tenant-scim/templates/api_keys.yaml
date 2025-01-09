@@ -1,0 +1,14 @@
+---
+{{- $secretName := include "multi-tenant-scim.auth.secretName" . -}}
+{{- $secretKey := include "multi-tenant-scim.auth.secretKey" . -}}
+{{- $data :=  (lookup "v1" "Secret" .Release.Namespace $secretName).data }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ $secretName }}
+data:
+  {{- if $data }}
+  {{ $secretKey }}: {{ get $data $secretKey }}
+  {{- else }}
+  {{ $secretKey }}: {{ randAlphaNum 20 | b64enc }}
+  {{- end }}
