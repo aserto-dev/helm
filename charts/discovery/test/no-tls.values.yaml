@@ -1,6 +1,9 @@
 ---
 image:
-  tag: 0.1.4-9679fe1-amd64
+  tag: 0.1.4
+
+imagePullSecrets:
+  - name: ghcr-creds
 
 apiKey:
   secretName: discovery-keys
@@ -9,7 +12,6 @@ apiKey:
 rootDS:
   address: "topaz.discovery-no-tls.svc.cluster.local:8282"
   apiKey: " "
-  tenantID: ""
   noTLS: true
 
 registries:
