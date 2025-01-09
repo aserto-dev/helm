@@ -42,7 +42,7 @@ read_timeout: {{ .read_timeout | default "2s"}}
 read_header_timeout: {{ .read_header_timeout | default "2s" }}
 write_timeout: {{ .write_timeout | default "2s" }}
 idle_timeout: {{ .idle_timeout | default "30s" }}
-{{- with .cerSecret }}
+{{- with .certSecret }}
 certs:
   tls_key_path: '/https-certs/tls.key'
   tls_cert_path: '/https-certs/tls.crt'

@@ -3,4 +3,4 @@ dependencies:
   repository: file://../aserto-lib
   version: 0.2.1
 digest: sha256:83c950a4ee60c07dbc8e045f6645365ca35eced4f1aa329f51c8e2de1de28f93
-generated: "2024-12-17T16:14:52.436288+02:00"
+generated: "2024-12-17T16:14:52.214206+02:00"

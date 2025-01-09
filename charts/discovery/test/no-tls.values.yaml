@@ -1,0 +1,21 @@
+---
+image:
+  tag: 0.1.4
+
+imagePullSecrets:
+  - name: ghcr-creds
+
+apiKey:
+  secretName: discovery-keys
+  secretKey: api-key
+
+rootDS:
+  address: "topaz.discovery-no-tls.svc.cluster.local:8282"
+  apiKey: " "
+  noTLS: true
+
+registries:
+  ghcr.io:
+    scheme: bearer
+    tokenSecretName: discovery-ghcr-token
+    tokenSecretKey: token

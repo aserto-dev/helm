@@ -1,6 +1,6 @@
 dependencies:
 - name: aserto-lib
   repository: file://../aserto-lib
-  version: 0.2.0
-digest: sha256:e847ea16d4c0c170655af988461152ab61eed5372f1639769dd7d198346da272
-generated: "2024-11-26T12:31:22.063478-05:00"
+  version: 0.2.1
+digest: sha256:83c950a4ee60c07dbc8e045f6645365ca35eced4f1aa329f51c8e2de1de28f93
+generated: "2024-12-17T16:09:37.348401+02:00"

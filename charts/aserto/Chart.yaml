@@ -21,7 +21,7 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.1.11
+version: 0.1.12
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
@@ -31,20 +31,29 @@ appVersion: "0.1.0"
 
 dependencies:
   - name: aserto-lib
-    version: 0.2.0
+    version: 0.2.1
     repository: file://../aserto-lib
   - name: directory
-    version: 0.2.0
+    version: 0.2.2
     repository: file://../directory
+    condition: directory.enabled
   - name: authorizer
-    version: 0.1.8
+    version: 0.1.9
     repository: file://../authorizer
+    condition: authorizer.enabled
   - name: discovery
-    version: 0.1.7
+    version: 0.1.9
     repository: file://../discovery
+    condition: discovery.enabled
   - name: console
-    version: 0.1.7
+    version: 0.1.8
     repository: file://../console
+    condition: console.enabled
   - name: scim
-    version: 0.1.6
+    version: 0.1.7
     repository: file://../scim
+    condition: scim.enabled
+  - name: registry-proxy
+    version: 0.1.6
+    repository: file://../registry-proxy
+    condition: registry-proxy.enabled
