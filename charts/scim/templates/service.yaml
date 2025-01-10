@@ -7,8 +7,8 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-    - name: https
+    - name: scim
       port: {{ include "scim.port" . }}
-      targetPort: https
+      targetPort: scim
   selector:
     {{- include "scim.selectorLabels" . | nindent 4 }}

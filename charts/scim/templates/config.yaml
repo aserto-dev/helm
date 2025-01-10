@@ -14,10 +14,12 @@ stringData:
 
     server:
       listen_address: ":{{ include "scim.port" . }}"
+    {{- with .Values.certSecret -}}
       certs:
         tls_key_path: '/https-certs/tls.key'
         tls_cert_path: '/https-certs/tls.crt'
         tls_ca_cert_path: '/https-certs/ca.crt'
+    {{- end }}
       auth:
         basic:
           enabled: {{ ((.Values.auth).basic).enabled | default "true" }}

@@ -31,24 +31,20 @@ spec:
             items:
               - key: config.yaml
                 path: config.yaml
+      {{- with .Values.certSecret }}
         - name: https-certs
-          {{- with (include "aserto-lib.httpsConfig" . | fromYaml) }}
-          {{- if .certSecret }}
           secret:
-            secretName: {{ .certSecret }}
-          {{- else }}
-          emptyDir: {}
-          {{- end }}
-          {{- end }}
+            secretName: {{ . }}
+      {{- end }}
 
-        {{- with ((include "aserto-lib.rootClientCfg" . | fromYaml).caCertSecret).name }}                
+      {{- with ((include "aserto-lib.rootClientCfg" . | fromYaml).caCertSecret).name }}
         - name: root-ds-grpc-certs
           secret:
             secretName: {{ . }}
             items:
               - key: ca.crt
-                path: ca.crt        
-        {{- end }}
+                path: ca.crt
+      {{- end }}
 
       containers:
         - name: {{ .Chart.Name }}
@@ -58,23 +54,22 @@ spec:
           args: ["run", "--config", "/config/config.yaml"]
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: https
+            - name: scim
               containerPort: {{ include "scim.port" . }}
           volumeMounts:
             - name: config
               mountPath: /config
               readOnly: true
+          {{- with .Values.certSecret }}
             - name: https-certs
               mountPath: /https-certs
-            {{- if (include "aserto-lib.httpsConfig" . | fromYaml).certSecret  }}
               readOnly: true
-            {{- end }}
-
-            {{- with ((include "aserto-lib.rootClientCfg" . | fromYaml).caCertSecret).name }}        
+          {{- end }}
+          {{- with ((include "aserto-lib.rootClientCfg" . | fromYaml).caCertSecret).name }}
             - name: root-ds-grpc-certs
               mountPath: /root-ds-grpc-certs
               readOnly: true
-            {{- end }}
+          {{- end }}
           env:
             - name: ASERTO_SCIM_SERVER_AUTH_BASIC_PASSWORD
               valueFrom:
@@ -88,7 +83,7 @@ spec:
                   key: {{ include "scim.auth.secretKey" . }}
             {{- with (include "aserto-lib.rootApiKeyEnv" . | fromYaml) }}
             - name: ASERTO_SCIM_DIRECTORY_API_KEY
-              {{ . | toYaml | nindent 14 }}    
+              {{ . | toYaml | nindent 14 }}
             {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

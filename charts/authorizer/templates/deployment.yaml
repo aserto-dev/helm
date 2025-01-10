@@ -31,43 +31,35 @@ spec:
             items:
               - key: config.yaml
                 path: config.yaml
-        - name: grpc-certs
-          {{- with include "aserto-lib.grpcConfig" . | fromYaml }}
-          {{- if .certSecret  }}
-          secret:
-            secretName: {{ .certSecret }}
-          {{- else }}
-          emptyDir: {}
-          {{- end }}
-          {{- end }}
-        - name: https-certs
-          {{- with (include "aserto-lib.httpsConfig" . | fromYaml) }}
-          {{- if .certSecret }}
-          secret:
-            secretName: {{ .certSecret }}
-          {{- else }}
-          emptyDir: {}
-          {{- end }}
-          {{- end }}
 
-        {{- with ((include "aserto-lib.rootClientCfg" . | fromYaml).caCertSecret).name }}        
+        {{- with (include "aserto-lib.grpcConfig" . | fromYaml).certSecret }}
+        - name: grpc-certs
+          secret:
+            secretName: {{ . }}
+        {{- end }}
+
+        {{- with (include "aserto-lib.httpsConfig" . | fromYaml).certSecret }}
+        - name: https-certs
+          secret:
+            secretName: {{ . }}
+        {{- end }}
+
+        {{- with ((include "aserto-lib.rootClientCfg" . | fromYaml).caCertSecret).name }}
         - name: root-ds-grpc-certs
           secret:
             secretName: {{ . }}
             items:
               - key: ca.crt
-                path: ca.crt        
+                path: ca.crt
         {{- end }}
 
-        {{- with (include "aserto-lib.discoveryCfg" . | fromYaml) }}
-        {{- if .httpsCertSecret }}
+        {{- with (include "aserto-lib.discoveryCfg" . | fromYaml).httpsCertSecret }}
         - name: discovery-https-certs
           secret:
-            secretName: {{ .httpsCertSecret }}
+            secretName: {{ . }}
             items:
               - key: ca.crt
                 path: ca.crt
-        {{- end }}
         {{- end }}
 
       containers:
@@ -90,18 +82,20 @@ spec:
             - name: config
               mountPath: /config
               readOnly: true
+
+          {{- with (include "aserto-lib.grpcConfig" . | fromYaml).certSecret }}
             - name: grpc-certs
               mountPath: /grpc-certs
-            {{- if (include "aserto-lib.grpcConfig" . | fromYaml).certSecret  }}
               readOnly: true
-            {{- end }}
+          {{- end }}
+
+          {{- with (include "aserto-lib.httpsConfig" . | fromYaml).certSecret }}
             - name: https-certs
               mountPath: /https-certs
-            {{- if (include "aserto-lib.httpsConfig" . | fromYaml).certSecret  }}
               readOnly: true
-            {{- end }}
+          {{- end }}
 
-          {{- with ((include "aserto-lib.rootClientCfg" . | fromYaml).caCertSecret).name }}        
+          {{- with ((include "aserto-lib.rootClientCfg" . | fromYaml).caCertSecret).name }}
             - name: root-ds-grpc-certs
               mountPath: /root-ds-grpc-certs
               readOnly: true
@@ -115,6 +109,7 @@ spec:
           env:
             - name: AUTHORIZER_DS0_API_KEY
               {{ include "aserto-lib.rootApiKeyEnv" . | nindent 14 }}
+
           {{- with .Values.apiKey }}
             - name: AUTHORIZER_ROOT_KEY
               valueFrom:
