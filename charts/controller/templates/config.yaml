@@ -135,3 +135,10 @@ stringData:
             oidc: true
           {{- end }}
 
+    {{- with .Values.secretsVault }}
+    secrets_vault:
+      address: {{ .address }}
+      insecure: {{ .insecure | default false }}
+      root_path: {{ .rootPath | default "/" }}
+      token: ""
+    {{- end }}
