@@ -71,6 +71,18 @@ tenants:
 #       writerKey: writer
 #       readerKey: reader
 
+# secretsVault:
+#   [Optional] Vault token
+#   token: ""
+#   [Optional] Kubernetes secret containing the vault token
+#   tokenSecret:
+#     # Secret name
+#     name: ""
+#     # Secret key
+#     key: "token"
+#   address: "https://127.0.0.1:8200"
+#   rootPath: "/"
+#   insecure: true
 
 # Set the service log level (trace/debug/info/warn/error).
 # The default is 'info'.
