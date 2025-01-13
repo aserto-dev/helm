@@ -166,6 +166,21 @@ spec:
             {{- end }}
             {{- end }}
 
+            {{- if .Values.secretsVault }}
+            {{- if .Values.secretsVault.token }}
+            - name: DIRECTORY_SECRETS_VAULT_TOKEN
+              value: {{ .Values.secretsVault.token }}
+            {{- else -}}
+            {{- with .Values.secretsVault.tokenSecret }}
+            - name: DIRECTORY_SECRETS_VAULT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .name }}
+                  key: {{ .key }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+
           {{- range $_, $tenant := .Values.tenants -}}
             {{- with $tenant.keysSecret }}
             - name: {{ printf "TENANT_%s_WRITER_KEY" (replace "." "_" $tenant.name | upper) }}

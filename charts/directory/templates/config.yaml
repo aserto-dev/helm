@@ -156,4 +156,10 @@ stringData:
           - /grpc.reflection.v1.ServerReflection/ServerReflectionInfo
           authenticators_enabled:
             anonymous: true
-
+    {{- with .Values.secretsVault }}
+    secrets_vault:
+      address: {{ .address }}
+      insecure: {{ .insecure | default false }}
+      root_path: {{ .rootPath | default "/" }}
+      token: ""
+    {{- end }}
