@@ -1,6 +1,6 @@
 {{- $cfg := .Values.apiKey -}}
 {{- $secret :=  lookup "v1" "Secret" .Release.Namespace $cfg.secretName }}
-{{- if empty $secret | or (include "aserto-lib.isManagedResource" (list $secret .Release.Name) | toYaml) -}}
+{{- if empty $secret | or (include "aserto-lib.isManagedResource" (list $secret .Release.Name) | eq "true") -}}
 
 ---
 apiVersion: v1

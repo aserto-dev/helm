@@ -63,6 +63,11 @@ lint-%:
 	@echo -e "${ATTN_COLOR}==> lint $* ${NO_COLOR}"
 	@${CT_LINT_CMD} --charts ${CHARTS_DIR}/$*
 
+.PHONY: test-%
+test-%:
+	@echo -e "${ATTN_COLOR}==> test $* ${NO_COLOR}"
+	@uv run --project tools/ktest tools/ktest/ktest.py charts/$*/test/tests.yaml
+
 .PHONY: update-%
 update-%:
 	@echo -e "${ATTN_COLOR}==> update $* ${NO_COLOR}"

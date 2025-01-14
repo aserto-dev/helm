@@ -2,7 +2,7 @@
 {{- $secretName := include "scim.auth.secretName" . -}}
 {{- $secretKey := include "scim.auth.secretKey" . -}}
 {{- $secret :=  lookup "v1" "Secret" .Release.Namespace $secretName }}
-{{- if empty $secret | or (include "aserto-lib.isManagedResource" (list $secret .Release.Name) | toYaml) }}
+{{- if empty $secret | or (include "aserto-lib.isManagedResource" (list $secret .Release.Name) | eq "true") }}
 apiVersion: v1
 kind: Secret
 metadata:

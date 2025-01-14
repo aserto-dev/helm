@@ -2,7 +2,7 @@
 {{- $cfg := include "aserto-lib.directoryApiKeys" . | fromYaml -}}
 {{- $secret :=  lookup "v1" "Secret" .Release.Namespace $cfg.secretName }}
 {{- if empty $secret | or
-    (include "aserto-lib.isManagedResource" (list $secret .Release.Name) | toYaml)
+    (include "aserto-lib.isManagedResource" (list $secret .Release.Name) | eq "true")
 -}}
 
 ---

@@ -47,10 +47,10 @@ Takes a k8s resource retrieved using the `lookup` function and returns true
 if the resource is managed by the current helm release. False otherwise.
 */}}
 {{- define "aserto-lib.isManagedResource" -}}
-{{- $resource := first . }}
+{{- $resource := first . | default dict}}
 {{- $releaseName := last . }}
-{{- if get ($resource.metadata).labels "app.kubernetes.io/managed-by" | eq "Helm" | and
-      (get ($resource.metadata).annotations "meta.helm.sh/release-name" | eq $releaseName) }}
+{{- if $resource | dig "metadata" "labels" "app.kubernetes.io/managed-by" "" | eq "Helm" | and
+       ($resource | dig "metadata" "annotations" "meta.helm.sh/release-name" "" | eq $releaseName) }}
 true
 {{- else }}
 false

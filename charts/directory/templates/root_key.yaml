@@ -8,7 +8,7 @@
   {{- $secret :=  lookup "v1" "Secret" $.Release.Namespace $secretName }}
   {{- if empty $secret }}
     {{- $apiKey = randAlphaNum 32 | b64enc }}
-  {{- else if (include "aserto-lib.isManagedResource" (list $secret .Release.Name) | toYaml) -}}
+  {{- else if (include "aserto-lib.isManagedResource" (list $secret .Release.Name) | eq "true") -}}
     {{- $apiKey = get ($secret).data $secretKey }}
   {{- end }}
 {{- end -}}
