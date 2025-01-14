@@ -1,0 +1,105 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "controller.fullname" . }}-config
+  labels:
+    {{- include "controller.labels" . | nindent 4 }}
+stringData:
+  config.yaml: |
+    ---
+    logging:
+      prod: true
+      log_level: {{ .Values.logLevel | default "info" }}
+
+    api:
+      grpc:
+        {{- include "aserto-lib.grpcService" . | nindent 8 }}
+      gateway:
+        {{- include "aserto-lib.httpsService" . | nindent 8 }}
+      health:
+        listen_address: 0.0.0.0:{{ include "aserto-lib.healthPort" . }}
+      metrics:
+        {{- include "aserto-lib.metricsService" . | nindent 8 }}
+      admin:
+        authorized_keys_path: /admin-keys/{{ include "controller.adminKeysConfigMapKey" . }}
+
+    {{- with .Values.database }}
+    root_db:
+      writer:
+        host: "{{ .host | required ".Values.database.host is required." }}"
+        port: {{ .port | default "5432" }}
+        db_name: {{  .dbName | default "aserto-root-ds" }}
+        ssl_mode: {{ .sslMode | default "require" }}
+        user: {{ .admin.user | default "postgres" }}
+      {{- if .admin.options -}}
+        {{ toYaml .admin.options | nindent 8 }}
+      {{ end }}
+      reader:
+        host: "{{ .host | required ".Values.database.host is required." }}"
+        port: {{ .port | default 5432 }}
+        db_name: {{ .dbName | default "aserto-root-ds" }}
+        ssl_mode: {{ .sslMode | default "require" }}
+        user: {{ .reader.user | default "root_reader" }}
+      {{- if .reader.options -}}
+        {{ toYaml .reader.options | nindent 8 }}
+      {{ end }}
+    {{- end }}
+
+    root_ds:
+      client:
+        {{- include "controller.rootClient" . | nindent 8 }}
+    {{- with .Values.manifest }}
+      root_manifest: {{ . }}
+    {{- end }}
+
+    nats:
+      {{- if .Values.nats }}
+      {{ toYaml .Values.nats | nindent 6 }}
+      {{- else }}
+      enabled: false
+      {{- end }}
+
+    cache:
+      {{- $cache := .Values.cache | default dict }}
+      cache_size_mb: {{ $cache.sizeMB | default 128 }}
+      cache_invalidation_time_seconds: {{ $cache.ttlSeconds | default 1800 }}
+      clean_window_seconds: {{ $cache.cleanWindowSeconds | default 10 }}
+
+    authorization:
+    {{- if .Values.noAuthorization }}
+      disable: true
+    {{- else }}
+      bypass:
+        - /grpc.reflection.v1.ServerReflection/ServerReflectionInfo
+        - /grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo
+      bypass_tenants:
+        - {{ include "aserto-lib.rootDirectoryTenantID" . }}
+    {{- end }}
+
+    authentication:
+      authenticators_enabled:
+        root_key: true
+        {{- with .Values.oidc }}
+        oidc: true
+        {{- end }}
+        {{- if (.Values.authentication).machineAccounts }}
+        machine_account: true
+        {{- end }}
+
+      root_keys:
+        keys:
+          - key: ${DIRECTORY_ROOT_DS_CLIENT_API_KEY}
+            account: "root-ds"
+
+      {{- with .Values.oidc -}}
+      oidc:
+        {{- include "aserto-lib.oidcConfig" . | nindent 8 }}
+      {{- end }}
+
+      override:
+        - methods:
+          - /grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo
+          - /grpc.reflection.v1.ServerReflection/ServerReflectionInfo
+          authenticators_enabled:
+            anonymous: true

@@ -1,0 +1,152 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "controller.fullname" . }}
+  labels:
+    {{- include "controller.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "controller.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/config.yaml") . | sha256sum }}
+        checksum/admin_keys: {{ include (print $.Template.BasePath "/admin_keys.yaml") . | sha256sum }}
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "controller.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- include "aserto-lib.imagePullSecrets" . | nindent 6 }}
+      serviceAccountName: {{ include "controller.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+        - name: config
+          secret:
+            secretName: {{ include "controller.fullname" . }}-config
+            items:
+              - key: config.yaml
+                path: config.yaml
+        - name: admin-keys
+          configMap:
+            name: {{ include "controller.adminKeysConfigMapName" . }}
+        {{- with (include "aserto-lib.grpcConfig" . | fromYaml).certSecret }}
+        - name: grpc-certs
+          secret:
+            secretName: {{ . }}
+        {{- end }}
+        {{- with (include "aserto-lib.httpsConfig" . | fromYaml).certSecret }}
+        - name: https-certs
+          secret:
+            secretName: {{ . }}
+        {{- end }}
+
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          args: ["--config", "/config/config.yaml", "run"]
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+          {{- with (include "aserto-lib.selfPorts" . | fromYaml )}}
+            - name: https
+              containerPort: {{ .https }}
+            - name: grpc
+              containerPort: {{ .grpc }}
+            - name: metrics
+              containerPort: {{ .metrics }}
+          {{- end }}
+            - containerPort: 2222
+              name: ssh-admin
+          volumeMounts:
+            - name: config
+              mountPath: /config
+              readOnly: true
+            - name: admin-keys
+              mountPath: "/admin-keys"
+              readOnly: true
+          {{- with (include "aserto-lib.grpcConfig" . | fromYaml).certSecret }}
+            - name: grpc-certs
+              mountPath: /grpc-certs
+              readOnly: true
+          {{- end }}
+          {{- with (include "aserto-lib.httpsConfig" . | fromYaml).certSecret }}
+            - name: https-certs
+              mountPath: /https-certs
+              readOnly: true
+          {{- end }}
+
+          env:
+            - name: DIRECTORY_ROOT_DS_CLIENT_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: root-ds-key
+                  key: api-key
+
+            {{- with .Values.database }}
+            - name: DIRECTORY_ROOT_DB_WRITER_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .admin.credentialsSecret }}
+                  key: username
+            - name: DIRECTORY_ROOT_DB_WRITER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .admin.credentialsSecret }}
+                  key: password
+            - name: DIRECTORY_ROOT_DB_READER_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ (.reader).credentialsSecret }}
+                  key: username
+            - name: DIRECTORY_ROOT_DB_READER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .reader.credentialsSecret }}
+                  key: password
+            {{- end }}
+
+          {{- range $_, $tenant := .Values.tenants -}}
+            {{- with $tenant.keysSecret }}
+            - name: {{ printf "TENANT_%s_WRITER_KEY" (replace "." "_" $tenant.name | upper) }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .name | required "tenants[].keysSecret.name is required" }}
+                  key: {{ .writerKey | default "writer" }}
+            - name: {{ printf "TENANT_%s_READER_KEY" (replace "." "_" $tenant.name | upper) }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .name | required "tenants[].keysSecret.name is required" }}
+                  key: {{ .readerKey | default "reader" }}
+            {{- end }}
+          {{- end }}
+
+          {{- with (include "aserto-lib.selfPorts" . | fromYaml )}}
+          livenessProbe:
+            grpc:
+              port: {{ .health }}
+          readinessProbe:
+            grpc:
+              port: {{ .health }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

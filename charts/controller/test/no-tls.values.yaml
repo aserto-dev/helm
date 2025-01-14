@@ -1,0 +1,23 @@
+---
+image:
+  tag: 0.33.5
+
+imagePullSecrets:
+  - name: ghcr-creds
+
+database:
+  host: postgresql.postgres.svc.cluster.local
+  dbName: test-root-ds
+  sslMode: disable
+  admin:
+    credentialsSecret: pg-credentials
+  reader:
+    credentialsSecret: pg-root-reader-credentials
+
+cache:
+  sizeMB: 100
+
+sshAdminKeys:
+  configMap:
+    name: controller-admin-keys
+    key: authorized_keys

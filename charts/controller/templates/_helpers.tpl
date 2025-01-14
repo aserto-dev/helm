@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "directory.name" -}}
+{{- define "controller.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "directory.fullname" -}}
+{{- define "controller.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "directory.chart" -}}
+{{- define "controller.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "directory.labels" -}}
-helm.sh/chart: {{ include "directory.chart" . }}
-{{ include "directory.selectorLabels" . }}
+{{- define "controller.labels" -}}
+helm.sh/chart: {{ include "controller.chart" . }}
+{{ include "controller.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,23 +45,23 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "directory.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "directory.name" . }}
+{{- define "controller.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "controller.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "directory.serviceAccountName" -}}
+{{- define "controller.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "directory.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "controller.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
 
-{{- define "directory.tenantKeys" -}}
+{{- define "controller.tenantKeys" -}}
 {{- if empty .name -}}
 	{{- fail "tenants[].name is require" }}
 {{- end -}}
@@ -81,13 +81,7 @@ Create the name of the service account to use
 {{- end}}
 
 
-{{- define "directory.rootClient" -}}
-{{- if not (.Values.rootDirectory).runService | and (not .Values.rootDS) -}}
-  {{- fail "roodDS configuration is required when running a standalone directory with the root in another deployment."}}
-{{- end }}
-{{- if .Values.rootDS }}
-{{ include "aserto-lib.rootDirectoryClient" . }}
-{{- else -}}
+{{- define "controller.rootClient" -}}
 address: localhost:{{ include "aserto-lib.grpcPort" . }}
 tenant_id: {{ include "aserto-lib.rootDirectoryTenantID" . }}
 {{- if (include "aserto-lib.grpcConfig" . | fromYaml).certSecret }}
@@ -96,29 +90,13 @@ ca_cert_path: /grpc-certs/ca.crt
 no_tls: true
 {{- end }}
 {{- end }}
-{{- end }}
 
-
-{{- define "directory.rootApiKeyEnv" -}}
-{{- if not (.Values.rootDirectory).runService | and (not .Values.rootDS) -}}
-  {{- fail "roodDS configuration is required when running a standalone directory with the root in another deployment." -}}
-{{- end -}}
-{{- if .Values.rootDS -}}
-{{ include "aserto-lib.rootApiKeyEnv" . }}
-{{- else -}}
-valueFrom:
-  secretKeyRef:
-    name: root-ds-key
-    key: api-key
-{{- end }}
-{{- end }}
-
-{{- define "directory.adminKeysConfigMapName" -}}
+{{- define "controller.adminKeysConfigMapName" -}}
 {{ ((.Values.sshAdminKeys).configMap).name | default
-	(printf "%s-admin-keys" (include "directory.fullname" .)) }}
+	(printf "%s-admin-keys" (include "controller.fullname" .)) }}
 {{- end }}
 
-{{- define "directory.adminKeysConfigMapKey" -}}
+{{- define "controller.adminKeysConfigMapKey" -}}
 {{ ((.Values.sshAdminKeys).configMap).key | default "authorized_keys" }}
 {{- end }}
 

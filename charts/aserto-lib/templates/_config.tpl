@@ -17,7 +17,7 @@ value: {{ .apiKey }}
 {{- else -}}
 valueFrom:
   secretKeyRef:
-    name: {{ (.apiKeySecret).name | default "root-ds-keys" }}
+    name: {{ (.apiKeySecret).name | default "root-ds-key" }}
     key: {{ (.apiKeySecret).key | default "api-key" }}
 {{- end }}
 {{- end }}

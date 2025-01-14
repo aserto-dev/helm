@@ -124,6 +124,16 @@ jobs:
 
           chmod 400 ~/.ssh/config
       -
+        name: Test Controller
+        timeout-minutes: 10
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SSH_PUBLIC_KEY: ${{ steps.sshkey.outputs.public_key }}
+          SSH_PRIVATE_KEY: ${{ steps.sshkey.outputs.private_key }}
+          TOPAZ_CERTS_DIR: ${{ env.TOPAZ_CERTS_DIR }}
+        run: |
+          make test-controller
+      -
         name: Test Directory
         timeout-minutes: 10
         env:

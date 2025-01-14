@@ -1,19 +1,13 @@
 ---
 tests:
   - name: registry-proxy-test
-    pull_secret: $GITHUB_TOKEN    
+    pull_secret: $GITHUB_TOKEN
     deployments:
       - chart: registry-proxy
         values: test-values.yaml
         ports:
-          8383: 8383              
+          8383: 8383
     run:
-      - >
-         ${POLICY:-policy} login -s localhost:8383 -u $GITHUB_USER -p $GITHUB_TOKEN -d --insecure
-      - >
-         time ${POLICY:-policy} pull localhost:8383/aserto-policies/policy-todo:latest --insecure
-      - > 
-         time ${POLICY:-policy} pull localhost:8383/aserto-policies/policy-todo:latest --insecure
-    cleanup:     
-      - >
-        exit 0  
+      - ${POLICY:-policy} login -s localhost:8383 -u $GITHUB_USER -p $GITHUB_TOKEN -d --insecure
+      - time ${POLICY:-policy} pull localhost:8383/aserto-policies/policy-todo:latest --insecure
+      - time ${POLICY:-policy} pull localhost:8383/aserto-policies/policy-todo:latest --insecure
