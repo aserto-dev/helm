@@ -5,18 +5,22 @@
 
 {{- $apiKey := $cfg.apiKey -}}
 {{- if empty $apiKey -}}
-  {{- $current :=  (lookup "v1" "Secret" $.Release.Namespace $secretName).data }}
-  {{- if $current }}
-    {{- $apiKey = get $current $secretKey }}
-  {{- else -}}
+  {{- $secret :=  lookup "v1" "Secret" $.Release.Namespace $secretName }}
+  {{- if empty $secret }}
     {{- $apiKey = randAlphaNum 32 | b64enc }}
+  {{- else if (include "aserto-lib.isManagedResource" (list $secret .Release.Name) | toYaml) -}}
+    {{- $apiKey = get ($secret).data $secretKey }}
   {{- end }}
 {{- end -}}
+
+{{- with $apiKey }}
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: {{ $secretName }}
 data:
-  {{ $secretKey }}: {{ $apiKey }}
+  {{ $secretKey }}: {{ . }}
+{{- end }}
+
 {{- end }}

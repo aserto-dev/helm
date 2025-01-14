@@ -1,18 +1,23 @@
 {{- if .Values.rootDirectory.runService }}
 {{- $cfg := include "aserto-lib.directoryApiKeys" . | fromYaml -}}
-{{- $data :=  (lookup "v1" "Secret" .Release.Namespace $cfg.secretName).data }}
+{{- $secret :=  lookup "v1" "Secret" .Release.Namespace $cfg.secretName }}
+{{- if empty $secret | or
+    (include "aserto-lib.isManagedResource" (list $secret .Release.Name) | toYaml)
+-}}
+
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: {{ $cfg.secretName }}
 data:
-  {{- if $data }}
-  {{ $cfg.writerSecretKey }}: {{ get $data $cfg.writerSecretKey }}
-  {{ $cfg.readerSecretKey }}: {{ get $data $cfg.readerSecretKey }}
-  {{- else }}
+{{- if ($secret).data }}
+  {{ $cfg.writerSecretKey }}: {{ get $secret.data $cfg.writerSecretKey }}
+  {{ $cfg.readerSecretKey }}: {{ get $secret.data $cfg.readerSecretKey }}
+{{- else }}
   {{ $cfg.writerSecretKey }}: {{ randAlphaNum 20 | b64enc }}
   {{ $cfg.readerSecretKey }}: {{ randAlphaNum 20 | b64enc }}
-  {{- end }}
 {{- end }}
 
+{{- end }}
+{{- end }}
