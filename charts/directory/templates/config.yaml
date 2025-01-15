@@ -109,12 +109,14 @@ stringData:
     authentication:
       authenticators_enabled:
         root_key: true
-        {{- with .Values.oidc }}
+
+      {{- with include "aserto-lib.oidcConfig" . }}
         oidc: true
-        {{- end }}
-        {{- if (.Values.authentication).machineAccounts }}
+      {{- end }}
+
+      {{- if (.Values.authentication).machineAccounts }}
         machine_account: true
-        {{- end }}
+      {{- end }}
 
       root_keys:
       {{- if .Values.tenantDirectory.runService }}
@@ -143,10 +145,10 @@ stringData:
             account: "root-ds"
       {{- end }}
 
-      {{- with .Values.oidc -}}
+    {{- with include "aserto-lib.oidcConfig" . }}
       oidc:
-        {{- include "aserto-lib.oidcConfig" . | nindent 8 }}
-      {{- end }}
+        {{- . | nindent 8 }}
+    {{- end }}
 
       override:
         - methods:
