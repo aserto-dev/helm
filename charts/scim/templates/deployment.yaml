@@ -37,7 +37,7 @@ spec:
             secretName: {{ . }}
       {{- end }}
 
-      {{- with ((include "aserto-lib.rootClientCfg" . | fromYaml).caCertSecret).name }}
+      {{- with ((include "aserto-lib.controllerClientCfg" . | fromYaml).caCertSecret).name }}
         - name: root-ds-grpc-certs
           secret:
             secretName: {{ . }}
@@ -65,7 +65,7 @@ spec:
               mountPath: /https-certs
               readOnly: true
           {{- end }}
-          {{- with ((include "aserto-lib.rootClientCfg" . | fromYaml).caCertSecret).name }}
+          {{- with ((include "aserto-lib.controllerClientCfg" . | fromYaml).caCertSecret).name }}
             - name: root-ds-grpc-certs
               mountPath: /root-ds-grpc-certs
               readOnly: true
@@ -81,7 +81,7 @@ spec:
                 secretKeyRef:
                   name: {{ include "scim.auth.secretName" . }}
                   key: {{ include "scim.auth.secretKey" . }}
-            {{- with (include "aserto-lib.rootApiKeyEnv" . | fromYaml) }}
+            {{- with (include "aserto-lib.controllerApiKeyEnv" . | fromYaml) }}
             - name: ASERTO_SCIM_DIRECTORY_API_KEY
               {{ . | toYaml | nindent 14 }}
             {{- end }}

@@ -25,7 +25,7 @@ stringData:
         authorized_keys_path: /admin-keys/{{ include "controller.adminKeysConfigMapKey" . }}
 
     {{- with .Values.database }}
-    root_db:
+    db:
       writer:
         host: "{{ .host | required ".Values.database.host is required." }}"
         port: {{ .port | default "5432" }}
@@ -46,12 +46,15 @@ stringData:
       {{ end }}
     {{- end }}
 
-    root_ds:
+    controller:
       client:
-        {{- include "controller.rootClient" . | nindent 8 }}
+        address: self
+        tenant_id: {{ include "aserto-lib.controllerTenantID" . }}
     {{- with .Values.manifest }}
-      root_manifest: {{ . }}
+      manifest: {{ . }}
     {{- end }}
+      stores:
+        {{- list (include "aserto-lib.directoryClient" . | fromYaml) | toYaml | nindent 8 }}
 
     nats:
       {{- if .Values.nats }}
@@ -74,7 +77,7 @@ stringData:
         - /grpc.reflection.v1.ServerReflection/ServerReflectionInfo
         - /grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo
       bypass_tenants:
-        - {{ include "aserto-lib.rootDirectoryTenantID" . }}
+        - {{ include "aserto-lib.controllerTenantID" . }}
     {{- end }}
 
     authentication:

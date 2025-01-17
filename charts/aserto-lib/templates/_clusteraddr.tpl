@@ -28,8 +28,8 @@ Args: [scope, config, service]
 {{/*
 Cluster address of the root directory service
 */}}
-{{- define "aserto-lib.rootDirectoryAddress" }}
-{{- include "aserto-lib.svcClusterAddress" (list . "grpc" "rootDS" "directory")}}
+{{- define "aserto-lib.controllerAddress" }}
+{{- include "aserto-lib.svcClusterAddress" (list . "grpc" "controller" "controller")}}
 {{- end }}
 
 {{/*

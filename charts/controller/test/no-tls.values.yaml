@@ -1,6 +1,6 @@
 ---
 image:
-  tag: 0.33.5
+  tag: 0.33.7-1852a794-arm64
 
 imagePullSecrets:
   - name: ghcr-creds
@@ -12,7 +12,7 @@ database:
   admin:
     credentialsSecret: pg-credentials
   reader:
-    credentialsSecret: pg-root-reader-credentials
+    credentialsSecret: pg-controller-reader-credentials
 
 cache:
   sizeMB: 100

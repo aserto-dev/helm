@@ -50,13 +50,13 @@ spec:
           {{- end }}
           {{- end }}
 
-        {{- with ((include "aserto-lib.rootClientCfg" . | fromYaml).caCertSecret).name }}                
+        {{- with ((include "aserto-lib.controllerClientCfg" . | fromYaml).caCertSecret).name }}
         - name: root-ds-grpc-certs
           secret:
             secretName: {{ . }}
             items:
               - key: ca.crt
-                path: ca.crt        
+                path: ca.crt
         {{- end }}
 
         {{- with (include "aserto-lib.discoveryCfg" . | fromYaml) }}
@@ -80,7 +80,7 @@ spec:
           ports:
             {{- with (include "aserto-lib.selfPorts" . | fromYaml )}}
             - name: https
-              containerPort: {{ .https }}            
+              containerPort: {{ .https }}
             - name: metrics
               containerPort: {{ .metrics }}
             {{- end }}
@@ -93,12 +93,12 @@ spec:
             {{- if (include "aserto-lib.httpsConfig" . | fromYaml).certSecret  }}
               readOnly: true
             {{- end }}
-            {{- with ((include "aserto-lib.rootClientCfg" . | fromYaml).caCertSecret).name }}        
+            {{- with ((include "aserto-lib.controllerClientCfg" . | fromYaml).caCertSecret).name }}
             - name: root-ds-grpc-certs
               mountPath: /root-ds-grpc-certs
               readOnly: true
             {{- end }}
-          
+
           {{- with (include "aserto-lib.selfPorts" . | fromYaml )}}
           livenessProbe:
             grpc:

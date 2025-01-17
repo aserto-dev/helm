@@ -1,5 +1,5 @@
-{{- define "aserto-lib.rootClientCfg" }}
-{{- include "aserto-lib.mergeGlobal" (list . "rootDS") }}
+{{- define "aserto-lib.controllerClientCfg" }}
+{{- include "aserto-lib.mergeGlobal" (list . "controller") }}
 {{- end }}
 
 {{- define "aserto-lib.directoryCfg" }}
@@ -10,22 +10,22 @@
 {{- include "aserto-lib.mergeGlobal" (list . "discovery") }}
 {{- end }}
 
-{{- define "aserto-lib.rootApiKeyEnv" }}
-{{- with include "aserto-lib.rootClientCfg" . | fromYaml -}}
+{{- define "aserto-lib.controllerApiKeyEnv" }}
+{{- with include "aserto-lib.controllerClientCfg" . | fromYaml -}}
 {{- if .apiKey -}}
 value: {{ .apiKey }}
 {{- else -}}
 valueFrom:
   secretKeyRef:
-    name: {{ (.apiKeySecret).name | default "root-ds-key" }}
+    name: {{ (.apiKeySecret).name | default "controller-key" }}
     key: {{ (.apiKeySecret).key | default "api-key" }}
 {{- end }}
 {{- end }}
 {{- end }}
 
 {{- define "aserto-lib.directoryApiKeys" }}
-{{- (include "aserto-lib.directoryCfg" . | fromYaml).apiKey |
-  default (dict "secretName" "ds-keys" "writerSecretKey" "writeKey" "readerSecretKey" "readKey") | toYaml -}}
+{{- (include "aserto-lib.directoryCfg" . | fromYaml).apiKeys |
+  default (dict "secretName" "directory-keys" "writerKey" "writeKey" "readerKey" "readKey") | toYaml -}}
 {{- end }}
 
 {{- define "aserto-lib.discoveryApiKey" }}
@@ -37,8 +37,8 @@ valueFrom:
 {{/*
 Root directory tenant ID
 */}}
-{{- define "aserto-lib.rootDirectoryTenantID" -}}
-{{- (include "aserto-lib.rootClientCfg" . | fromYaml).tenantID |
+{{- define "aserto-lib.controllerTenantID" -}}
+{{- (include "aserto-lib.controllerClientCfg" . | fromYaml).tenantID |
 	default "00000000-0000-11ef-0000-000000000000" -}}
 {{- end }}
 

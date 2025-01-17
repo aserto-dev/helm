@@ -9,7 +9,7 @@ apiKey:
   secretName: discovery-keys
   secretKey: api-key
 
-rootDS:
+controller:
   address: "topaz.discovery-no-tls.svc.cluster.local:8282"
   apiKey: " "
   noTLS: true

@@ -24,68 +24,40 @@ stringData:
       admin:
         authorized_keys_path: /admin-keys/{{ include "directory.adminKeysConfigMapKey" . }}
 
-    {{ if .Values.rootDirectory.runService }}
-    {{- with .Values.rootDirectory.database -}}
-    root_db:
-      writer:
-        host: "{{ .host | required ".Values.rootDirectory.database.host is required." }}"
-        port: {{ .port | default "5432" }}
-        db_name: {{  .dbName | default "aserto-root-ds" }}
-        ssl_mode: {{ .sslMode | default "require" }}
-        user: {{ .admin.user | default "postgres" }}
-        {{- if .admin.options -}}
-        {{ toYaml .admin.options | nindent 8 }}
-        {{ end }}
-      reader:
-        host: "{{ .host | required ".Values.rootDirectory.database.host is required." }}"
-        port: {{ .port | default 5432 }}
-        db_name: {{ .dbName | default "aserto-root-ds" }}
-        ssl_mode: {{ .sslMode | default "require" }}
-        user: {{ .reader.user | default "root_reader" }}
-        {{- if .reader.options -}}
-        {{ toYaml .reader.options | nindent 8 }}
-        {{ end }}
-    {{- end }}
-    {{- end }}
-
-    {{ if .Values.tenantDirectory.runService }}
-    {{- with .Values.tenantDirectory.database -}}
+  {{- with .Values.database }}
     db:
       writer:
-        host: "{{ .host | required ".Values.tenantDirectory.database.host is required." }}"
+        host: "{{ .host | required ".Values.database.host is required." }}"
         port: {{ .port | default 5432 }}
-        db_name: {{ .dbName | default "aserto-ds" }}
+        db_name: {{ .dbName | default "aserto-directory" }}
         ssl_mode: {{ .sslMode | default "require" }}
         user: {{ .admin.user | default "postgres" }}
-        {{- if .admin.options -}}
+      {{- if .admin.options -}}
         {{ toYaml .admin.options | nindent 8 }}
-        {{ end }}
+      {{ end }}
       reader:
-        host: "{{ .host | required ".Values.tenantDirectory.database.host is required." }}"
+        host: "{{ .host | required ".Values.database.host is required." }}"
         port: {{ .port | default 5432 }}
-        db_name: {{ .dbName | default "aserto-ds" }}
+        db_name: {{ .dbName | default "aserto-directory" }}
         ssl_mode: {{ .sslMode | default "require" }}
-        user: {{ .reader.user | default "tenant_reader" }}
-        {{- if .reader.options -}}
+        user: {{ .reader.user | default "directory_reader" }}
+      {{- if .reader.options -}}
         {{ toYaml .reader.options | nindent 8 }}
-        {{ end }}
-    {{- end }}
-    {{- end }}
+      {{ end }}
+  {{- end }}
 
+  {{- if not (include "directory.isStandalone" .) }}
     root_ds:
       client:
-        {{- include "directory.rootClient" . | nindent 8 }}
-
-      {{- if and .Values.rootDirectory.runService .Values.rootDirectory.manifest }}
-      root_manifest: {{ .Values.rootDirectory.manifest }}
-      {{- end }}
+        {{- include "aserto-lib.controllerClient" . | nindent 8 }}
+  {{- end }}
 
     nats:
-      {{- if .Values.nats }}
+    {{- if .Values.nats }}
       {{ toYaml .Values.nats | nindent 6 }}
-      {{- else }}
+    {{- else }}
       enabled: false
-      {{- end }}
+    {{- end }}
 
     cache:
       {{- $cache := .Values.cache | default dict }}
@@ -94,17 +66,13 @@ stringData:
       clean_window_seconds: {{ $cache.cleanWindowSeconds | default 10 }}
 
     authorization:
-      {{- if .Values.noAuthorization }}
+  {{- if include "directory.isStandalone" . }}
       disable: true
-      {{- else }}
+  {{- else }}
       bypass:
         - /grpc.reflection.v1.ServerReflection/ServerReflectionInfo
         - /grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo
-      {{- if .Values.rootDirectory.runService }}
-      bypass_tenants:
-        - {{ include "aserto-lib.rootDirectoryTenantID" . }}
-      {{- end }}
-      {{- end }}
+  {{- end }}
 
     authentication:
       authenticators_enabled:
@@ -119,7 +87,6 @@ stringData:
       {{- end }}
 
       root_keys:
-      {{- if .Values.tenantDirectory.runService }}
         keys:
           - key: ${DIRECTORY_DS_WRITE_KEY}
             account: root-key-directory-writer@aserto.com
@@ -128,22 +95,6 @@ stringData:
           - key: ${DIRECTORY_ROOT_DS_CLIENT_API_KEY}
             account: root-key-directory-store-writer@aserto.com
 
-        {{ if .Values.rootDirectory.runService -}}
-        tenant_overrides:
-          {{ include "aserto-lib.rootDirectoryTenantID" .}}:
-            - key: ${DIRECTORY_ROOT_DS_CLIENT_API_KEY}
-              account: "root-ds"
-        {{- range .Values.tenants }}
-          {{ .id | required "all tenants must have an id." }}:
-            {{- include "directory.tenantKeys" . | nindent 12 }}
-        {{- end }}
-        {{- end }}
-
-      {{- else }}
-        keys:
-          - key: ${DIRECTORY_ROOT_DS_CLIENT_API_KEY}
-            account: "root-ds"
-      {{- end }}
 
     {{- with include "aserto-lib.oidcConfig" . }}
       oidc:
@@ -156,4 +107,3 @@ stringData:
           - /grpc.reflection.v1.ServerReflection/ServerReflectionInfo
           authenticators_enabled:
             anonymous: true
-

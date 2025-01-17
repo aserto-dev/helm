@@ -50,13 +50,13 @@ spec:
           {{- end }}
           {{- end }}
 
-        {{- with ((include "aserto-lib.rootClientCfg" . | fromYaml).caCertSecret).name }}                
+        {{- with ((include "aserto-lib.controllerClientCfg" . | fromYaml).caCertSecret).name }}
         - name: root-ds-grpc-certs
           secret:
             secretName: {{ . }}
             items:
               - key: ca.crt
-                path: ca.crt        
+                path: ca.crt
         {{- end }}
 
       containers:
@@ -88,7 +88,7 @@ spec:
               readOnly: true
             {{- end }}
 
-            {{- with ((include "aserto-lib.rootClientCfg" . | fromYaml).caCertSecret).name }}        
+            {{- with ((include "aserto-lib.controllerClientCfg" . | fromYaml).caCertSecret).name }}
             - name: root-ds-grpc-certs
               mountPath: /root-ds-grpc-certs
               readOnly: true
@@ -102,9 +102,9 @@ spec:
                   key: {{ .secretKey }}
             {{- end }}
 
-            {{- with (include "aserto-lib.rootApiKeyEnv" . | fromYaml) }}
+            {{- with (include "aserto-lib.controllerApiKeyEnv" . | fromYaml) }}
             - name: DISCOVERY_DS0_API_KEY
-              {{ . | toYaml | nindent 14 }}                
+              {{ . | toYaml | nindent 14 }}
             {{- end }}
 
             {{- include "discovery.registriesEnv" . | nindent 12 }}

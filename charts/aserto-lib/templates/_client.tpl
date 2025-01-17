@@ -11,11 +11,11 @@ ca_cert_path: /{{ .certVolume }}/ca.crt
 {{- end }}
 {{- end }}
 
-{{- define "aserto-lib.rootDirectoryClient" -}}
-address: {{ include "aserto-lib.rootDirectoryAddress" . }}
-tenant_id: {{ include "aserto-lib.rootDirectoryTenantID" . }}
-{{- $cfg := include "aserto-lib.rootClientCfg" . | fromYaml }}
-{{- include "aserto-lib.clientTLS" (mergeOverwrite $cfg (dict "certVolume" "root-ds-grpc-certs")) -}}
+{{- define "aserto-lib.controllerClient" -}}
+address: {{ include "aserto-lib.controllerAddress" . }}
+tenant_id: {{ include "aserto-lib.controllerTenantID" . }}
+{{- $cfg := include "aserto-lib.controllerClientCfg" . | fromYaml }}
+{{- include "aserto-lib.clientTLS" (mergeOverwrite $cfg (dict "certVolume" "controller-grpc-certs")) -}}
 {{- end }}
 
 {{- define "aserto-lib.directoryClient" -}}

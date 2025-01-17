@@ -15,13 +15,13 @@ discovery:
       scheme: bearer
       tokenSecretName: ghcr-token-secret
 
+controller:
+  database:
+    host: root-db-host
+
 directory:
-  rootDirectory:
-    database:
-      host: root-db-host
-  tenantDirectory:
-    database:
-      host: tenant-db-host
+  database:
+    host: tenant-db-host
   sshAdminKeys:
     keys: |
       ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDf6

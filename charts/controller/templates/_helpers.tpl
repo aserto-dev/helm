@@ -81,9 +81,9 @@ Create the name of the service account to use
 {{- end}}
 
 
-{{- define "controller.rootClient" -}}
+{{- define "controller.controllerClient" -}}
 address: localhost:{{ include "aserto-lib.grpcPort" . }}
-tenant_id: {{ include "aserto-lib.rootDirectoryTenantID" . }}
+tenant_id: {{ include "aserto-lib.controllerTenantID" . }}
 {{- if (include "aserto-lib.grpcConfig" . | fromYaml).certSecret }}
 ca_cert_path: /grpc-certs/ca.crt
 {{- else }}

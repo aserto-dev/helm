@@ -63,7 +63,7 @@ Create the name of the service account to use
 
 {{- define "directory.tenantKeys" -}}
 {{- if empty .name -}}
-	{{- fail "tenants[].name is require" }}
+  {{- fail "tenants[].name is require" }}
 {{- end -}}
 {{- if .keysSecret -}}
 - key: {{ printf "${TENANT_%s_WRITER_KEY}" (replace "." "_" .name | upper) }}
@@ -80,36 +80,20 @@ Create the name of the service account to use
 {{- end }}
 {{- end}}
 
-
-{{- define "directory.rootClient" -}}
-{{- if not (.Values.rootDirectory).runService | and (not .Values.rootDS) -}}
-  {{- fail "roodDS configuration is required when running a standalone directory with the root in another deployment."}}
+{{- define "directory.isStandalone" -}}
+{{- if empty ((.Values.controller).address | default (((.Values.global).aserto).controller).address) -}}
+true
 {{- end }}
-{{- if .Values.rootDS }}
-{{ include "aserto-lib.rootDirectoryClient" . }}
+{{- end }}
+
+
+{{- define "directory.controllerApiKeyEnv" -}}
+{{- if .Values.controller -}}
+{{ include "aserto-lib.controllerApiKeyEnv" . }}
+{{/*
 {{- else -}}
-address: localhost:{{ include "aserto-lib.grpcPort" . }}
-tenant_id: {{ include "aserto-lib.rootDirectoryTenantID" . }}
-{{- if (include "aserto-lib.grpcConfig" . | fromYaml).certSecret }}
-ca_cert_path: /grpc-certs/ca.crt
-{{- else }}
-no_tls: true
-{{- end }}
-{{- end }}
-{{- end }}
-
-
-{{- define "directory.rootApiKeyEnv" -}}
-{{- if not (.Values.rootDirectory).runService | and (not .Values.rootDS) -}}
-  {{- fail "roodDS configuration is required when running a standalone directory with the root in another deployment." -}}
-{{- end -}}
-{{- if .Values.rootDS -}}
-{{ include "aserto-lib.rootApiKeyEnv" . }}
-{{- else -}}
-valueFrom:
-  secretKeyRef:
-    name: root-ds-key
-    key: api-key
+  {{- fail "controller configuration is required when running a standalone directory with the root in another deployment."}}
+*/}}
 {{- end }}
 {{- end }}
 

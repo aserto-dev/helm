@@ -43,9 +43,9 @@ global:
     #     durations: false
     #     gateway: false
 
-    rootDS:
-      # Address and port of the root directory's gRPC service.
-      # Default: directory.<namespace>.svc.cluster.local:8282
+    controller:
+      # Address and port of the controller's gRPC service.
+      # Default: controller.<namespace>.svc.cluster.local:8282
       address: ""
       # [Optiona] API key for the remote directory
       apiKey: ""
@@ -65,12 +65,24 @@ global:
       # INSECURE: credentials are sent unencrypted within the cluster.
       noTLS: false
 
-    rootDirectory:
-      # Disable TLS verification on
-      disableTLSVerification: true
+controller:
+  # Database configuration.
+  database:
+    # [REQUIRED] Host name of the root directory PostgreSQL instance.
+    host: ""
+    port: 5432
+    # Set to 'disable` if the PostgreSQL instance does not use SSL.
+    sslMode: require
+    admin:
+      # Kubernetes secret containing credentials for the root database's owner.
+      credentialsSecret: pg-ds-credentials
 
-    directory:
-      disableTLSVerification: true
+  # Required: Provide one or more SSH public keys to be granted admin access.
+  # sshAdminKeys: |
+  #   # Add your authorized SSH public keys here
+  #   ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDf6
+  #   ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDa7
+
 
 directory:
   enabled: true
@@ -84,37 +96,16 @@ directory:
   #   tag: x.y.z
   #   pullPolicy: IfNotPresent
 
-  # Required: Provide one or more SSH public keys to be granted admin access.
-  # sshAdminKeys: |
-  #   # Add your authorized SSH public keys here
-  #   ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDf6
-  #   ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDa7
-
-  # Configuration for the root directory.
-  rootDirectory:
-    # Database configuration.
-    database:
-      # [REQUIRED] Host name of the root directory PostgreSQL instance.
-      host: ""
-      port: 5432
-      # Set to 'disable` if the PostgreSQL instance does not use SSL.
-      sslMode: require
-      admin:
-        # Kubernetes secret containing credentials for the root database's owner.
-        credentialsSecret: pg-ds-credentials
-
-  # Configuration for the tenant directory.
-  tenantDirectory:
-    # Database configuration.
-    database:
-      # [REQUIRED] Host name of the tenant directory PostgreSQL instance.
-      host: ""
-      port: 5432
-      # Set to 'disable` if the PostgreSQL instance does not use SSL.
-      sslMode: require
-      admin:
-        # Kubernetes secret containing credentials for the tenant database's owner.
-        credentialsSecret: pg-ds-credentials
+  # Database configuration.
+  database:
+    # [REQUIRED] Host name of the tenant directory PostgreSQL instance.
+    host: ""
+    port: 5432
+    # Set to 'disable` if the PostgreSQL instance does not use SSL.
+    sslMode: require
+    admin:
+      # Kubernetes secret containing credentials for the tenant database's owner.
+      credentialsSecret: pg-ds-credentials
 
 discovery:
   enabled: true

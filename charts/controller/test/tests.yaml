@@ -7,13 +7,13 @@ tests:
         values:
           username: postgres
           password: $POSTGRES_PASSWORD
-      - name: pg-root-reader-credentials
+      - name: pg-controller-reader-credentials
         values:
-          username: root_reader
-          password: root_reader
-      - name: root-ds-key
+          username: controller_reader
+          password: controller_reader
+      - name: controller-key
         values:
-          api-key: root-ds-key
+          api-key: controller-key
     config_maps:
       - name: controller-admin-keys
         keys:
@@ -28,7 +28,7 @@ tests:
     run:
       - >
         ${TOPAZ:-topaz} ds get manifest -H localhost:8282 --tenant-id 00000000-0000-11ef-0000-000000000000
-        -k root-ds-key --stdout --plaintext
+        -k controller-key --stdout --plaintext
 
   - name: controller-tls
     pull_secret: $GITHUB_TOKEN
@@ -37,13 +37,13 @@ tests:
         values:
           username: postgres
           password: $POSTGRES_PASSWORD
-      - name: pg-root-reader-credentials
+      - name: pg-controller-reader-credentials
         values:
-          username: root_reader
-          password: root_reader
-      - name: root-ds-key
+          username: controller_reader
+          password: controller_reader
+      - name: controller-key
         values:
-          api-key: root-ds-key
+          api-key: controller-key
       - name: grpc-cert
         files:
           tls.crt: $TOPAZ_CERTS_DIR/grpc.crt
@@ -67,4 +67,4 @@ tests:
     run:
       - >
         ${TOPAZ:-topaz} ds get manifest -H localhost:8282 --tenant-id 00000000-0000-11ef-0000-000000000000
-        -k root-ds-key --stdout --insecure
+        -k controller-key --stdout --insecure

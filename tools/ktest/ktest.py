@@ -181,6 +181,13 @@ def main(specfile: TextIO, include: Sequence[str], teardown: bool):
     init_logging(logging.DEBUG)
     config.load_kube_config()
 
+    # Ensure that the current kubectl context has "test" in its name.
+    context = Namespace.current_context()
+    if "test" not in context:
+        raise click.ClickException(
+            f"Current kubernetes context ({context}) is not a test environemnt. Exiting."
+        )
+
     spec = Spec(**yaml.safe_load(specfile))
     spec_path = path.dirname(specfile.name)
 

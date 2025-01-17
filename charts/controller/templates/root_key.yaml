@@ -1,5 +1,5 @@
-{{- $cfg := include "aserto-lib.rootClientCfg" . | fromYaml -}}
-{{- $secretName := ($cfg.apiKeySecret).name | default "root-ds-key" -}}
+{{- $cfg := include "aserto-lib.controllerClientCfg" . | fromYaml -}}
+{{- $secretName := ($cfg.apiKeySecret).name | default "controller-key" -}}
 {{- $secretKey := ($cfg.apiKeySecret).key | default "api-key" -}}
 
 {{- $apiKey := $cfg.apiKey -}}

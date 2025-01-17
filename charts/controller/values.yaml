@@ -39,7 +39,7 @@ database:
   dbName: aserto-root-ds
   sslMode: require
   admin:
-    credentialsSecret: pg-root-admin-credentials
+    credentialsSecret: pg-controller-admin-credentials
     options:
       debug_mode: false
       max_open_conns: 25
@@ -48,7 +48,7 @@ database:
       query_timeout_seconds: 60
 
   reader:
-    credentialsSecret: pg-root-reader-credentials
+    credentialsSecret: pg-controller-reader-credentials
     options:
       debug_mode: false
       max_open_conns: 25

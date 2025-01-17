@@ -30,7 +30,7 @@ stringData:
             {{- include "authorizer.gatewayService" . | nindent 12 }}
 
     ds0:
-      {{- include "aserto-lib.rootDirectoryClient" . | nindent 6 }}
+      {{- include "aserto-lib.controllerClient" . | nindent 6 }}
 
     remote_directory:
       {{- include "aserto-lib.directoryClient" . | nindent 6 }}

@@ -87,26 +87,26 @@ spec:
             - name: DIRECTORY_ROOT_DS_CLIENT_API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: root-ds-key
+                  name: controller-key
                   key: api-key
 
             {{- with .Values.database }}
-            - name: DIRECTORY_ROOT_DB_WRITER_USER
+            - name: DIRECTORY_DB_WRITER_USER
               valueFrom:
                 secretKeyRef:
                   name: {{ .admin.credentialsSecret }}
                   key: username
-            - name: DIRECTORY_ROOT_DB_WRITER_PASSWORD
+            - name: DIRECTORY_DB_WRITER_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ .admin.credentialsSecret }}
                   key: password
-            - name: DIRECTORY_ROOT_DB_READER_USER
+            - name: DIRECTORY_DB_READER_USER
               valueFrom:
                 secretKeyRef:
                   name: {{ (.reader).credentialsSecret }}
                   key: username
-            - name: DIRECTORY_ROOT_DB_READER_PASSWORD
+            - name: DIRECTORY_DB_READER_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ .reader.credentialsSecret }}
