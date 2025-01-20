@@ -1,0 +1,33 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "multi-tenant-scim.fullname" . }}-config
+  labels:
+    {{- include "multi-tenant-scim.labels" . | nindent 4 }}
+stringData:
+  config.yaml: |
+    ---
+    logging:
+      prod: true
+      log_level: {{ .Values.logLevel | default "info" }}
+
+    server:
+      listen_address: ":{{ include "multi-tenant-scim.port" . }}"
+    {{- with .Values.certSecret -}}
+      certs:
+        tls_key_path: '/https-certs/tls.key'
+        tls_cert_path: '/https-certs/tls.crt'
+        tls_ca_cert_path: '/https-certs/ca.crt'
+    {{- end }}
+      auth:
+        basic:
+          enabled: true
+          passthrough: true
+        bearer:
+          enabled: true
+          passthrough: true
+    directory:
+      {{- include "aserto-lib.directoryClient" . | nindent 6 }}
+    controller:
+      {{- include "aserto-lib.controllerClient" . | nindent 6 }}

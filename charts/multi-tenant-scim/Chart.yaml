@@ -1,7 +1,7 @@
 ---
 apiVersion: v2
-name: aserto
-description: A Helm chart for Kubernetes
+name: multi-tenant-scim
+description: A Helm chart for the Aserto Multi Tenant SCIM Gateway
 icon: https://www.aserto.com/images/aserto-logo.png
 
 maintainers:
@@ -21,45 +21,15 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.1.12
+version: 0.0.1
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
-appVersion: "0.1.0"
+appVersion: "0.0.1"
 
 dependencies:
-  - name: controller
-    version: 0.0.1
-    repository: file://../controller
-  - name: directory
-    version: 0.2.2
-    repository: file://../directory
-  - name: authorizer
-    version: 0.1.10
-    repository: file://../authorizer
-    condition: authorizer.enabled
-  - name: discovery
-    version: 0.1.9
-    repository: file://../discovery
-    condition: discovery.enabled
-  - name: console
-    version: 0.1.8
-    repository: file://../console
-    condition: console.enabled
-  - name: scim
-    version: 0.1.7
-    repository: file://../scim
-    condition: scim.enabled
-  - name: registry-proxy
-    version: 0.1.6
-    repository: file://../registry-proxy
-    condition: registry-proxy.enabled
   - name: aserto-lib
     version: 0.2.1
     repository: file://../aserto-lib
-  - name: multi-tenant-scim
-    version: 0.0.1
-    repository: file://../multi-tenant-scim
-    condition: multi-tenant-scim.enabled
