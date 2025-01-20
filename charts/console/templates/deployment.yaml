@@ -57,7 +57,7 @@ spec:
             {{- end }}
             {{- with (include "aserto-lib.controllerApiKeyEnv" .) }}
             - name: DS0_ROOT_KEY
-              {{ . | nindent 14 }}
+              {{- . | nindent 14 }}
             {{- end }}
           livenessProbe:
             httpGet:

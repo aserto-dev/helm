@@ -29,7 +29,7 @@ stringData:
       writer:
         host: "{{ .host | required ".Values.database.host is required." }}"
         port: {{ .port | default "5432" }}
-        db_name: {{  .dbName | default "aserto-root-ds" }}
+        db_name: {{  .dbName | default "aserto-controller" }}
         ssl_mode: {{ .sslMode | default "require" }}
         user: {{ .admin.user | default "postgres" }}
       {{- if .admin.options -}}
@@ -38,7 +38,7 @@ stringData:
       reader:
         host: "{{ .host | required ".Values.database.host is required." }}"
         port: {{ .port | default 5432 }}
-        db_name: {{ .dbName | default "aserto-root-ds" }}
+        db_name: {{ .dbName | default "aserto-controller" }}
         ssl_mode: {{ .sslMode | default "require" }}
         user: {{ .reader.user | default "root_reader" }}
       {{- if .reader.options -}}
@@ -92,8 +92,8 @@ stringData:
 
       root_keys:
         keys:
-          - key: ${DIRECTORY_ROOT_DS_CLIENT_API_KEY}
-            account: "root-ds"
+          - key: ${DIRECTORY_CONTROLLER_CLIENT_API_KEY}
+            account: "controller"
 
       {{- with .Values.oidc -}}
       oidc:

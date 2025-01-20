@@ -51,7 +51,7 @@ spec:
           {{- end }}
 
         {{- with ((include "aserto-lib.controllerClientCfg" . | fromYaml).caCertSecret).name }}
-        - name: root-ds-grpc-certs
+        - name: controller-grpc-certs
           secret:
             secretName: {{ . }}
             items:
@@ -89,8 +89,8 @@ spec:
             {{- end }}
 
             {{- with ((include "aserto-lib.controllerClientCfg" . | fromYaml).caCertSecret).name }}
-            - name: root-ds-grpc-certs
-              mountPath: /root-ds-grpc-certs
+            - name: controller-grpc-certs
+              mountPath: /controller-grpc-certs
               readOnly: true
             {{- end }}
           env:

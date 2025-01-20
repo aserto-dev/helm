@@ -35,7 +35,7 @@ oidc:
 database:
   host: ""
   port: 5432
-  dbName: aserto-ds
+  dbName: aserto-directory
   sslMode: require
   admin:
     credentialsSecret: pg-directory-admin-credentials
@@ -54,7 +54,8 @@ database:
       conn_max_lifetime: 5
       query_timeout_seconds: 5
 
-# controller:
+controller:
+  enabled: false
 #   # Address and port of the controller's gRPC service.
 #   # Default: controller.<namespace>.svc.cluster.local:8282
 #   address: ""

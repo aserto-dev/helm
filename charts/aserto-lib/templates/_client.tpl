@@ -21,5 +21,5 @@ tenant_id: {{ include "aserto-lib.controllerTenantID" . }}
 {{- define "aserto-lib.directoryClient" -}}
 address: {{ include "aserto-lib.directoryAddress" . }}
 {{- $cfg := include "aserto-lib.mergeGlobal" (list . "directory") | fromYaml }}
-{{- include "aserto-lib.clientTLS" (mergeOverwrite $cfg (dict "certVolume" "ds-grpc-certs")) -}}
+{{- include "aserto-lib.clientTLS" (mergeOverwrite $cfg (dict "certVolume" "directory-grpc-certs")) -}}
 {{- end }}

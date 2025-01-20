@@ -45,7 +45,7 @@ spec:
         {{- end }}
 
         {{- with ((include "aserto-lib.controllerClientCfg" . | fromYaml).caCertSecret).name }}
-        - name: root-ds-grpc-certs
+        - name: controller-grpc-certs
           secret:
             secretName: {{ . }}
             items:
@@ -96,8 +96,8 @@ spec:
           {{- end }}
 
           {{- with ((include "aserto-lib.controllerClientCfg" . | fromYaml).caCertSecret).name }}
-            - name: root-ds-grpc-certs
-              mountPath: /root-ds-grpc-certs
+            - name: controller-grpc-certs
+              mountPath: /controller-grpc-certs
               readOnly: true
           {{- end }}
 
@@ -108,7 +108,7 @@ spec:
           {{- end }}
           env:
             - name: AUTHORIZER_DS0_API_KEY
-              {{ include "aserto-lib.controllerApiKeyEnv" . | nindent 14 }}
+              {{- include "aserto-lib.controllerApiKeyEnv" . | nindent 14 }}
 
           {{- with .Values.apiKey }}
             - name: AUTHORIZER_ROOT_KEY
@@ -123,7 +123,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: {{ .secretName }}
-                  key: {{ .readerSecretKey }}
+                  key: {{ .readerKey }}
           {{- end }}
           {{- with (include "aserto-lib.discoveryApiKey" . | fromYaml) }}
             - name: AUTHORIZER_DISCOVERY_ROOT_KEY

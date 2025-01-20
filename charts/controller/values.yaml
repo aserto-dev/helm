@@ -36,7 +36,7 @@ database:
   # REQUIRED: root directory database hostname
   host: ""
   port: 5432
-  dbName: aserto-root-ds
+  dbName: aserto-controller
   sslMode: require
   admin:
     credentialsSecret: pg-controller-admin-credentials

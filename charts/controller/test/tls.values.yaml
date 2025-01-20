@@ -1,13 +1,13 @@
 ---
 image:
-  tag: 0.33.7-1852a794-arm64
+  tag: 0.33.7-1852a794-amd64
 
 imagePullSecrets:
   - name: ghcr-creds
 
 database:
   host: postgresql.postgres.svc.cluster.local
-  dbName: test-root-ds
+  dbName: test-controller
   sslMode: disable
   admin:
     credentialsSecret: pg-credentials

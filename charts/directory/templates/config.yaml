@@ -46,8 +46,8 @@ stringData:
       {{ end }}
   {{- end }}
 
-  {{- if not (include "directory.isStandalone" .) }}
-    root_ds:
+  {{- if .Values.controller.enabled }}
+    controller:
       client:
         {{- include "aserto-lib.controllerClient" . | nindent 8 }}
   {{- end }}
@@ -66,12 +66,12 @@ stringData:
       clean_window_seconds: {{ $cache.cleanWindowSeconds | default 10 }}
 
     authorization:
-  {{- if include "directory.isStandalone" . }}
-      disable: true
-  {{- else }}
+  {{- if .Values.controller.enabled }}
       bypass:
         - /grpc.reflection.v1.ServerReflection/ServerReflectionInfo
         - /grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo
+  {{- else }}
+      disable: true
   {{- end }}
 
     authentication:
@@ -92,7 +92,7 @@ stringData:
             account: root-key-directory-writer@aserto.com
           - key: ${DIRECTORY_DS_READ_KEY}
             account: root-key-directory-reader@aserto.com
-          - key: ${DIRECTORY_ROOT_DS_CLIENT_API_KEY}
+          - key: ${DIRECTORY_CONTROLLER_CLIENT_API_KEY}
             account: root-key-directory-store-writer@aserto.com
 
 

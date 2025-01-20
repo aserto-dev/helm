@@ -24,20 +24,33 @@ tests:
       - chart: directory
         values: no-tls.values.yaml
         ports:
-          2222: 2222
           8282: 8282
     run:
-      - >
-        ssh -i ${SSH_PRIVATE_KEY:-$(ls -1 ~/.ssh/id_* | head -1)} -p 2222 -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR
-        localhost provision tenant test --id 3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1
-      - >
-        ${TOPAZ:-topaz} ds get manifest -H localhost:8282 --tenant-id 3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1
-        -k apikey_reader --stdout --plaintext
-      - "false"
+      # Create a tenant.
+      - |
+        grpcurl -plaintext -H "Authorization: basic apikey_writer" \
+          -d '{"tenant": {"id": "3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1", "name": "test-tenant"}}' \
+          localhost:8282 aserto.directory.store.v2.Store.CreateTenant
+
+      # Set a manifest for the new tenant.
+      - |
+        ${TOPAZ:-topaz} ds set manifest charts/directory/test/manifest.yaml \
+          -H localhost:8282 --tenant-id 3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1 \
+          -k apikey_reader --plaintext
+
+      # Get the tenant's manifest.
+      - |
+        ${TOPAZ:-topaz} ds get manifest -H localhost:8282 --tenant-id 3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1 \
+          -k apikey_reader --plaintext $TMPDIR/manifest.yaml
+
+      # Ensure the downloaded manifest has the expected content.
+      - diff charts/directory/test/manifest.yaml $TMPDIR/manifest.yaml
     cleanup:
-      - >
-        ssh -i ${SSH_PRIVATE_KEY:-$(ls -1 ~/.ssh/id_* | head -1)} -p 2222 -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR
-        localhost provision tenant test --id 3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1 --delete
+      # Delete tenant.
+      - |
+        grpcurl -plaintext -H "Authorization: basic apikey_writer" \
+          -d '{"id": "3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1"}' \
+          localhost:8282 aserto.directory.store.v2.Store.DeleteTenant
 
   - name: directory-tls
     pull_secret: $GITHUB_TOKEN
@@ -76,16 +89,29 @@ tests:
       - chart: directory
         values: tls.values.yaml
         ports:
-          2222: 2222
           8282: 8282
     run:
-      - >
-        ssh -i ${SSH_PRIVATE_KEY:-$(ls -1 ~/.ssh/id_* | head -1)} -p 2222 -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR
-        localhost provision tenant test --id 3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1
-      - >
-        ${TOPAZ:-topaz} ds get manifest -H localhost:8282 --tenant-id 3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1
-        -k apikey_reader --stdout --insecure
+      # Create a tenant.
+      - |
+        grpcurl -insecure -H "Authorization: basic apikey_writer" \
+          -d '{"tenant": {"id": "3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1", "name": "test-tenant"}}' \
+          localhost:8282 aserto.directory.store.v2.Store.CreateTenant
+
+      # Set a manifest for the new tenant.
+      - |
+        ${TOPAZ:-topaz} ds set manifest charts/directory/test/manifest.yaml \
+          -H localhost:8282 --tenant-id 3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1 \
+          -k apikey_reader --insecure
+          #
+      # Get the tenant's manifest.
+      - |
+        ${TOPAZ:-topaz} ds get manifest -H localhost:8282 --tenant-id 3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1 \
+          -k apikey_reader --insecure $TMPDIR/manifest.yaml
+
+      # Ensure the downloaded manifest has the expected content.
+      - diff charts/directory/test/manifest.yaml $TMPDIR/manifest.yaml
     cleanup:
-      - >
-        ssh -i ${SSH_PRIVATE_KEY:-$(ls -1 ~/.ssh/id_* | head -1)} -p 2222 -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR
-        localhost provision tenant test --id 3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1 --delete
+      - |
+        grpcurl -insecure -H "Authorization: basic apikey_writer" \
+          -d '{"id": "3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1"}' \
+          localhost:8282 aserto.directory.store.v2.Store.DeleteTenant

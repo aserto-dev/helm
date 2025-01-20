@@ -84,7 +84,7 @@ spec:
           {{- end }}
 
           env:
-            - name: DIRECTORY_ROOT_DS_CLIENT_API_KEY
+            - name: DIRECTORY_CONTROLLER_CLIENT_API_KEY
               valueFrom:
                 secretKeyRef:
                   name: controller-key

@@ -23,12 +23,11 @@ tests:
       - chart: controller
         values: no-tls.values.yaml
         ports:
-          2222: 2222
           8282: 8282
     run:
-      - >
-        ${TOPAZ:-topaz} ds get manifest -H localhost:8282 --tenant-id 00000000-0000-11ef-0000-000000000000
-        -k controller-key --stdout --plaintext
+      - |
+        ${TOPAZ:-topaz} ds get manifest -H localhost:8282 --tenant-id 00000000-0000-11ef-0000-000000000000 \
+          -k controller-key --stdout --plaintext
 
   - name: controller-tls
     pull_secret: $GITHUB_TOKEN
@@ -62,9 +61,8 @@ tests:
       - chart: controller
         values: tls.values.yaml
         ports:
-          2222: 2222
           8282: 8282
     run:
-      - >
-        ${TOPAZ:-topaz} ds get manifest -H localhost:8282 --tenant-id 00000000-0000-11ef-0000-000000000000
-        -k controller-key --stdout --insecure
+      - |
+        ${TOPAZ:-topaz} ds get manifest -H localhost:8282 --tenant-id 00000000-0000-11ef-0000-000000000000 \
+          -k controller-key --stdout --insecure

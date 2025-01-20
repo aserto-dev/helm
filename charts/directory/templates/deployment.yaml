@@ -48,7 +48,7 @@ spec:
         {{- end }}
 
         {{- with (.Values.controller).caCertSecret }}
-        - name: root-ds-grpc-certs
+        - name: controller-grpc-certs
           secret:
             secretName: {{ .name }}
             items:
@@ -93,13 +93,13 @@ spec:
           {{- end }}
 
           {{- if (.Values.controller).caCertSecret }}
-            - name: root-ds-grpc-certs
-              mountPath: /root-ds-grpc-certs
+            - name: controller-grpc-certs
+              mountPath: /controller-grpc-certs
               readOnly: true
           {{- end }}
           env:
             {{- with include "directory.controllerApiKeyEnv" . }}
-            - name: DIRECTORY_ROOT_DS_CLIENT_API_KEY
+            - name: DIRECTORY_CONTROLLER_CLIENT_API_KEY
               {{- . | nindent 14 }}
             {{- end }}
 
