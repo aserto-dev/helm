@@ -18,10 +18,10 @@ discovery:
 controller:
   database:
     host: root-db-host
+  sshAdminKeys:
+    keys: |
+      ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDf6
 
 directory:
   database:
     host: tenant-db-host
-  sshAdminKeys:
-    keys: |
-      ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDf6
