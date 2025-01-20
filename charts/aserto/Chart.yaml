@@ -56,3 +56,6 @@ dependencies:
     version: 0.1.6
     repository: file://../registry-proxy
     condition: registry-proxy.enabled
+  - name: aserto-lib
+    version: 0.2.1
+    repository: file://../aserto-lib
