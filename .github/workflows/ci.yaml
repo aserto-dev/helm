@@ -110,6 +110,13 @@ jobs:
           kubectl wait pods --selector app.kubernetes.io/name=postgresql \
             --for condition=Ready --namespace postgres --timeout=60s
       -
+        # This step can be removed when the directory migrations no longer depend on the tenant_reader role.
+        name: Create tenant_reader Role
+        run: >
+          kubectl exec -n postgres postgresql-0 -- bash -c
+          "PGPASSWORD=${{ env.POSTGRES_PASSWORD }} psql -U postgres
+          -c 'CREATE ROLE tenant_reader WITH NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT NOREPLICATION'"
+      -
         name: Generate admin ssh key
         id: sshkey
         run: |
