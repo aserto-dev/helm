@@ -53,6 +53,11 @@ jobs:
         with:
           version: ${{ env.HELM_VERSION }}
       -
+        name: Install tools
+        run: |
+          make install-grpcurl
+          echo "GRPCURL=$(realpath .ext/bin/grpcurl)" >> "$GITHUB_ENV"
+      -
         name: Install topaz CLI
         run: |
           gh release download v${{env.TOPAZ_VERSION}} --repo aserto-dev/topaz --pattern "topaz_linux_x86_64.zip" \

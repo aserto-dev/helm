@@ -12,6 +12,7 @@ CHARTS 			:= ${shell ls ${CHARTS_DIR}}
 BUMP_PART 		?= patch
 
 CT_VERSION		:= 3.11.0
+GRPCURL_VERSION := 1.9.2
 
 BIN_DIR			:= ./bin
 EXT_DIR			:= ./.ext
@@ -25,7 +26,7 @@ CT_LINT_CMD		:= ${EXT_BIN_DIR}/ct lint --config ct.yaml \
 
 
 .PHONY: deps
-deps: install-ct install-bumpversion;
+deps: install-ct install-bumpversion install-grpcurl;
 
 .PHONY: clean
 clean: ${addprefix clean-,${CHARTS}}
@@ -121,6 +122,16 @@ install-ct: ${EXT_TMP_DIR} ${EXT_BIN_DIR}
 install-bumpversion: ${EXT_TMP_DIR} ${EXT_BIN_DIR}
 	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
 	@pip install bump2version
+
+.PHONY: install-grpcurl
+install-grpcurl: ${EXT_TMP_DIR} ${EXT_BIN_DIR}
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@gh release download v${GRPCURL_VERSION} --repo https://github.com/fullstorydev/grpcurl \
+		--pattern "grpcurl_${GRPCURL_VERSION}_$$(uname -s | tr '[:upper:]' '[:lower:]' | sed s/darwin/osx/)_$$(uname -m).tar.gz" \
+		--output "${EXT_TMP_DIR}/grpcurl.tar.gz" --clobber
+	@tar -xvf ${EXT_TMP_DIR}/grpcurl.tar.gz --directory ${EXT_BIN_DIR} grpcurl
+	@chmod +x ${EXT_BIN_DIR}/grpcurl
+	@${EXT_BIN_DIR}/grpcurl -version
 
 ${BIN_DIR}:
 	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
