@@ -13,6 +13,7 @@
 
 {{- define "aserto-lib.dsApiKeyEnv" -}}
 {{- $keyType := index . 1 -}}
+{{- $defaultSecretName := index . 2 -}}
 
 {{- with first . -}}
 {{- $key := dig "apiKeys" $keyType "" . }}
@@ -21,7 +22,7 @@ value: {{ $key }}
 {{- else -}}
 valueFrom:
   secretKeyRef:
-    name: {{ .apiKeysSecret }}
+    name: {{ .apiKeysSecret | default $defaultSecretName }}
     key: {{ $keyType }}
 {{- end }}
 {{- end }}
@@ -30,42 +31,42 @@ valueFrom:
 
 
 {{- define "aserto-lib.controllerReadKeyEnv" -}}
-{{- with include "aserto-lib.controllerClientCfg" . | fromYaml | default (dict "apiKeysSecret" "controller-keys") -}}
-{{ include "aserto-lib.dsApiKeyEnv" (list . "read") }}
+{{- with include "aserto-lib.controllerClientCfg" . | fromYaml | default dict -}}
+{{ include "aserto-lib.dsApiKeyEnv" (list . "read" "controller-keys") }}
 {{- end }}
 {{- end }}
 
 
 {{- define "aserto-lib.controllerWriteKeyEnv" -}}
-{{- with include "aserto-lib.controllerClientCfg" . | fromYaml | default (dict "apiKeysSecret" "controller-keys") -}}
-{{ include "aserto-lib.dsApiKeyEnv" (list . "write") }}
+{{- with include "aserto-lib.controllerClientCfg" . | fromYaml | default dict -}}
+{{ include "aserto-lib.dsApiKeyEnv" (list . "write" "controller-keys") }}
 {{- end }}
 {{- end }}
 
 
 {{- define "aserto-lib.controllerStoreKeyEnv" -}}
-{{- with include "aserto-lib.controllerClientCfg" . | fromYaml | default (dict "apiKeysSecret" "controller-keys") -}}
-{{ include "aserto-lib.dsApiKeyEnv" (list . "store") }}
+{{- with include "aserto-lib.controllerClientCfg" . | fromYaml | default dict -}}
+{{ include "aserto-lib.dsApiKeyEnv" (list . "store" "controller-keys") }}
 {{- end }}
 {{- end }}
 
 {{- define "aserto-lib.directoryReadKeyEnv" -}}
-{{- with include "aserto-lib.directoryClientCfg" . | fromYaml | default (dict "apiKeysSecret" "directory-keys") -}}
-{{ include "aserto-lib.dsApiKeyEnv" (list . "read") }}
+{{- with include "aserto-lib.directoryClientCfg" . | fromYaml | default dict -}}
+{{ include "aserto-lib.dsApiKeyEnv" (list . "read" "directory-keys") }}
 {{- end }}
 {{- end }}
 
 
 {{- define "aserto-lib.directoryWriteKeyEnv" -}}
-{{- with include "aserto-lib.directoryClientCfg" . | fromYaml | default (dict "apiKeysSecret" "directory-keys") -}}
-{{ include "aserto-lib.dsApiKeyEnv" (list . "write") }}
+{{- with include "aserto-lib.directoryClientCfg" . | fromYaml | default dict -}}
+{{ include "aserto-lib.dsApiKeyEnv" (list . "write" "directory-keys") }}
 {{- end }}
 {{- end }}
 
 
 {{- define "aserto-lib.directoryStoreKeyEnv" -}}
-{{- with include "aserto-lib.directoryClientCfg" . | fromYaml | default (dict "apiKeysSecret" "directory-keys") -}}
-{{ include "aserto-lib.dsApiKeyEnv" (list . "store") }}
+{{- with include "aserto-lib.directoryClientCfg" . | fromYaml | default dict -}}
+{{ include "aserto-lib.dsApiKeyEnv" (list . "store" "directory-keys") }}
 {{- end }}
 {{- end }}
 

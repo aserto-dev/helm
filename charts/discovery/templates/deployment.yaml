@@ -94,18 +94,18 @@ spec:
               readOnly: true
             {{- end }}
           env:
-            {{- with .Values.apiKey }}
+          {{- with .Values.apiKey }}
             - name: DISCOVERY_ROOT_KEY
               valueFrom:
                 secretKeyRef:
                   name: {{ .secretName }}
                   key: {{ .secretKey }}
-            {{- end }}
+          {{- end }}
 
-            {{- with (include "aserto-lib.controllerReadKeyEnv" . | fromYaml) }}
+          {{- with include "aserto-lib.controllerReadKeyEnv" . }}
             - name: DISCOVERY_DS0_API_KEY
-              {{ . | toYaml | nindent 14 }}
-            {{- end }}
+              {{- . | nindent 14 }}
+          {{- end }}
 
             {{- include "discovery.registriesEnv" . | nindent 12 }}
           {{- with (include "aserto-lib.selfPorts" . | fromYaml )}}
