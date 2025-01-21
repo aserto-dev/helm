@@ -11,9 +11,11 @@ tests:
         values:
           username: controller_reader
           password: controller_reader
-      - name: controller-key
+      - name: controller-keys
         values:
-          api-key: controller-key
+          read: controller-read-key
+          write: controller-write-key
+          store: controller-store-key
     config_maps:
       - name: controller-admin-keys
         keys:
@@ -27,7 +29,7 @@ tests:
     run:
       - |
         ${TOPAZ:-topaz} ds get manifest -H localhost:8282 --tenant-id 00000000-0000-11ef-0000-000000000000 \
-          -k controller-key --stdout --plaintext
+          -k controller-read-key --stdout --plaintext
 
   - name: controller-tls
     pull_secret: $GITHUB_TOKEN
@@ -40,9 +42,11 @@ tests:
         values:
           username: controller_reader
           password: controller_reader
-      - name: controller-key
+      - name: controller-keys
         values:
-          api-key: controller-key
+          read: controller-read-key
+          write: controller-write-key
+          store: controller-store-key
       - name: grpc-cert
         files:
           tls.crt: $TOPAZ_CERTS_DIR/grpc.crt
@@ -65,4 +69,4 @@ tests:
     run:
       - |
         ${TOPAZ:-topaz} ds get manifest -H localhost:8282 --tenant-id 00000000-0000-11ef-0000-000000000000 \
-          -k controller-key --stdout --insecure
+          -k controller-read-key --stdout --insecure

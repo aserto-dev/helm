@@ -98,22 +98,24 @@ spec:
               readOnly: true
           {{- end }}
           env:
-            {{- with include "directory.controllerApiKeyEnv" . }}
+            {{- with include "directory.controllerReadKeyEnv" . }}
             - name: DIRECTORY_CONTROLLER_CLIENT_API_KEY
               {{- . | nindent 14 }}
             {{- end }}
 
-            {{- with (include "aserto-lib.directoryApiKeys" . | fromYaml) }}
-            - name: DIRECTORY_DS_WRITE_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .secretName }}
-                  key: {{ .writerKey }}
+            {{- with include "aserto-lib.directoryReadKeyEnv" . }}
             - name: DIRECTORY_DS_READ_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .secretName }}
-                  key: {{ .readerKey }}
+              {{- . | nindent 14 }}
+            {{- end }}
+
+            {{- with include "aserto-lib.directoryWriteKeyEnv" . }}
+            - name: DIRECTORY_DS_WRITE_KEY
+              {{- . | nindent 14 }}
+            {{- end }}
+
+            {{- with include "aserto-lib.directoryStoreKeyEnv" . }}
+            - name: DIRECTORY_DS_STORE_KEY
+              {{- . | nindent 14 }}
             {{- end }}
 
           {{- with .Values.database }}

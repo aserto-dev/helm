@@ -81,9 +81,9 @@ Create the name of the service account to use
 {{- end}}
 
 
-{{- define "directory.controllerApiKeyEnv" -}}
+{{- define "directory.controllerReadKeyEnv" -}}
 {{- if .Values.controller.enabled -}}
-{{ include "aserto-lib.controllerApiKeyEnv" . }}
+{{ include "aserto-lib.controllerReadKeyEnv" . }}
 {{- end }}
 {{- end }}
 

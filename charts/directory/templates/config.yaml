@@ -70,6 +70,13 @@ stringData:
       bypass:
         - /grpc.reflection.v1.ServerReflection/ServerReflectionInfo
         - /grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo
+        - /aserto.directory.store.v2.Store/CreateTenant
+        - /aserto.directory.store.v2.Store/DeleteTenant
+        - /aserto.directory.store.v2.Store/GetTenant
+        - /aserto.directory.store.v2.Store/ListTenants
+        - /aserto.directory.store.v2.Store/MigrateSchema
+        - /aserto.directory.store.v2.Store/DeleteIDPConnection
+        - /aserto.directory.store.v2.Store/PurgeDeletedTenants
   {{- else }}
       disable: true
   {{- end }}
@@ -82,18 +89,18 @@ stringData:
         oidc: true
       {{- end }}
 
-      {{- if (.Values.authentication).machineAccounts }}
+      {{- if .Values.controller.enabled }}
         machine_account: true
       {{- end }}
 
       root_keys:
         keys:
           - key: ${DIRECTORY_DS_WRITE_KEY}
-            account: root-key-directory-writer@aserto.com
+            account: rk:directory-writer
           - key: ${DIRECTORY_DS_READ_KEY}
-            account: root-key-directory-reader@aserto.com
-          - key: ${DIRECTORY_CONTROLLER_CLIENT_API_KEY}
-            account: root-key-directory-store-writer@aserto.com
+            account: rk:directory-reader
+          - key: ${DIRECTORY_DS_STORE_KEY}
+            account: rk:directory-store-writer
 
 
     {{- with include "aserto-lib.oidcConfig" . }}
@@ -103,7 +110,19 @@ stringData:
 
       override:
         - methods:
-          - /grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo
-          - /grpc.reflection.v1.ServerReflection/ServerReflectionInfo
+            - /grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo
+            - /grpc.reflection.v1.ServerReflection/ServerReflectionInfo
           authenticators_enabled:
             anonymous: true
+
+        - methods:
+            - /aserto.directory.store.v2.Store/CreateTenant
+            - /aserto.directory.store.v2.Store/DeleteTenant
+            - /aserto.directory.store.v2.Store/GetTenant
+            - /aserto.directory.store.v2.Store/ListTenants
+            - /aserto.directory.store.v2.Store/MigrateSchema
+            - /aserto.directory.store.v2.Store/DeleteIDPConnection
+            - /aserto.directory.store.v2.Store/PurgeDeletedTenants
+          authenticators_enabled:
+            root_key: true
+

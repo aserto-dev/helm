@@ -102,7 +102,7 @@ spec:
                   key: {{ .secretKey }}
             {{- end }}
 
-            {{- with (include "aserto-lib.controllerApiKeyEnv" . | fromYaml) }}
+            {{- with (include "aserto-lib.controllerReadKeyEnv" . | fromYaml) }}
             - name: DISCOVERY_DS0_API_KEY
               {{ . | toYaml | nindent 14 }}
             {{- end }}

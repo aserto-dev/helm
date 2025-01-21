@@ -87,8 +87,8 @@ spec:
             - name: DIRECTORY_CONTROLLER_CLIENT_API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: controller-key
-                  key: api-key
+                  name: controller-keys
+                  key: read
 
             {{- with .Values.database }}
             - name: DIRECTORY_DB_WRITER_USER

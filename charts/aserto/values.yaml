@@ -46,14 +46,13 @@ global:
       # # Address and port of the controller's gRPC service.
       # # Default: controller.<namespace>.svc.cluster.local:8282
       # address: ""
-      # # [Optiona] API key for the remote directory
-      # apiKey: ""
-      # # [Optional] Kubernetes secret containing the API key for the remote directory
-      # apiKeySecret:
-      #   # Secret name
-      #   name: ""
-      #   # Secret key
-      #   key: "api-key"
+      # # [Optiona] Controller API keys. All three fields are required.
+      # apiKeys:
+      #   read: ""
+      #   write: ""
+      #   store: ""
+      # # [Optional] Kubernetes secret containing the controller's API keys.
+      # apiKeysSecret: controller-keys
       # # [Optional] Kubernetes secret containing the CA certificate of the root directory.
       # caCertSecret:
       #   name: ""
@@ -67,15 +66,14 @@ global:
       # # Address and port of the directory's gRPC service.
       # # Default: directory.<namespace>.svc.cluster.local:8282
       # address: ""
-      # # [Optiona] API key for the remote directory
-      # apiKey: ""
-      # # [Optional] Kubernetes secret containing the API key for the remote directory
-      # apiKeySecret:
-      #   # Secret name
-      #   name: ""
-      #   # Secret key
-      #   key: "api-key"
-      # # [Optional] Kubernetes secret containing the CA certificate of the root directory.
+      # # [Optiona] Directory API keys.
+      # apiKeys:
+      #   read: ""
+      #   write: ""
+      #   store: ""
+      # # [Optional] Kubernetes secret containing the directory's API keys.
+      # apiKeysSecret: directory-keys
+      # # [Optional] Kubernetes secret containing the directory's CA certificate.
       # caCertSecret:
       #   name: ""
       #   key: ""

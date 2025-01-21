@@ -108,7 +108,7 @@ spec:
           {{- end }}
           env:
             - name: AUTHORIZER_DS0_API_KEY
-              {{- include "aserto-lib.controllerApiKeyEnv" . | nindent 14 }}
+              {{- include "aserto-lib.controllerReadKeyEnv" . | nindent 14 }}
 
           {{- with .Values.apiKey }}
             - name: AUTHORIZER_ROOT_KEY
@@ -118,13 +118,11 @@ spec:
                   key: {{ .secretKey }}
           {{- end }}
 
-          {{- with (include "aserto-lib.directoryApiKeys" . | fromYaml) }}
+          {{- with include "aserto-lib.directoryReadKeyEnv" . }}
             - name: AUTHORIZER_REMOTE_DIRECTORY_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .secretName }}
-                  key: {{ .readerKey }}
+              {{- . | nindent 14 }}
           {{- end }}
+
           {{- with (include "aserto-lib.discoveryApiKey" . | fromYaml) }}
             - name: AUTHORIZER_DISCOVERY_ROOT_KEY
               valueFrom:

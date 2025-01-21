@@ -1,12 +1,12 @@
-{{- $cfg := include "aserto-lib.directoryClientCfg" . | fromYaml -}}
+{{- $cfg := include "aserto-lib.controllerClientCfg" . | fromYaml -}}
 
 {{- with $cfg.apiKeys -}}
 {{- if list .read .write .store | has nil -}}
-    {{- fail "directory.apiKeys must include 'read', 'write', and 'store' keys." -}}
+    {{- fail "controller.apiKeys must include 'read', 'write', and 'store' keys." -}}
 {{- end -}}
 {{- end -}}
 
-{{- $secretName := ($cfg.apiKeySecret).name | default "directory-keys" -}}
+{{- $secretName := ($cfg.apiKeySecret).name | default "controller-keys" -}}
 {{- $apiKeys := dict -}}
 
 {{- if $cfg.apiKeys -}}
@@ -30,4 +30,3 @@ metadata:
 data:
   {{- . | toYaml | nindent 2 }}
 {{- end }}
-

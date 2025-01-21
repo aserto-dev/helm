@@ -83,26 +83,30 @@ stringData:
     authentication:
       authenticators_enabled:
         root_key: true
-        {{- with .Values.oidc }}
+
+      {{- with include "aserto-lib.oidcConfig" . }}
         oidc: true
-        {{- end }}
-        {{- if (.Values.authentication).machineAccounts }}
-        machine_account: true
-        {{- end }}
+      {{- end }}
 
       root_keys:
         keys:
           - key: ${DIRECTORY_CONTROLLER_CLIENT_API_KEY}
             account: "controller"
 
-      {{- with .Values.oidc -}}
+    {{- with include "aserto-lib.oidcConfig" . }}
       oidc:
-        {{- include "aserto-lib.oidcConfig" . | nindent 8 }}
-      {{- end }}
+        {{- . | nindent 8 }}
+    {{- end }}
 
       override:
         - methods:
-          - /grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo
-          - /grpc.reflection.v1.ServerReflection/ServerReflectionInfo
+            - /grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo
+            - /grpc.reflection.v1.ServerReflection/ServerReflectionInfo
           authenticators_enabled:
             anonymous: true
+
+        - methods:
+            - /aserto.directory.reader.v3.Reader/Check
+          authenticators_enabled:
+            root_key: true
+

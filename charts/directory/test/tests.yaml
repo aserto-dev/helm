@@ -13,8 +13,9 @@ tests:
           password: directory_reader
       - name: directory-keys
         values:
-          writeKey: apikey_writer
-          readKey: apikey_reader
+          write: apikey_writer
+          read: apikey_reader
+          store: apikey_store
     config_maps:
       - name: directory-admin-keys
         keys:
@@ -69,8 +70,9 @@ tests:
           password: directory_reader
       - name: directory-keys
         values:
-          writeKey: apikey_writer
-          readKey: apikey_reader
+          write: apikey_writer
+          read: apikey_reader
+          store: apikey_store
       - name: grpc-cert
         files:
           tls.crt: $TOPAZ_CERTS_DIR/grpc.crt

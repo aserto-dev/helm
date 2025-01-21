@@ -81,7 +81,7 @@ spec:
                 secretKeyRef:
                   name: {{ include "scim.auth.secretName" . }}
                   key: {{ include "scim.auth.secretKey" . }}
-            {{- with (include "aserto-lib.controllerApiKeyEnv" . | fromYaml) }}
+            {{- with (include "aserto-lib.controllerWriteKeyEnv" . | fromYaml) }}
             - name: ASERTO_SCIM_DIRECTORY_API_KEY
               {{ . | toYaml | nindent 14 }}
             {{- end }}
