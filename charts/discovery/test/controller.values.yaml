@@ -1,0 +1,4 @@
+---
+auth:
+  apiKeys:
+    - key: controller-root-key

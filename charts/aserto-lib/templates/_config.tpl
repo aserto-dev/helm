@@ -1,11 +1,11 @@
 {{- define "aserto-lib.controllerClientCfg" }}
 {{- include "aserto-lib.mergeGlobal" (list . "controller") | fromYaml |
-	merge (dict "apiKeysSecret" "controller-keys") }}
+	merge (dict "apiKeysSecret" "controller-keys") | toYaml }}
 {{- end }}
 
 {{- define "aserto-lib.directoryClientCfg" }}
 {{- include "aserto-lib.mergeGlobal" (list . "directory") | fromYaml |
-	merge (dict "apiKeysSecret" "directory-keys") }}
+	merge (dict "apiKeysSecret" "directory-keys") | toYaml }}
 {{- end }}
 
 {{- define "aserto-lib.discoveryCfg" }}

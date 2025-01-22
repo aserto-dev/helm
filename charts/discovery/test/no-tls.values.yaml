@@ -12,9 +12,9 @@ apiKey:
 controller:
   address: "topaz.discovery-no-tls.svc.cluster.local:8282"
   apiKeys:
-    read: " "
-    write: " "
-    store: " "
+    read: controller-root-key
+    write: controller-root-key
+    store: controller-root-key
   noTLS: true
 
 registries:
