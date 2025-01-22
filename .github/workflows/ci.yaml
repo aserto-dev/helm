@@ -58,6 +58,10 @@ jobs:
           make install-grpcurl
           echo "GRPCURL=$(realpath .ext/bin/grpcurl)" >> "$GITHUB_ENV"
       -
+        name: Create Temp Directory
+        run: |
+          echo "TMPDIR=$(mktemp -d)" >> "$GITHUB_ENV"
+      -
         name: Install topaz CLI
         run: |
           gh release download v${{env.TOPAZ_VERSION}} --repo aserto-dev/topaz --pattern "topaz_linux_x86_64.zip" \
