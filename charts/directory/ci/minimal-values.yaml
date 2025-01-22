@@ -5,8 +5,4 @@ global:
       - name: ghcr-creds
 
 database:
-  host: tenant-db-host
-
-sshAdminKeys:
-  keys: |
-    ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDf6
+  host: directory-postgres

@@ -13,11 +13,3 @@ database:
     credentialsSecret: pg-credentials
   reader:
     credentialsSecret: pg-directory-reader-credentials
-
-cache:
-  sizeMB: 100
-
-sshAdminKeys:
-  configMap:
-    name: directory-admin-keys
-    key: authorized_keys

@@ -29,7 +29,7 @@ tests:
     run:
       # Create a tenant.
       - |
-        ${GRPCURL:=grpcurl} -plaintext -H "Authorization: basic apikey_writer" \
+        ${GRPCURL:=grpcurl} -plaintext -H "Authorization: basic apikey_store" \
           -d '{"tenant": {"id": "3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1", "name": "test-tenant"}}' \
           localhost:8282 aserto.directory.store.v2.Store.CreateTenant
 
@@ -49,7 +49,7 @@ tests:
     cleanup:
       # Delete tenant.
       - |
-        ${GRPCURL:=grpcurl} -plaintext -H "Authorization: basic apikey_writer" \
+        ${GRPCURL:=grpcurl} -plaintext -H "Authorization: basic apikey_store" \
           -d '{"id": "3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1"}' \
           localhost:8282 aserto.directory.store.v2.Store.DeleteTenant
 
@@ -95,7 +95,7 @@ tests:
     run:
       # Create a tenant.
       - |
-        ${GRPCURL:=grpcurl} -insecure -H "Authorization: basic apikey_writer" \
+        ${GRPCURL:=grpcurl} -insecure -H "Authorization: basic apikey_store" \
           -d '{"tenant": {"id": "3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1", "name": "test-tenant"}}' \
           localhost:8282 aserto.directory.store.v2.Store.CreateTenant
 
@@ -114,6 +114,6 @@ tests:
       - diff charts/directory/test/manifest.yaml $TMPDIR/manifest.yaml
     cleanup:
       - |
-        docker run --network="host" fullstorydev/grpcurl -insecure -H "Authorization: basic apikey_writer" \
+        ${GRPCURL:=grpcurl} -insecure -H "Authorization: basic apikey_store" \
           -d '{"id": "3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1"}' \
           localhost:8282 aserto.directory.store.v2.Store.DeleteTenant
