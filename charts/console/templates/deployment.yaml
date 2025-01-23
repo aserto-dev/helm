@@ -55,7 +55,7 @@ spec:
             - name: DS0_TENANT_ID
               value: {{ .tenant_id }}
             {{- end }}
-            {{- with (include "aserto-lib.controllerStoreKeyEnv" .) }}
+            {{- with include "aserto-lib.controllerKeyEnv" (list . "read") }}
             - name: DS0_ROOT_KEY
               {{- . | nindent 14 }}
             {{- end }}

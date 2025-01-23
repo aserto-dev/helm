@@ -13,9 +13,10 @@ tests:
           password: controller_reader
       - name: controller-keys
         values:
-          read: controller-read-key
-          write: controller-write-key
-          store: controller-store-key
+          write: apikey_writer
+          read: apikey_reader
+          readStore: apikey_store_reader
+          writeStore: apikey_store_writer
     config_maps:
       - name: controller-admin-keys
         keys:
@@ -25,11 +26,15 @@ tests:
       - chart: controller
         values: no-tls.values.yaml
         ports:
+          2222: 2222
           8282: 8282
     run:
       - |
+        ssh -i ${SSH_PRIVATE_KEY:-$(ls -1 ~/.ssh/id_* | head -1)} -p 2222 -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR \
+          localhost provision root-keys
+      - |
         ${TOPAZ:-topaz} ds get manifest -H localhost:8282 --tenant-id 00000000-0000-11ef-0000-000000000000 \
-          -k controller-read-key --stdout --plaintext
+          -k apikey_reader --stdout --plaintext
 
   - name: controller-tls
     pull_secret: $GITHUB_TOKEN
@@ -44,9 +49,10 @@ tests:
           password: controller_reader
       - name: controller-keys
         values:
-          read: controller-read-key
-          write: controller-write-key
-          store: controller-store-key
+          write: apikey_writer
+          read: apikey_reader
+          readStore: apikey_store_reader
+          writeStore: apikey_store_writer
       - name: grpc-cert
         files:
           tls.crt: $TOPAZ_CERTS_DIR/grpc.crt
@@ -65,8 +71,12 @@ tests:
       - chart: controller
         values: tls.values.yaml
         ports:
+          2222: 2222
           8282: 8282
     run:
       - |
+        ssh -i ${SSH_PRIVATE_KEY:-$(ls -1 ~/.ssh/id_* | head -1)} -p 2222 -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR \
+          localhost provision root-keys
+      - |
         ${TOPAZ:-topaz} ds get manifest -H localhost:8282 --tenant-id 00000000-0000-11ef-0000-000000000000 \
-          -k controller-read-key --stdout --insecure
+          -k apikey_reader --stdout --insecure

@@ -81,9 +81,10 @@ Create the name of the service account to use
 {{- end}}
 
 
-{{- define "directory.controllerReadKeyEnv" -}}
-{{- if .Values.controller.enabled -}}
-{{ include "aserto-lib.controllerReadKeyEnv" . }}
+{{- define "directory.controllerKeyEnv" -}}
+{{- $scope := first . -}}
+{{- if $scope.Values.controller.enabled -}}
+{{ include "aserto-lib.controllerKeyEnv" . }}
 {{- end }}
 {{- end }}
 

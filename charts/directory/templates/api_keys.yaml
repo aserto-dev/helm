@@ -1,8 +1,8 @@
 {{- $cfg := include "aserto-lib.directoryClientCfg" . | fromYaml -}}
 
 {{- with $cfg.apiKeys -}}
-{{- if list .read .write .store | has nil -}}
-    {{- fail "directory.apiKeys must include 'read', 'write', and 'store' keys." -}}
+{{- if list .read .write .readStore  .writeStore | has nil -}}
+    {{- fail "directory.apiKeys must include 'read', 'write', 'readStore' and 'writeStore' keys." -}}
 {{- end -}}
 {{- end -}}
 
@@ -14,7 +14,7 @@
 {{- else -}}
   {{- $secret := lookup "v1" "Secret" .Release.Namespace $secretName }}
   {{- if empty $secret | or (include "aserto-lib.isManagedResource" (list $secret .Release.Name) | eq "true") -}}
-    {{- range (list "read" "write" "store") -}}
+    {{- range (list "read" "write" "readStore" "writeStore") -}}
       {{- $apiKeys = set $apiKeys . (dig "data" . (randAlphaNum 32 | b64enc) $secret) -}}
     {{- end -}}
   {{- end -}}

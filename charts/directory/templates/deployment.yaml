@@ -98,27 +98,23 @@ spec:
               readOnly: true
           {{- end }}
           env:
-            {{- with include "directory.controllerReadKeyEnv" . }}
+            {{- with include "directory.controllerKeyEnv" (list . "read") }}
             - name: DIRECTORY_CONTROLLER_CLIENT_API_KEY
               {{- . | nindent 14 }}
             {{- end }}
 
-            {{- with include "aserto-lib.directoryReadKeyEnv" . }}
-            - name: DIRECTORY_DS_READ_KEY
+          {{- range $keyType, $varName := dict
+              "read" "DS_READ_KEY"
+              "write" "DS_WRITE_KEY"
+              "readStore" "STORE_READ_KEY"
+              "writeStore" "STORE_WRITE_KEY" -}}
+            {{- with include "aserto-lib.directoryKeyEnv" (list $ $keyType) }}
+            - name: {{ $varName }}
               {{- . | nindent 14 }}
             {{- end }}
+          {{- end }}
 
-            {{- with include "aserto-lib.directoryWriteKeyEnv" . }}
-            - name: DIRECTORY_DS_WRITE_KEY
-              {{- . | nindent 14 }}
-            {{- end }}
-
-            {{- with include "aserto-lib.directoryStoreKeyEnv" . }}
-            - name: DIRECTORY_DS_STORE_KEY
-              {{- . | nindent 14 }}
-            {{- end }}
-
-          {{- with .Values.database }}
+            {{- with .Values.database }}
             - name: DIRECTORY_DB_WRITER_USER
               valueFrom:
                 secretKeyRef:
@@ -139,7 +135,7 @@ spec:
                 secretKeyRef:
                   name: {{ .reader.credentialsSecret }}
                   key: password
-          {{- end }}
+            {{- end }}
 
           {{- range $_, $tenant := .Values.tenants -}}
             {{- with $tenant.keysSecret }}

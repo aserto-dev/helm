@@ -32,43 +32,20 @@ valueFrom:
 {{- end }}
 
 
-{{- define "aserto-lib.controllerReadKeyEnv" -}}
-{{- with include "aserto-lib.controllerClientCfg" . | fromYaml -}}
-{{ include "aserto-lib.dsApiKeyEnv" (list . "read" "controller-keys") }}
+{{- define "aserto-lib.controllerKeyEnv" -}}
+{{- $scope := first . -}}
+{{- $keyType := last . -}}
+{{- with include "aserto-lib.controllerClientCfg" $scope | fromYaml -}}
+{{ include "aserto-lib.dsApiKeyEnv" (list . $keyType "controller-keys") }}
 {{- end }}
 {{- end }}
 
 
-{{- define "aserto-lib.controllerWriteKeyEnv" -}}
-{{- with include "aserto-lib.controllerClientCfg" . | fromYaml -}}
-{{ include "aserto-lib.dsApiKeyEnv" (list . "write" "controller-keys") }}
-{{- end }}
-{{- end }}
-
-
-{{- define "aserto-lib.controllerStoreKeyEnv" -}}
-{{- with include "aserto-lib.controllerClientCfg" . | fromYaml -}}
-{{ include "aserto-lib.dsApiKeyEnv" (list . "store" "controller-keys") }}
-{{- end }}
-{{- end }}
-
-{{- define "aserto-lib.directoryReadKeyEnv" -}}
-{{- with include "aserto-lib.directoryClientCfg" . | fromYaml -}}
-{{ include "aserto-lib.dsApiKeyEnv" (list . "read" "directory-keys") }}
-{{- end }}
-{{- end }}
-
-
-{{- define "aserto-lib.directoryWriteKeyEnv" -}}
-{{- with include "aserto-lib.directoryClientCfg" . | fromYaml -}}
-{{ include "aserto-lib.dsApiKeyEnv" (list . "write" "directory-keys") }}
-{{- end }}
-{{- end }}
-
-
-{{- define "aserto-lib.directoryStoreKeyEnv" -}}
-{{- with include "aserto-lib.directoryClientCfg" . | fromYaml -}}
-{{ include "aserto-lib.dsApiKeyEnv" (list . "store" "directory-keys") }}
+{{- define "aserto-lib.directoryKeyEnv" -}}
+{{- $scope := first . -}}
+{{- $keyType := last . -}}
+{{- with include "aserto-lib.directoryClientCfg" $scope | fromYaml -}}
+{{ include "aserto-lib.dsApiKeyEnv" (list . $keyType "directory-keys") }}
 {{- end }}
 {{- end }}
 

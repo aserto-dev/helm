@@ -15,7 +15,8 @@ tests:
         values:
           write: apikey_writer
           read: apikey_reader
-          store: apikey_store
+          readStore: apikey_store_reader
+          writeStore: apikey_store_writer
     config_maps:
       - name: directory-admin-keys
         keys:
@@ -29,7 +30,7 @@ tests:
     run:
       # Create a tenant.
       - |
-        ${GRPCURL:=grpcurl} -plaintext -H "Authorization: basic apikey_store" \
+        ${GRPCURL:=grpcurl} -plaintext -H "Authorization: basic apikey_store_writer" \
           -d '{"tenant": {"id": "3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1", "name": "test-tenant"}}' \
           localhost:8282 aserto.directory.store.v2.Store.CreateTenant
 
@@ -49,7 +50,7 @@ tests:
     cleanup:
       # Delete tenant.
       - |
-        ${GRPCURL:=grpcurl} -plaintext -H "Authorization: basic apikey_store" \
+        ${GRPCURL:=grpcurl} -plaintext -H "Authorization: basic apikey_store_writer" \
           -d '{"id": "3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1"}' \
           localhost:8282 aserto.directory.store.v2.Store.DeleteTenant
 
@@ -72,7 +73,8 @@ tests:
         values:
           write: apikey_writer
           read: apikey_reader
-          store: apikey_store
+          readStore: apikey_store_reader
+          writeStore: apikey_store_writer
       - name: grpc-cert
         files:
           tls.crt: $TOPAZ_CERTS_DIR/grpc.crt
@@ -95,7 +97,7 @@ tests:
     run:
       # Create a tenant.
       - |
-        ${GRPCURL:=grpcurl} -insecure -H "Authorization: basic apikey_store" \
+        ${GRPCURL:=grpcurl} -insecure -H "Authorization: basic apikey_store_writer" \
           -d '{"tenant": {"id": "3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1", "name": "test-tenant"}}' \
           localhost:8282 aserto.directory.store.v2.Store.CreateTenant
 
@@ -114,6 +116,6 @@ tests:
       - diff charts/directory/test/manifest.yaml $TMPDIR/manifest.yaml
     cleanup:
       - |
-        ${GRPCURL:=grpcurl} -insecure -H "Authorization: basic apikey_store" \
+        ${GRPCURL:=grpcurl} -insecure -H "Authorization: basic apikey_store_writer" \
           -d '{"id": "3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1"}' \
           localhost:8282 aserto.directory.store.v2.Store.DeleteTenant

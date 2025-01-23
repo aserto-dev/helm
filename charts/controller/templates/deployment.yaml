@@ -84,11 +84,21 @@ spec:
           {{- end }}
 
           env:
+            {{- with include "aserto-lib.controllerKeyEnv" (list . "write") }}
             - name: DIRECTORY_CONTROLLER_CLIENT_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: controller-keys
-                  key: read
+              {{- . | nindent 14 }}
+            {{- end }}
+
+          {{- range $keyType, $varName := dict
+              "read" "DS_READ_KEY"
+              "write" "DS_WRITE_KEY"
+              "readStore" "STORE_READ_KEY"
+              "writeStore" "STORE_WRITE_KEY" -}}
+            {{- with include "aserto-lib.controllerKeyEnv" (list $ $keyType) }}
+            - name: {{ $varName }}
+              {{- . | nindent 14 }}
+            {{- end }}
+          {{- end }}
 
             {{- with .Values.database }}
             - name: DIRECTORY_DB_WRITER_USER

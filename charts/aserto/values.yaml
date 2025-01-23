@@ -46,11 +46,12 @@ global:
       # # Address and port of the controller's gRPC service.
       # # Default: controller.<namespace>.svc.cluster.local:8282
       # address: ""
-      # # [Optiona] Controller API keys. All three fields are required.
+      # # [Optiona] Controller API keys. All fields are required.
       # apiKeys:
       #   read: ""
       #   write: ""
-      #   store: ""
+      #   readStore: ""
+      #   writeStore: ""
       # # [Optional] Kubernetes secret containing the controller's API keys.
       # apiKeysSecret: controller-keys
       # # [Optional] Kubernetes secret containing the CA certificate of the root directory.
@@ -70,7 +71,8 @@ global:
       # apiKeys:
       #   read: ""
       #   write: ""
-      #   store: ""
+      #   readStore: ""
+      #   writeStore: ""
       # # [Optional] Kubernetes secret containing the directory's API keys.
       # apiKeysSecret: directory-keys
       # # [Optional] Kubernetes secret containing the directory's CA certificate.

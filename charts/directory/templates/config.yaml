@@ -95,18 +95,26 @@ stringData:
 
       root_keys:
         keys:
-          - key: ${DIRECTORY_DS_WRITE_KEY}
-            account: rk:directory-writer
-          - key: ${DIRECTORY_DS_READ_KEY}
-            account: rk:directory-reader
-          - key: ${DIRECTORY_DS_STORE_KEY}
-            account: rk:directory-store-writer
+          - key: ${DS_READ_KEY}
+            account: rk:directory:reader
+          - key: ${DS_WRITE_KEY}
+            account: rk:directory:writer
+          - key: ${STORE_READ_KEY}
+            account: rk:directory:store-reader
+          - key: ${STORE_WRITE_KEY}
+            account: rk:directory:store-writer
 
 
     {{- with include "aserto-lib.oidcConfig" . }}
       oidc:
         {{- . | nindent 8 }}
     {{- end }}
+
+    {{- if .Values.controller.enabled }}
+      machine_accounts:
+        use_controller_resolver: true
+    {{- end }}
+
 
       override:
         - methods:

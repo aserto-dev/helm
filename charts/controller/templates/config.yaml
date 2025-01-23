@@ -76,22 +76,23 @@ stringData:
       bypass:
         - /grpc.reflection.v1.ServerReflection/ServerReflectionInfo
         - /grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo
-      bypass_tenants:
-        - {{ include "aserto-lib.controllerTenantID" . }}
+        - /aserto.directory.reader.v3.Reader/Check
     {{- end }}
 
     authentication:
       authenticators_enabled:
         root_key: true
 
-      {{- with include "aserto-lib.oidcConfig" . }}
-        oidc: true
-      {{- end }}
-
       root_keys:
         keys:
-          - key: ${DIRECTORY_CONTROLLER_CLIENT_API_KEY}
-            account: "controller"
+          - key: ${DS_READ_KEY}
+            account: rk:controller:reader
+          - key: ${DS_WRITE_KEY}
+            account: rk:controller:writer
+          - key: ${STORE_READ_KEY}
+            account: rk:controller:store-reader
+          - key: ${STORE_WRITE_KEY}
+            account: rk:controller:store-writer
 
     {{- with include "aserto-lib.oidcConfig" . }}
       oidc:
@@ -106,7 +107,30 @@ stringData:
             anonymous: true
 
         - methods:
-            - /aserto.directory.reader.v3.Reader/Check
+            - /aserto.directory.store.v2.Store/GetTenant
+            - /aserto.directory.store.v2.Store/CreateTenant
+            - /aserto.directory.store.v2.Store/DeleteTenant
+            - /aserto.directory.store.v2.Store/ListTenants
+            - /aserto.directory.store.v2.Store/Info
+            - /aserto.directory.store.v2.Store/ListTenantMembers
+            - /aserto.directory.store.v2.Store/ListUserTenants
+            - /aserto.directory.store.v2.Store/AssignRoleToTenant
+            - /aserto.directory.store.v2.Store/RemoveRoleFromTenant
+            - /aserto.directory.store.v2.Store/ListAPIKeys
+            - /aserto.directory.store.v2.Store/DeleteAPIKey
+            - /aserto.directory.store.v2.Store/CreateAPIKey
+            - /aserto.directory.store.v2.Store/GetAPIKeyIdentity
+            - /aserto.directory.store.v2.Store/GetConfig
+            - /aserto.directory.store.v2.Store/SetConfig
+            - /aserto.directory.store.v2.Store/ListConfigs
+            - /aserto.directory.store.v2.Store/DeleteConfig
+            - /aserto.directory.store.v2.Store/GetSecret
+            - /aserto.directory.store.v2.Store/SetSecret
+            - /aserto.directory.store.v2.Store/ListSecrets
+            - /aserto.directory.store.v2.Store/DeleteSecret
           authenticators_enabled:
             root_key: true
+          {{- with include "aserto-lib.oidcConfig" . }}
+            oidc: true
+          {{- end }}
 
