@@ -1,10 +1,17 @@
----
 {{- $cfg := .Values.apiKey -}}
-{{- if empty (lookup "v1" "Secret" .Release.Namespace $cfg.secretName).data }}
+{{- $secret :=  lookup "v1" "Secret" .Release.Namespace $cfg.secretName }}
+{{- if empty $secret | or (include "aserto-lib.isManagedResource" (list $secret .Release.Name) | eq "true") -}}
+
+---
 apiVersion: v1
 kind: Secret
 metadata:
   name: {{ $cfg.secretName }}
-data:  
-  {{ $cfg.secretKey }}: {{ randAlphaNum 20 | b64enc }}  
+data:
+{{- if ($secret).data }}
+  {{ $cfg.secretKey }}: {{ get $secret.data $cfg.secretKey }}
+{{- else }}
+  {{ $cfg.secretKey }}: {{ randAlphaNum 20 | b64enc }}
+{{- end }}
+
 {{- end }}

@@ -1,14 +1,17 @@
 ---
 {{- $secretName := include "scim.auth.secretName" . -}}
 {{- $secretKey := include "scim.auth.secretKey" . -}}
-{{- $data :=  (lookup "v1" "Secret" .Release.Namespace $secretName).data }}
+{{- $secret :=  lookup "v1" "Secret" .Release.Namespace $secretName }}
+{{- if empty $secret | or (include "aserto-lib.isManagedResource" (list $secret .Release.Name) | eq "true") }}
 apiVersion: v1
 kind: Secret
 metadata:
   name: {{ $secretName }}
 data:
-  {{- if $data }}
-  {{ $secretKey }}: {{ get $data $secretKey }}
-  {{- else }}
+{{- if ($secret).data }}
+  {{ $secretKey }}: {{ get $secret.data $secretKey }}
+{{- else }}
   {{ $secretKey }}: {{ randAlphaNum 20 | b64enc }}
-  {{- end }}
+{{- end }}
+
+{{- end }}

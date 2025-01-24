@@ -66,9 +66,9 @@ Create the name of the service account to use
 {{- end }}
 
 {{- define "scim.auth.secretName" -}}
-{{ ((.Values).auth).secretName | default "scim-password" }}
+{{ (.Values.auth).secretName | default "scim-password" }}
 {{- end }}
 
 {{- define "scim.auth.secretKey" -}}
-{{ ((.Values).auth).secretKey | default "password" }}
+{{ (.Values.auth).secretKey | default "password" }}
 {{- end }}

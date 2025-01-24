@@ -41,3 +41,18 @@ Root directory tenant ID
 {{- (include "aserto-lib.rootClientCfg" . | fromYaml).tenantID |
 	default "00000000-0000-11ef-0000-000000000000" -}}
 {{- end }}
+
+{{/*
+Takes a k8s resource retrieved using the `lookup` function and returns true
+if the resource is managed by the current helm release. False otherwise.
+*/}}
+{{- define "aserto-lib.isManagedResource" -}}
+{{- $resource := first . | default dict }}
+{{- $releaseName := last . }}
+{{- if $resource | dig "metadata" "labels" "app.kubernetes.io/managed-by" "" | eq "Helm" | and
+       ($resource | dig "metadata" "annotations" "meta.helm.sh/release-name" "" | eq $releaseName) -}}
+true
+{{- else -}}
+false
+{{- end }}
+{{- end }}

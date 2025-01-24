@@ -135,7 +135,7 @@ discovery:
     #   tokenSecretKey: token
 
 console:
-  enabled: false
+  enabled: true
   # Kubernetes pull secret for private Aserto images.
   # imagePullSecrets:
   #   - name: ghcr-creds
