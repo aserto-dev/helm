@@ -13,10 +13,16 @@ tests:
           password: controller_reader
       - name: controller-keys
         values:
-          write: apikey_writer
-          read: apikey_reader
-          readStore: apikey_store_reader
-          writeStore: apikey_store_writer
+          write: controller_apikey_writer
+          read: controller_apikey_reader
+          readStore: controller_apikey_store_reader
+          writeStore: controller_apikey_store_writer
+      - name: directory-keys
+        values:
+          write: directory_apikey_writer
+          read: directory_apikey_reader
+          readStore: directory_apikey_store_reader
+          writeStore: directory_apikey_store_writer
     config_maps:
       - name: controller-admin-keys
         keys:
@@ -34,7 +40,7 @@ tests:
           localhost provision root-keys
       - |
         ${TOPAZ:-topaz} ds get manifest -H localhost:8282 --tenant-id 00000000-0000-11ef-0000-000000000000 \
-          -k apikey_reader --stdout --plaintext
+          -k controller_apikey_reader --stdout --plaintext
 
   - name: controller-tls
     pull_secret: $GITHUB_TOKEN
@@ -49,10 +55,16 @@ tests:
           password: controller_reader
       - name: controller-keys
         values:
-          write: apikey_writer
-          read: apikey_reader
-          readStore: apikey_store_reader
-          writeStore: apikey_store_writer
+          write: controller_apikey_writer
+          read: controller_apikey_reader
+          readStore: controller_apikey_store_reader
+          writeStore: controller_apikey_store_writer
+      - name: directory-keys
+        values:
+          write: directory_apikey_writer
+          read: directory_apikey_reader
+          readStore: directory_apikey_store_reader
+          writeStore: directory_apikey_store_writer
       - name: grpc-cert
         files:
           tls.crt: $TOPAZ_CERTS_DIR/grpc.crt
@@ -79,4 +91,4 @@ tests:
           localhost provision root-keys
       - |
         ${TOPAZ:-topaz} ds get manifest -H localhost:8282 --tenant-id 00000000-0000-11ef-0000-000000000000 \
-          -k apikey_reader --stdout --insecure
+          -k controller_apikey_reader --stdout --insecure
