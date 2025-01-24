@@ -55,6 +55,7 @@ stringData:
     {{- end }}
       stores:
         {{- list (include "aserto-lib.directoryClient" . | fromYaml) | toYaml | nindent 8 }}
+          api_key: ${DIRECTORY_STORE_WRITE_KEY}
 
     nats:
       {{- if .Values.nats }}

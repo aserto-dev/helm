@@ -89,6 +89,11 @@ spec:
               {{- . | nindent 14 }}
             {{- end }}
 
+            {{- with include "aserto-lib.directoryKeyEnv" (list . "readStore") }}
+            - name: DIRECTORY_STORE_WRITE_KEY
+              {{- . | nindent 14 }}
+            {{- end }}
+
           {{- range $keyType, $varName := dict
               "read" "DS_READ_KEY"
               "write" "DS_WRITE_KEY"
