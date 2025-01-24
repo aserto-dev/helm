@@ -21,6 +21,11 @@ class Namespace:
         self.namespace = namespace
         self.cluster = client.CoreV1Api()
 
+    @staticmethod
+    def current_context() -> str:
+        proc = kubectl("config", "current-context", capture_output=True)
+        return proc.stdout.decode().strip()
+
     def create_ns(self):
         kubectl("create", "namespace", self.namespace)
 

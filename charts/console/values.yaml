@@ -18,10 +18,27 @@ oidc:
   domain: ""
   audience: ""
 
-rootDirectory:
-  disableTLSVerification: false
-  caCertSecret: ""
-  # address: "{{ .Release.Name }}-aserto-directory.aserto.svc.cluster.local:8282"
+# controller:
+#   # Address and port of the controller's gRPC service.
+#   # Default: controller.<namespace>.svc.cluster.local:8282
+#   address: ""
+#   # [Optiona] API key for the remote directory
+#   apiKey: ""
+#   # [Optional] Kubernetes secret containing the API key for the remote directory
+#   apiKeySecret:
+#     # Secret name
+#     name: ""
+#     # Secret key
+#     key: "api-key"
+#   # [Optional] Kubernetes secret containing the CA certificate of the root directory.
+#   caCertSecret:
+#     name: ""
+#     key: ""
+#   # Skip verification of remote TLS certificate
+#   noVerify: false
+#   # Connect over a plain-text connection.
+#   # INSECURE: credentials are sent unencrypted within the cluster.
+#   noTLS: false
 
 # Set the service log level (trace/debug/info/warn/error)
 # logLevel: info

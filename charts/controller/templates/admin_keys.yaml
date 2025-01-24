@@ -1,0 +1,13 @@
+{{- if empty .Values.sshAdminKeys -}}
+  {{ fail "sshAdminKeys is required" }}
+{{- end -}}
+{{- if (.Values.sshAdminKeys).keys -}}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "controller.adminKeysConfigMapName" . }}
+data:
+  {{ include "controller.adminKeysConfigMapKey" . }}: |
+    {{- $.Values.sshAdminKeys.keys | required  "sshAdminKeys.keys is required" | nindent 4 }}
+{{- end -}}

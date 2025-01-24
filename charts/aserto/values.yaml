@@ -18,62 +18,92 @@ global:
       health: 8484
       mertics: 8585
 
-    # # gRPC configuration.
-    # grpc:
-    #   connectionTimeoutSec: 2
+    # gRPC configuration.
+    grpc:
+      connectionTimeoutSec: 2
 
-    # # HTTPS configuration.
+    # HTTPS configuration.
     https:
-      # read_timeout: 2s
-      # read_header_timeout: 2s
-      # write_timeout: 2s
-      # idle_timeout: 30s
+      read_timeout: 2s
+      read_header_timeout: 2s
+      write_timeout: 2s
+      idle_timeout: 30s
 
       # [REQUIRED] Specify the ingress address of the
       # conosle service.
       allowed_origins:
       # - https://console.aserto.example.com
 
+    # Metrics configuration.
+    metrics:
+      zpages: false
 
-    # # Metrics configuration.
-    # metrics:
-    #   zpages: false
-    #   grpc:
-    #     counters: false
-    #     durations: false
-    #     gateway: false
-
-    rootDS:
-      # Address and port of the root directory's gRPC service.
-      # Default: directory.<namespace>.svc.cluster.local:8282
-      address: ""
-      # [Optiona] API key for the remote directory
-      apiKey: ""
-      # [Optional] Kubernetes secret containing the API key for the remote directory
-      apiKeySecret:
-        # Secret name
-        name: ""
-        # Secret key
-        key: "api-key"
-      # [Optional] Kubernetes secret containing the CA certificate of the root directory.
-      caCertSecret:
-        name: ""
-        key: ""
-      # Skip verification of remote TLS certificate
-      noVerify: false
-      # Connect over a plain-text connection.
-      # INSECURE: credentials are sent unencrypted within the cluster.
-      noTLS: false
-
-    rootDirectory:
-      # Disable TLS verification on
-      disableTLSVerification: true
+    # Controller connection configuration.
+    # Services use these options when connecting to the controller.
+    controller:
+      # Use plain-text connection between pods.
+      noTLS: true
+      # # Address and port of the controller's gRPC service.
+      # # Default: controller.<namespace>.svc.cluster.local:8282
+      # address: ""
+      # # [Optiona] Controller API keys. All fields are required.
+      # apiKeys:
+      #   read: ""
+      #   write: ""
+      #   readStore: ""
+      #   writeStore: ""
+      # # [Optional] Kubernetes secret containing the controller's API keys.
+      # apiKeysSecret: controller-keys
+      # # [Optional] Kubernetes secret containing the CA certificate of the root directory.
+      # caCertSecret:
+      #   name: ""
+      #   key: ""
+      # # Skip verification of remote TLS certificate
+      # noVerify: false
 
     directory:
-      disableTLSVerification: true
+      # Use plain-text connection between pods.
+      noTLS: true
+      # # Address and port of the directory's gRPC service.
+      # # Default: directory.<namespace>.svc.cluster.local:8282
+      # address: ""
+      # # [Optiona] Directory API keys.
+      # apiKeys:
+      #   read: ""
+      #   write: ""
+      #   readStore: ""
+      #   writeStore: ""
+      # # [Optional] Kubernetes secret containing the directory's API keys.
+      # apiKeysSecret: directory-keys
+      # # [Optional] Kubernetes secret containing the directory's CA certificate.
+      # caCertSecret:
+      #   name: ""
+      #   key: ""
+      # # Skip verification of remote TLS certificate
+      # noVerify: false
+
+controller:
+  # Database configuration.
+  database:
+    # [REQUIRED] Host name of the root directory PostgreSQL instance.
+    host: ""
+    port: 5432
+    # Set to 'disable` if the PostgreSQL instance does not use SSL.
+    sslMode: require
+    admin:
+      # Kubernetes secret containing credentials for the root database's owner.
+      credentialsSecret: pg-controller-credentials
+
+  # Required: Provide one or more SSH public keys to be granted admin access.
+  # sshAdminKeys: |
+  #   # Add your authorized SSH public keys here
+  #   ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDf6
+  #   ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDa7
+
 
 directory:
-  enabled: true
+  controller:
+    enabled: true
   # Kubernetes pull secret for private Aserto images.
   # imagePullSecrets:
   #   - name: ghcr-creds
@@ -84,37 +114,16 @@ directory:
   #   tag: x.y.z
   #   pullPolicy: IfNotPresent
 
-  # Required: Provide one or more SSH public keys to be granted admin access.
-  # sshAdminKeys: |
-  #   # Add your authorized SSH public keys here
-  #   ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDf6
-  #   ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDa7
-
-  # Configuration for the root directory.
-  rootDirectory:
-    # Database configuration.
-    database:
-      # [REQUIRED] Host name of the root directory PostgreSQL instance.
-      host: ""
-      port: 5432
-      # Set to 'disable` if the PostgreSQL instance does not use SSL.
-      sslMode: require
-      admin:
-        # Kubernetes secret containing credentials for the root database's owner.
-        credentialsSecret: pg-ds-credentials
-
-  # Configuration for the tenant directory.
-  tenantDirectory:
-    # Database configuration.
-    database:
-      # [REQUIRED] Host name of the tenant directory PostgreSQL instance.
-      host: ""
-      port: 5432
-      # Set to 'disable` if the PostgreSQL instance does not use SSL.
-      sslMode: require
-      admin:
-        # Kubernetes secret containing credentials for the tenant database's owner.
-        credentialsSecret: pg-ds-credentials
+  # Database configuration.
+  database:
+    # [REQUIRED] Host name of the tenant directory PostgreSQL instance.
+    host: ""
+    port: 5432
+    # Set to 'disable` if the PostgreSQL instance does not use SSL.
+    sslMode: require
+    admin:
+      # Kubernetes secret containing credentials for the tenant database's owner.
+      credentialsSecret: pg-directory-credentials
 
 discovery:
   enabled: true

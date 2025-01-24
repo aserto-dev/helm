@@ -49,15 +49,15 @@ spec:
               value: {{ .Values.authorizerURL | required "console authorizerURL is required" }}
             - name: SERVER_PORT
               value: {{ include "console.port" . | quote }}
-            {{- with (include "aserto-lib.rootDirectoryClient" .) | fromYaml }}
+            {{- with (include "aserto-lib.controllerClient" .) | fromYaml }}
             - name: DS0_SERVICE_URL
               value: {{ .address }}
             - name: DS0_TENANT_ID
               value: {{ .tenant_id }}
             {{- end }}
-            {{- with (include "aserto-lib.rootApiKeyEnv" .) }}
+            {{- with include "aserto-lib.controllerKeyEnv" (list . "read") }}
             - name: DS0_ROOT_KEY
-              {{ . | nindent 14 }}
+              {{- . | nindent 14 }}
             {{- end }}
           livenessProbe:
             httpGet:

@@ -4,6 +4,7 @@ tests:
     pull_secret: $GITHUB_TOKEN
     deployments:
       - chart: topaz
+        values: controller.values.yaml
         ports:
           8282: 8282
           8383: 8383
@@ -19,17 +20,13 @@ tests:
         values:
           token: ghuser:$GITHUB_TOKEN
     run:
-      - >
-        ${TOPAZ:-topaz} ds set manifest charts/discovery/test/manifest.yaml
-        -H localhost:8282 --plaintext
-      - >
-        ${TOPAZ:-topaz} ds import --directory charts/discovery/test/data
-        -H localhost:8282 --plaintext
-      - >
-        curl http://localhost:18383/api/v1/info
-      - >
-        curl -H "Authorization:basic discovery-root-key" -H "aserto-tenant-id:4f71c224-e742-11ee-86df-00ba61ff9342"
-        http://localhost:18383/api/v2/discovery/test-policy/test-policy/opa
-    cleanup:
-      - >
-        exit 0
+      - |
+        ${TOPAZ:-topaz} ds set manifest charts/discovery/test/manifest.yaml \
+          -H localhost:8282 --api-key controller-root-key --plaintext
+      - |
+        ${TOPAZ:-topaz} ds import --directory charts/discovery/test/data \
+          -H localhost:8282 --api-key controller-root-key --plaintext
+      - curl http://localhost:18383/api/v1/info
+      - |
+        curl -H "Authorization:basic discovery-root-key" -H "aserto-tenant-id:4f71c224-e742-11ee-86df-00ba61ff9342" \
+          http://localhost:18383/api/v2/discovery/test-policy/test-policy/opa

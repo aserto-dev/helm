@@ -1,0 +1,12 @@
+---
+global:
+  aserto:
+    imagePullSecrets:
+      - name: ghcr-creds
+
+database:
+  host: root-db-host
+
+sshAdminKeys:
+  keys: |
+    ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDf6

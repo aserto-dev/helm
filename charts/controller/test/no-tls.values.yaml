@@ -1,0 +1,23 @@
+---
+image:
+  tag: 0.33.11-b041fc2e-amd64
+
+imagePullSecrets:
+  - name: ghcr-creds
+
+database:
+  host: postgresql.postgres.svc.cluster.local
+  dbName: test-controller
+  sslMode: disable
+  admin:
+    credentialsSecret: pg-credentials
+  reader:
+    credentialsSecret: pg-controller-reader-credentials
+
+cache:
+  sizeMB: 100
+
+sshAdminKeys:
+  configMap:
+    name: controller-admin-keys
+    key: authorized_keys

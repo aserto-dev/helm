@@ -90,7 +90,7 @@ tls:
 {{- end }}
 {{- end }}
 
-{{- define "authorizer.gatewayService" }}
+{{- define "authorizer.gatewayService" -}}
 {{ include "aserto-lib.httpsService" .  }}
 {{- $cfg := include "aserto-lib.httpsConfig" . | fromYaml }}
 allowed_headers:

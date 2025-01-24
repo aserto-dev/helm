@@ -1,0 +1,32 @@
+{{- $cfg := include "aserto-lib.controllerClientCfg" . | fromYaml -}}
+
+{{- with $cfg.apiKeys -}}
+{{- if list .read .write .readStore .writeStore | has nil -}}
+    {{- fail "controller.apiKeys must include 'read', 'write', 'readStore', and 'writeStore' keys." -}}
+{{- end -}}
+{{- end -}}
+
+{{- $secretName := ($cfg.apiKeySecret).name | default "controller-keys" -}}
+{{- $apiKeys := dict -}}
+
+{{- if $cfg.apiKeys -}}
+  {{- $apiKeys := $cfg.apiKeys -}}
+{{- else -}}
+  {{- $secret := lookup "v1" "Secret" .Release.Namespace $secretName }}
+  {{- if empty $secret | or (include "aserto-lib.isManagedResource" (list $secret .Release.Name) | eq "true") -}}
+    {{- range (list "read" "write" "readStore" "writeStore") -}}
+      {{- $apiKeys = set $apiKeys . (dig "data" . (randAlphaNum 32 | b64enc) $secret) -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+
+{{- with $apiKeys }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ $secretName }}
+data:
+  {{- . | toYaml | nindent 2 }}
+{{- end }}

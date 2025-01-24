@@ -35,7 +35,7 @@ stringData:
       {{- include "discovery.registriesConfig" . | nindent 6 }}
 
     ds0:
-      {{- include "aserto-lib.rootDirectoryClient" . | nindent 6 }}
+      {{- include "aserto-lib.controllerClient" . | nindent 6 }}
 
     authorization:
       enabled: {{ .Values.authorization.enabled }}

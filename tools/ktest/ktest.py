@@ -70,14 +70,15 @@ class Runner:
                     echo("✅", "Tests complete.", nl=True)
                 except:
                     echo("🚨", "Test failed.", nl=True, cl=COLOR_ERROR)
-                    for deployment in self.test.deployments:                      
+                    for deployment in self.test.deployments:
                         pod = ns.svc_pod(deployment.chart)
                         echo("📋", "Pod logs:", pod)
                         ns.logs(pod)
                         click.echo()
                     raise
                 finally:
-                    self.execute_cleanup()
+                    if self.test.cleanup:
+                        self.execute_cleanup()
 
     def deploy_chart(self, deployment: Deployment, ns: Namespace):
         chart_path = path.join(self.git_root, "charts", deployment.chart)
@@ -179,6 +180,13 @@ def main(specfile: TextIO, include: Sequence[str], teardown: bool):
 
     init_logging(logging.DEBUG)
     config.load_kube_config()
+
+    # Ensure that the current kubectl context has "test" in its name.
+    context = Namespace.current_context()
+    if "test" not in context:
+        raise click.ClickException(
+            f"Current kubernetes context ({context}) is not a test environemnt. Exiting."
+        )
 
     spec = Spec(**yaml.safe_load(specfile))
     spec_path = path.dirname(specfile.name)

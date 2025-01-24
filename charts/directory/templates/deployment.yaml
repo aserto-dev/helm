@@ -47,12 +47,12 @@ spec:
             secretName: {{ . }}
         {{- end }}
 
-        {{- if (.Values.tenantDirectory).runService | and ((.Values.rootDS).caCertSecret).name }}
-        - name: root-ds-grpc-certs
+        {{- with (.Values.controller).caCertSecret }}
+        - name: controller-grpc-certs
           secret:
-            secretName: {{ .Values.rootDS.caCertSecret.name }}
+            secretName: {{ .name }}
             items:
-              - key: {{ .Values.rootDS.caCertSecret.name | default "ca.crt" }}
+              - key: {{ .key | default "ca.crt" }}
                 path: ca.crt
         {{- end }}
 
@@ -92,32 +92,29 @@ spec:
               readOnly: true
           {{- end }}
 
-          {{- if and .Values.tenantDirectory.runService (.Values.rootDS).caCertSecret }}
-            - name: root-ds-grpc-certs
-              mountPath: /root-ds-grpc-certs
+          {{- if (.Values.controller).caCertSecret }}
+            - name: controller-grpc-certs
+              mountPath: /controller-grpc-certs
               readOnly: true
           {{- end }}
           env:
-            {{- with include "directory.rootApiKeyEnv" . }}
-            - name: DIRECTORY_ROOT_DS_CLIENT_API_KEY
+            {{- with include "directory.controllerKeyEnv" (list . "read") }}
+            - name: DIRECTORY_CONTROLLER_CLIENT_API_KEY
               {{- . | nindent 14 }}
             {{- end }}
 
-            {{- if .Values.tenantDirectory.runService }}
-            {{- with (include "aserto-lib.directoryApiKeys" . | fromYaml) }}
-            - name: DIRECTORY_DS_WRITE_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .secretName }}
-                  key: {{ .writerSecretKey }}
-            - name: DIRECTORY_DS_READ_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .secretName }}
-                  key: {{ .readerSecretKey }}
+          {{- range $keyType, $varName := dict
+              "read" "DS_READ_KEY"
+              "write" "DS_WRITE_KEY"
+              "readStore" "STORE_READ_KEY"
+              "writeStore" "STORE_WRITE_KEY" -}}
+            {{- with include "aserto-lib.directoryKeyEnv" (list $ $keyType) }}
+            - name: {{ $varName }}
+              {{- . | nindent 14 }}
             {{- end }}
+          {{- end }}
 
-            {{- with .Values.tenantDirectory.database }}
+            {{- with .Values.database }}
             - name: DIRECTORY_DB_WRITER_USER
               valueFrom:
                 secretKeyRef:
@@ -138,32 +135,6 @@ spec:
                 secretKeyRef:
                   name: {{ .reader.credentialsSecret }}
                   key: password
-            {{- end }}
-            {{- end }}
-
-            {{- if .Values.rootDirectory.runService -}}
-            {{- with .Values.rootDirectory.database }}
-            - name: DIRECTORY_ROOT_DB_WRITER_USER
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .admin.credentialsSecret }}
-                  key: username
-            - name: DIRECTORY_ROOT_DB_WRITER_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .admin.credentialsSecret }}
-                  key: password
-            - name: DIRECTORY_ROOT_DB_READER_USER
-              valueFrom:
-                secretKeyRef:
-                  name: {{ (.reader).credentialsSecret }}
-                  key: username
-            - name: DIRECTORY_ROOT_DB_READER_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .reader.credentialsSecret }}
-                  key: password
-            {{- end }}
             {{- end }}
 
           {{- range $_, $tenant := .Values.tenants -}}

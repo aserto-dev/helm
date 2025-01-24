@@ -32,69 +32,42 @@ oidc:
 #     name: directory-admin-keys
 #     key: authorized_keys
 
-rootDirectory:
-  runService: true
-  database:
-    # REQUIRED: root directory database hostname
-    host: ""
-    port: 5432
-    dbName: aserto-root-ds
-    sslMode: require
-    admin:
-      credentialsSecret: pg-root-admin-credentials
-      options:
-        debug_mode: false
-        max_open_conns: 25
-        max_idle_conns: 25
-        conn_max_lifetime: 5
-        query_timeout_seconds: 60
+database:
+  host: ""
+  port: 5432
+  dbName: aserto-directory
+  sslMode: require
+  admin:
+    credentialsSecret: pg-directory-admin-credentials
+    options:
+      debug_mode: false
+      max_open_conns: 25
+      max_idle_conns: 25
+      conn_max_lifetime: 5
+      query_timeout_seconds: 60
+  reader:
+    credentialsSecret: pg-directory-reader-credentials
+    options:
+      debug_mode: false
+      max_open_conns: 25
+      max_idle_conns: 25
+      conn_max_lifetime: 5
+      query_timeout_seconds: 5
 
-    reader:
-      credentialsSecret: pg-root-reader-credentials
-      options:
-        debug_mode: false
-        max_open_conns: 25
-        max_idle_conns: 25
-        conn_max_lifetime: 5
-        query_timeout_seconds: 5
-
-tenantDirectory:
-  runService: true
-  database:
-    host: ""
-    port: 5432
-    dbName: aserto-ds
-    sslMode: require
-    admin:
-      credentialsSecret: pg-tenant-admin-credentials
-      options:
-        debug_mode: false
-        max_open_conns: 25
-        max_idle_conns: 25
-        conn_max_lifetime: 5
-        query_timeout_seconds: 60
-    reader:
-      credentialsSecret: pg-tenant-reader-credentials
-      options:
-        debug_mode: false
-        max_open_conns: 25
-        max_idle_conns: 25
-        conn_max_lifetime: 5
-        query_timeout_seconds: 5
-
-# rootDS:
-#   # Address and port of the root directory's gRPC service.
-#   # Default: directory.<namespace>.svc.cluster.local:8282
+controller:
+  enabled: false
+#   # Address and port of the controller's gRPC service.
+#   # Default: controller.<namespace>.svc.cluster.local:8282
 #   address: ""
-#   # [Optional] API key for the remote directory
-#   apiKey: ""
-#   # [Optional] Kubernetes secret containing the API key for the remote directory
-#   apiKeySecret:
-#     # Secret name
-#     name: ""
-#     # Secret key
-#     key: "api-key"
-#   # [Optional] Kubernetes secret containing the CA certificate of the root directory.
+#   # [Optiona] Controller API keys. All fields are required.
+#   apiKeys:
+#     read: ""
+#     write: ""
+#     readStore: ""
+#     writeStore: ""
+#   # [Optional] Kubernetes secret containing the controller's API keys.
+#   apiKeysSecret: controller-keys
+#   # [Optional] Kubernetes secret containing the controller's CA certificate.
 #   caCertSecret:
 #     name: ""
 #     key: ""
@@ -154,9 +127,6 @@ grpc:
 #     counters: true
 #     durations: true
 #     gateway: true
-
-# Disable authorization
-# noAuthorization: false
 
 # cache:
 #   sizeMB: 25

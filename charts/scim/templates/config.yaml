@@ -27,7 +27,7 @@ stringData:
         bearer:
           enabled: {{ ((.Values.auth).bearer).enabled | default "true" }}
     directory:
-      {{- include "aserto-lib.rootDirectoryClient" . | nindent 6 }}
+      {{- include "aserto-lib.controllerClient" . | nindent 6 }}
     scim:
       create_email_identities: {{ .Values.createEmailIdentities | default "true" }}
       create_role_groups: {{ .Values.createRoleGroups | default "false" }}

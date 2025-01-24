@@ -1,23 +1,33 @@
-{{- if .Values.rootDirectory.runService }}
-{{- $cfg := include "aserto-lib.directoryApiKeys" . | fromYaml -}}
-{{- $secret :=  lookup "v1" "Secret" .Release.Namespace $cfg.secretName }}
-{{- if empty $secret | or
-    (include "aserto-lib.isManagedResource" (list $secret .Release.Name) | eq "true")
--}}
+{{- $cfg := include "aserto-lib.directoryClientCfg" . | fromYaml -}}
 
+{{- with $cfg.apiKeys -}}
+{{- if list .read .write .readStore  .writeStore | has nil -}}
+    {{- fail "directory.apiKeys must include 'read', 'write', 'readStore' and 'writeStore' keys." -}}
+{{- end -}}
+{{- end -}}
+
+{{- $secretName := ($cfg.apiKeySecret).name | default "directory-keys" -}}
+{{- $apiKeys := dict -}}
+
+{{- if $cfg.apiKeys -}}
+  {{- $apiKeys := $cfg.apiKeys -}}
+{{- else -}}
+  {{- $secret := lookup "v1" "Secret" .Release.Namespace $secretName }}
+  {{- if empty $secret | or (include "aserto-lib.isManagedResource" (list $secret .Release.Name) | eq "true") -}}
+    {{- range (list "read" "write" "readStore" "writeStore") -}}
+      {{- $apiKeys = set $apiKeys . (dig "data" . (randAlphaNum 32 | b64enc) $secret) -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+
+{{- with $apiKeys }}
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ $cfg.secretName }}
+  name: {{ $secretName }}
 data:
-{{- if ($secret).data }}
-  {{ $cfg.writerSecretKey }}: {{ get $secret.data $cfg.writerSecretKey }}
-  {{ $cfg.readerSecretKey }}: {{ get $secret.data $cfg.readerSecretKey }}
-{{- else }}
-  {{ $cfg.writerSecretKey }}: {{ randAlphaNum 20 | b64enc }}
-  {{ $cfg.readerSecretKey }}: {{ randAlphaNum 20 | b64enc }}
+  {{- . | toYaml | nindent 2 }}
 {{- end }}
 
-{{- end }}
-{{- end }}
