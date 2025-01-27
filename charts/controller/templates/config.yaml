@@ -78,6 +78,7 @@ stringData:
         - /grpc.reflection.v1.ServerReflection/ServerReflectionInfo
         - /grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo
         - /aserto.directory.reader.v3.Reader/Check
+        - /aserto.directory.store.v2.Store/GetAPIKeyIdentity
 
       tenant_id_field:
         id:
