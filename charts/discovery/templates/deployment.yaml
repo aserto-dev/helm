@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -95,7 +96,7 @@ spec:
                   key: {{ .secretKey }}
           {{- end }}
 
-          {{- with include "aserto-lib.controllerKeyEnv" (list . "read") }}
+          {{- with include "aserto-lib.controllerKeyEnv" (list . "readStore") }}
             - name: DISCOVERY_DS0_API_KEY
               {{- . | nindent 14 }}
           {{- end }}
