@@ -49,11 +49,9 @@ spec:
               value: {{ .Values.authorizerURL | required "console authorizerURL is required" }}
             - name: SERVER_PORT
               value: {{ include "console.port" . | quote }}
-            {{- with (include "aserto-lib.controllerClientCfg" .) | fromYaml }}
-            - name: DS0_SERVICE_URL
-              value: {{ if .noTLS }}http://{{ else }}https://{{ end }}{{ include "aserto-lib.controllerAddress" $ }}
-            {{- end }}
             {{- with (include "aserto-lib.controllerClient" .) | fromYaml }}
+            - name: DS0_SERVICE_URL
+              value: {{ .no_tls | default false | ternary "http" "https" }}://{{ .address }}
             - name: DS0_TENANT_ID
               value: {{ .tenant_id }}
             {{- end }}
