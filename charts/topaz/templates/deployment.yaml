@@ -14,7 +14,9 @@ metadata:
   labels:
     {{- include "topaz.labels" . | nindent 4 }}
 spec:
+  {{- if $persistence }}
   serviceName: {{ include "topaz.fullname" . }}
+  {{- end }}
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
