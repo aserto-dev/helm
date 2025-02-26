@@ -79,7 +79,7 @@ spec:
               readOnly: true
             {{- end }}
           env:
-            {{- with include "aserto-lib.controllerKeyEnv" (list . "write") }}
+            {{- with include "aserto-lib.controllerKeyEnv" (list . "readStore") }}
             - name: ASERTO_SCIM_CONTROLLER_API_KEY
               {{ . | nindent 14 }}
             {{- end }}

@@ -51,7 +51,7 @@ spec:
               value: {{ include "console.port" . | quote }}
             {{- with (include "aserto-lib.controllerClient" .) | fromYaml }}
             - name: DS0_SERVICE_URL
-              value: {{ .address }}
+              value: {{ .no_tls | default false | ternary "http" "https" }}://{{ .address }}
             - name: DS0_TENANT_ID
               value: {{ .tenant_id }}
             {{- end }}
