@@ -75,8 +75,7 @@ stringData:
         - /aserto.directory.store.v2.Store/GetTenant
         - /aserto.directory.store.v2.Store/ListTenants
         - /aserto.directory.store.v2.Store/MigrateSchema
-        - /aserto.directory.store.v2.Store/DeleteIDPConnection
-        - /aserto.directory.store.v2.Store/PurgeDeletedTenants
+        - /aserto.directory.store.v2.Store/Info
   {{- else }}
       disable: true
   {{- end }}
@@ -129,7 +128,6 @@ stringData:
             - /aserto.directory.store.v2.Store/GetTenant
             - /aserto.directory.store.v2.Store/ListTenants
             - /aserto.directory.store.v2.Store/MigrateSchema
-            - /aserto.directory.store.v2.Store/DeleteIDPConnection
-            - /aserto.directory.store.v2.Store/PurgeDeletedTenants
+            - /aserto.directory.store.v2.Store/Info
           authenticators_enabled:
             root_key: true

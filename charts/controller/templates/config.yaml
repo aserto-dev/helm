@@ -78,28 +78,9 @@ stringData:
         - /grpc.reflection.v1.ServerReflection/ServerReflectionInfo
         - /grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo
         - /aserto.directory.reader.v3.Reader/Check
-        - /aserto.directory.store.v2.Store/GetAPIKeyIdentity
-        - /aserto.directory.store.v2.Store/ListUserTenants
+        - /aserto.directory.reader.v3.Reader/Checks
+        - /aserto.directory.controller.v1.Controller/GetAPIKeyIdentity
 
-      tenant_id_field:
-        id:
-          - /aserto.directory.store.v2.Store/Info
-          - /aserto.directory.store.v2.Store/ListTenantMembers
-        tenant_id:
-          - /aserto.directory.store.v2.Store/AssignRoleToTenant
-          - /aserto.directory.store.v2.Store/CreateAPIKey
-          - /aserto.directory.store.v2.Store/DeleteAPIKey
-          - /aserto.directory.store.v2.Store/DeleteConfig
-          - /aserto.directory.store.v2.Store/DeleteSecret
-          - /aserto.directory.store.v2.Store/GetAPIKeyIdentity
-          - /aserto.directory.store.v2.Store/GetConfig
-          - /aserto.directory.store.v2.Store/GetSecret
-          - /aserto.directory.store.v2.Store/ListAPIKeys
-          - /aserto.directory.store.v2.Store/ListConfigs
-          - /aserto.directory.store.v2.Store/ListSecrets
-          - /aserto.directory.store.v2.Store/RemoveRoleFromTenant
-          - /aserto.directory.store.v2.Store/SetConfig
-          - /aserto.directory.store.v2.Store/SetSecret
     {{- end }}
 
     authentication:
@@ -135,22 +116,24 @@ stringData:
             - /aserto.directory.store.v2.Store/DeleteTenant
             - /aserto.directory.store.v2.Store/ListTenants
             - /aserto.directory.store.v2.Store/Info
-            - /aserto.directory.store.v2.Store/ListTenantMembers
-            - /aserto.directory.store.v2.Store/ListUserTenants
-            - /aserto.directory.store.v2.Store/AssignRoleToTenant
-            - /aserto.directory.store.v2.Store/RemoveRoleFromTenant
-            - /aserto.directory.store.v2.Store/ListAPIKeys
-            - /aserto.directory.store.v2.Store/DeleteAPIKey
-            - /aserto.directory.store.v2.Store/CreateAPIKey
-            - /aserto.directory.store.v2.Store/GetAPIKeyIdentity
-            - /aserto.directory.store.v2.Store/GetConfig
-            - /aserto.directory.store.v2.Store/SetConfig
-            - /aserto.directory.store.v2.Store/ListConfigs
-            - /aserto.directory.store.v2.Store/DeleteConfig
-            - /aserto.directory.store.v2.Store/GetSecret
-            - /aserto.directory.store.v2.Store/SetSecret
-            - /aserto.directory.store.v2.Store/ListSecrets
-            - /aserto.directory.store.v2.Store/DeleteSecret
+            - /aserto.directory.controller.v1.Controller/ListTenantMembers
+            - /aserto.directory.controller.v1.Controller/ListUserTenants
+            - /aserto.directory.controller.v1.Controller/ListRoles
+            - /aserto.directory.controller.v1.Controller/ListUserRoles
+            - /aserto.directory.controller.v1.Controller/SetUserRole
+            - /aserto.directory.controller.v1.Controller/DeleteUserRole
+            - /aserto.directory.controller.v1.Controller/ListAPIKeys
+            - /aserto.directory.controller.v1.Controller/DeleteAPIKey
+            - /aserto.directory.controller.v1.Controller/CreateAPIKey
+            - /aserto.directory.controller.v1.Controller/GetAPIKeyIdentity
+            - /aserto.directory.controller.v1.Controller/GetConfig
+            - /aserto.directory.controller.v1.Controller/SetConfig
+            - /aserto.directory.controller.v1.Controller/ListConfigs
+            - /aserto.directory.controller.v1.Controller/DeleteConfig
+            - /aserto.directory.controller.v1.Controller/GetSecret
+            - /aserto.directory.controller.v1.Controller/SetSecret
+            - /aserto.directory.controller.v1.Controller/ListSecrets
+            - /aserto.directory.controller.v1.Controller/DeleteSecret
           authenticators_enabled:
             root_key: true
           {{- with include "aserto-lib.oidcConfig" . }}

@@ -37,6 +37,7 @@ certSecret:
 # groupMemberRelation: memeber
 # groupMappings: []
 # userMappings: []
+# invertIdentityRelation: true
 
 # controller:
 #   # Address and port of the controller's gRPC service.
