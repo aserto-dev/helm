@@ -71,7 +71,7 @@ tenants:
 #       writerKey: writer
 #       readerKey: reader
 
-# secretsVault:
+# vault:
 #   [Optional] Vault token
 #   token: ""
 #   [Optional] Kubernetes secret containing the vault token
