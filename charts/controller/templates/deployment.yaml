@@ -128,20 +128,18 @@ spec:
                   key: password
             {{- end }}
 
-            {{- if .Values.secretsVault }}
-            {{- if .Values.secretsVault.token }}
-            - name: DIRECTORY_SECRETS_VAULT_TOKEN
-              value: {{ .Values.secretsVault.token }}
-            {{- else -}}
-            {{- with .Values.secretsVault.tokenSecret }}
-            - name: DIRECTORY_SECRETS_VAULT_TOKEN
+          {{- with (.Values.vault).token }}
+            - name: DIRECTORY_VAULT_TOKEN
+              value: {{ . }}
+          {{- else -}}
+            {{- with (.Values.vault).tokenSecret }}
+            - name: DIRECTORY_VAULT_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: {{ .name }}
                   key: {{ .key }}
             {{- end }}
-            {{- end }}
-            {{- end }}
+          {{- end }}
 
           {{- range $_, $tenant := .Values.tenants -}}
             {{- with $tenant.keysSecret }}

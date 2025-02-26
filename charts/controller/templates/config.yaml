@@ -157,8 +157,8 @@ stringData:
             oidc: true
           {{- end }}
 
-    {{- with .Values.secretsVault }}
-    secrets_vault:
+    {{- with .Values.vault }}
+    vault:
       address: {{ .address }}
       insecure: {{ .insecure | default false }}
       root_path: {{ .rootPath | default "/" }}
