@@ -78,6 +78,28 @@ stringData:
         - /grpc.reflection.v1.ServerReflection/ServerReflectionInfo
         - /grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo
         - /aserto.directory.reader.v3.Reader/Check
+        - /aserto.directory.store.v2.Store/GetAPIKeyIdentity
+        - /aserto.directory.store.v2.Store/ListUserTenants
+
+      tenant_id_field:
+        id:
+          - /aserto.directory.store.v2.Store/Info
+          - /aserto.directory.store.v2.Store/ListTenantMembers
+        tenant_id:
+          - /aserto.directory.store.v2.Store/AssignRoleToTenant
+          - /aserto.directory.store.v2.Store/CreateAPIKey
+          - /aserto.directory.store.v2.Store/DeleteAPIKey
+          - /aserto.directory.store.v2.Store/DeleteConfig
+          - /aserto.directory.store.v2.Store/DeleteSecret
+          - /aserto.directory.store.v2.Store/GetAPIKeyIdentity
+          - /aserto.directory.store.v2.Store/GetConfig
+          - /aserto.directory.store.v2.Store/GetSecret
+          - /aserto.directory.store.v2.Store/ListAPIKeys
+          - /aserto.directory.store.v2.Store/ListConfigs
+          - /aserto.directory.store.v2.Store/ListSecrets
+          - /aserto.directory.store.v2.Store/RemoveRoleFromTenant
+          - /aserto.directory.store.v2.Store/SetConfig
+          - /aserto.directory.store.v2.Store/SetSecret
     {{- end }}
 
     authentication:
@@ -135,3 +157,10 @@ stringData:
             oidc: true
           {{- end }}
 
+    {{- with .Values.secretsVault }}
+    secrets_vault:
+      address: {{ .address }}
+      insecure: {{ .insecure | default false }}
+      root_path: {{ .rootPath | default "/" }}
+      token: ""
+    {{- end }}

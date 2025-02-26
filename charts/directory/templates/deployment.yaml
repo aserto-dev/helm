@@ -98,7 +98,7 @@ spec:
               readOnly: true
           {{- end }}
           env:
-            {{- with include "directory.controllerKeyEnv" (list . "read") }}
+            {{- with include "directory.controllerKeyEnv" (list . "readStore") }}
             - name: DIRECTORY_CONTROLLER_CLIENT_API_KEY
               {{- . | nindent 14 }}
             {{- end }}

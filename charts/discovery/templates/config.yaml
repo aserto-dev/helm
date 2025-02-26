@@ -52,7 +52,6 @@ stringData:
       {{- end }}
 
     {{- with .Values.oidc -}}
-      foobar: no
       oidc:
         {{- include "aserto-lib.oidcConfig" . | nindent 8 }}
     {{- end }}

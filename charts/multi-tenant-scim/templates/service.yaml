@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "multi-tenant-scim.fullname" . }}
+  labels:
+    {{- include "multi-tenant-scim.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: mtscim
+      port: {{ include "multi-tenant-scim.port" . }}
+      targetPort: mtscim
+  selector:
+    {{- include "multi-tenant-scim.selectorLabels" . | nindent 4 }}

@@ -133,4 +133,3 @@ stringData:
             - /aserto.directory.store.v2.Store/PurgeDeletedTenants
           authenticators_enabled:
             root_key: true
-

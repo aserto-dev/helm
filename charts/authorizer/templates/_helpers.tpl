@@ -72,7 +72,7 @@ Local cluster address
 OPA discovery configuration
 */}}
 {{- define "authorizer.opaDiscovery" -}}
-url: https://{{ include "aserto-lib.discoveryAddress" . }}/api/
+url: http://{{ include "aserto-lib.discoveryAddress" . }}/api/
 credentials:
   bearer:
     token: ${AUTHORIZER_DISCOVERY_ROOT_KEY}

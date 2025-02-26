@@ -19,6 +19,12 @@ tests:
       - name: discovery-ghcr-token
         values:
           token: ghuser:$GITHUB_TOKEN
+      - name: controller-keys
+        values:
+          read: controller-root-key
+          write: controller-root-key
+          readStore: controller-root-key
+          writeStore: controller-root-key
     run:
       - |
         ${TOPAZ:-topaz} ds set manifest charts/discovery/test/manifest.yaml \
