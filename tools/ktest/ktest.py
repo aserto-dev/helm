@@ -3,6 +3,7 @@
 
 import logging
 import subprocess
+import time
 from contextlib import contextmanager, ExitStack
 from os import path
 from typing import Iterator, Sequence, TextIO
@@ -58,12 +59,15 @@ class Runner:
 
             with ExitStack() as stack:
                 for deployment in self.test.deployments:
-                    echo(
-                        "🔀",
-                        "Forwarding ports:",
-                        f"{deployment.chart} - {deployment.ports}",
-                    )
-                    stack.enter_context(ns.forward(deployment.chart, deployment.ports))
+                    if deployment.ports:
+                        echo(
+                            "🔀",
+                            "Forwarding ports:",
+                            f"{deployment.chart} - {deployment.ports}",
+                        )
+                        stack.enter_context(
+                            ns.forward(deployment.chart, deployment.ports)
+                        )
 
                 try:
                     self.execute_steps()
@@ -101,6 +105,7 @@ class Runner:
             try:
                 echo("⏳", "Waiting for pod:", pod)
                 ns.wait(pod)
+                time.sleep(2)  # give ingresses time to become available
             except:
                 echo(
                     "🚨",
@@ -172,7 +177,8 @@ class Runner:
 @click.argument("specfile", type=click.File())
 @click.option("--include", "-i", multiple=True, help="Only run specified test(s)")
 @click.option("--teardown/--no-teardown", default=True, show_default=True)
-def main(specfile: TextIO, include: Sequence[str], teardown: bool):
+@click.option("--check/--no-check", default=True, show_default=True)
+def main(specfile: TextIO, include: Sequence[str], teardown: bool, check: bool):
     """Run tests in a kubernetes cluster.
 
     SPECFILE: path to a YAML file with test definitions.
@@ -181,12 +187,13 @@ def main(specfile: TextIO, include: Sequence[str], teardown: bool):
     init_logging(logging.DEBUG)
     config.load_kube_config()
 
-    # Ensure that the current kubectl context has "test" in its name.
-    context = Namespace.current_context()
-    if "test" not in context:
-        raise click.ClickException(
-            f"Current kubernetes context ({context}) is not a test environemnt. Exiting."
-        )
+    if check:
+        # Ensure that the current kubectl context has "test" in its name.
+        context = Namespace.current_context()
+        if "test" not in context:
+            raise click.ClickException(
+                f"Current kubernetes context ({context}) is not a test environemnt. Exiting."
+            )
 
     spec = Spec(**yaml.safe_load(specfile))
     spec_path = path.dirname(specfile.name)

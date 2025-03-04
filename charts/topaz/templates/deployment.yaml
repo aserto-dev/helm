@@ -61,7 +61,7 @@ spec:
               containerPort: {{ (.Values.ports).grpc | default "8282" }}
               protocol: TCP
             - name: http
-              containerPort: {{ (.Values.ports).https | default "8383" }}
+              containerPort: {{ (.Values.ports).http | default "8383" }}
               protocol: TCP
             - name: health
               containerPort: {{ (.Values.ports).health | default "8484" }}
@@ -108,9 +108,9 @@ spec:
               mountPath: /grpc-certs
               readOnly: true
           {{- end }}
-          {{- if (.Values.tls).https }}
-            - name: https-certs
-              mountPath: /https-certs
+          {{- if (.Values.tls).http }}
+            - name: tls-certs
+              mountPath: /tls-certs
               readOnly: true
           {{- end }}
           {{- with (.Values.directory).remote -}}
@@ -154,8 +154,8 @@ spec:
           secret:
             secretName: {{ . }}
       {{- end }}
-      {{- with (.Values.tls).https }}
-        - name: https-certs
+      {{- with (.Values.tls).http }}
+        - name: tls-certs
           secret:
             secretName: {{ . }}
       {{- end }}

@@ -235,7 +235,7 @@ certs:
 {{- $values := first . -}}
 {{- $svc := last . -}}
 {{- $cfg := merge (dig $svc "http" dict $values.serviceOverrides) $values.http -}}
-listen_address: 0.0.0.0:{{ ($values.ports).https | default "8383" }}
+listen_address: 0.0.0.0:{{ ($values.ports).http | default "8383" }}
 
 {{- if $cfg.domain }}
 fqdn: {{ $cfg.domain }}
@@ -263,11 +263,11 @@ read_timeout: {{ $cfg.readTimeout | default "2s" }}
 read_header_timeout: {{ $cfg.readHeaderTimeout | default "2s" }}
 write_timeout: {{ $cfg.writeTimeout | default "2s" }}
 idle_timeout: {{ $cfg.idleTimeout | default "30s" }}
-{{- with ($values.tls).https }}
+{{- with ($values.tls).http }}
 certs:
-  tls_key_path: /https-certs/tls.key
-  tls_cert_path: /https-certs/tls.crt
-  tls_ca_cert_path: /https-certs/ca.crt
+  tls_key_path: /tls-certs/tls.key
+  tls_cert_path: /tls-certs/tls.crt
+  tls_ca_cert_path: /tls-certs/ca.crt
 {{- end }}
 {{- end }}
 

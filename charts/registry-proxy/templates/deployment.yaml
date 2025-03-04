@@ -40,8 +40,8 @@ spec:
           emptyDir: {}
           {{- end }}
           {{- end }}
-        - name: https-certs
-          {{- with (include "aserto-lib.httpsConfig" . | fromYaml) }}
+        - name: tls-certs
+          {{- with (include "aserto-lib.httpConfig" . | fromYaml) }}
           {{- if .certSecret }}
           secret:
             secretName: {{ .certSecret }}
@@ -60,10 +60,10 @@ spec:
         {{- end }}
 
         {{- with (include "aserto-lib.discoveryCfg" . | fromYaml) }}
-        {{- if .httpsCertSecret }}
-        - name: discovery-https-certs
+        {{- if .tlsCertSecret }}
+        - name: discovery-tls-certs
           secret:
-            secretName: {{ .httpsCertSecret }}
+            secretName: {{ .tlsCertSecret }}
             items:
               - key: ca.crt
                 path: ca.crt
@@ -79,8 +79,8 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             {{- with (include "aserto-lib.selfPorts" . | fromYaml )}}
-            - name: https
-              containerPort: {{ .https }}
+            - name: http
+              containerPort: {{ .http }}
             - name: metrics
               containerPort: {{ .metrics }}
             {{- end }}
@@ -88,9 +88,9 @@ spec:
             - name: config
               mountPath: /config
               readOnly: true
-            - name: https-certs
-              mountPath: /https-certs
-            {{- if (include "aserto-lib.httpsConfig" . | fromYaml).certSecret  }}
+            - name: tls-certs
+              mountPath: /tls-certs
+            {{- if (include "aserto-lib.httpConfig" . | fromYaml).certSecret  }}
               readOnly: true
             {{- end }}
             {{- with ((include "aserto-lib.controllerClientCfg" . | fromYaml).caCertSecret).name }}

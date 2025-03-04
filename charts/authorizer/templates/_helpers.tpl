@@ -80,19 +80,19 @@ credentials:
 {{- with (include "aserto-lib.discoveryCfg" . | fromYaml) }}
 {{- if .disableTLSVerification }}
 allow_insecure_tls : true
-{{- else if .httpsCertSecret }}
+{{- else if .tlsCertSecret }}
 tls:
-  ca_cert: /discovery-https-certs/ca.crt
+  ca_cert: /discovery-tls-certs/ca.crt
 {{- else }}
 tls:
-  ca_cert: /https-certs/ca.crt
+  ca_cert: /tls-certs/ca.crt
 {{- end }}
 {{- end }}
 {{- end }}
 
 {{- define "authorizer.gatewayService" -}}
-{{ include "aserto-lib.httpsService" .  }}
-{{- $cfg := include "aserto-lib.httpsConfig" . | fromYaml }}
+{{ include "aserto-lib.httpService" .  }}
+{{- $cfg := include "aserto-lib.httpConfig" . | fromYaml }}
 allowed_headers:
 {{- $cfg.allowed_headers | default (list "Aserto-Tenant-Id" "Authorization" "Content-Type" "Depth") | toYaml | nindent 2 }}
 {{- end }}

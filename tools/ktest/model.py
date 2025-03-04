@@ -23,7 +23,7 @@ class Secret(BaseModel):
 class Deployment(BaseModel):
     chart: str
     values: str = Field(default="")
-    ports: dict[int, int]
+    ports: dict[int, int] = Field(default_factory=lambda: {})
 
 
 class Test(BaseModel):

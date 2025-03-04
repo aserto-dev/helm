@@ -7,9 +7,9 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-    - name: https
-      port: {{ include "aserto-lib.httpsPort" . }}
-      targetPort: https
+    - name: http
+      port: {{ include "aserto-lib.httpPort" . }}
+      targetPort: http
     - name: grpc
       port: {{ include "aserto-lib.grpcPort" . }}
       targetPort: grpc

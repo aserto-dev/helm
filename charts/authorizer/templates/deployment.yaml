@@ -38,8 +38,8 @@ spec:
             secretName: {{ . }}
         {{- end }}
 
-        {{- with (include "aserto-lib.httpsConfig" . | fromYaml).certSecret }}
-        - name: https-certs
+        {{- with (include "aserto-lib.httpConfig" . | fromYaml).certSecret }}
+        - name: tls-certs
           secret:
             secretName: {{ . }}
         {{- end }}
@@ -53,8 +53,8 @@ spec:
                 path: ca.crt
         {{- end }}
 
-        {{- with (include "aserto-lib.discoveryCfg" . | fromYaml).httpsCertSecret }}
-        - name: discovery-https-certs
+        {{- with (include "aserto-lib.discoveryCfg" . | fromYaml).tlsCertSecret }}
+        - name: discovery-tls-certs
           secret:
             secretName: {{ . }}
             items:
@@ -71,8 +71,8 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
           {{- with (include "aserto-lib.selfPorts" . | fromYaml )}}
-            - name: https
-              containerPort: {{ .https }}
+            - name: http
+              containerPort: {{ .http }}
             - name: grpc
               containerPort: {{ .grpc }}
             - name: metrics
@@ -89,9 +89,9 @@ spec:
               readOnly: true
           {{- end }}
 
-          {{- with (include "aserto-lib.httpsConfig" . | fromYaml).certSecret }}
-            - name: https-certs
-              mountPath: /https-certs
+          {{- with (include "aserto-lib.httpConfig" . | fromYaml).certSecret }}
+            - name: tls-certs
+              mountPath: /tls-certs
               readOnly: true
           {{- end }}
 
@@ -101,9 +101,9 @@ spec:
               readOnly: true
           {{- end }}
 
-          {{- if (include "aserto-lib.discoveryCfg" . | fromYaml).httpsCertSecret }}
-            - name: discovery-https-certs
-              mountPath: /discovery-https-certs
+          {{- if (include "aserto-lib.discoveryCfg" . | fromYaml).tlsCertSecret }}
+            - name: discovery-tls-certs
+              mountPath: /discovery-tls-certs
               readOnly: true
           {{- end }}
           env:

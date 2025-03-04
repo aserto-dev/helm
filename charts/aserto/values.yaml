@@ -14,7 +14,7 @@ global:
     # Port configuration.
     ports:
       grpc: 8282
-      https: 8383
+      http: 8383
       health: 8484
       mertics: 8585
 
@@ -22,8 +22,8 @@ global:
     grpc:
       connectionTimeoutSec: 2
 
-    # HTTPS configuration.
-    https:
+    # HTTP configuration.
+    http:
       read_timeout: 2s
       read_header_timeout: 2s
       write_timeout: 2s

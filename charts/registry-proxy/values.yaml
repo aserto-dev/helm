@@ -50,7 +50,7 @@ ingress:
     # kubernetes.io/tls-acme: "true"
   hosts:
     - host: registry-proxy.example.com
-      port: https
+      port: http
     - host: grpc.registry-proxy.example.com
       port: grpc
       paths:
