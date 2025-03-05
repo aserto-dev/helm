@@ -85,26 +85,34 @@ securityContext: {}
 
 service:
   type: ClusterIP
+  annotations: {}
+  # When ingress is enabled, the gRPC port is defined on a separate 'authorizer-grpc' service.
+  # This allows for configuration of ingresses using service annotations. In particular, the service
+  # scheme needs to be set to 'h2c'.
+  # When ingress is not enabled, these values are ignored.
+  grpc:
+    type: ClusterIP
+    annotations: {}
+    #   With traefik ingress use:
+    #   traefik.ingress.kubernetes.io/service.serversscheme: h2c
+    #
+    #   With kong:
+    #   konghq.com/protocol: grpc
 
 ingress:
   enabled: false
+  # The ingress domain can be set here or in global.aserto.ingress.domain
   # domain: example.com
-  className: ""
-  annotations: {}
-  hosts:
-    - subdomain: authorizer
-      port: http
-      # host: authorizer.example.com
-    - subdomain: grpc-authorizer
-      port: grpc
-      # host: grpc-authorizer.example.com
-  tls: []
-  #  - secretName: authorizer-tls
-  #    subdomains:
-  #      - authorizer
-  #  - secretName: grpc-authorizer-tls
-  #    subdomains:
-  #      - grpc-authorizer
+  http:
+    subdomain: authorizer
+    className: ""
+    annotations: {}
+    # tlsSecret: authorizer-tls
+  grpc:
+    subdomain: grpc-authorizer
+    className: ""
+    annotations: {}
+    # tlsSecret: grpc-authorizer-tls
 
 resources: {}
 #   limits:

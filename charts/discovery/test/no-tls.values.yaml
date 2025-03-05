@@ -19,3 +19,12 @@ registries:
     scheme: bearer
     tokenSecretName: discovery-ghcr-token
     tokenSecretKey: token
+
+ingress:
+  enabled: true
+  domain: local.test
+
+service:
+  grpc:
+    annotations:
+      traefik.ingress.kubernetes.io/service.serversscheme: h2c

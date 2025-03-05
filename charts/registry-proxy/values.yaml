@@ -1,11 +1,10 @@
-# Default values for directory.
+# Default values for registry-proxy.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-
+---
 image:
   repository: ghcr.io/aserto-dev/registry-proxy
   pullPolicy: IfNotPresent
-  tag: 0.0.2
   # Overrides the image tag whose default is the chart appVersion.
   # tag: x.y.z
 
