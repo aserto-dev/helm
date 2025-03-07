@@ -40,3 +40,4 @@ stringData:
         {{- .Values.groupMappings | default list | toYaml | nindent 8 }}
       user_mappings:
         {{- .Values.userMappings | default list | toYaml | nindent 8 }}
+      invert_identity_relation: {{ .Values.invertIdentityRelation | default "true" }}
