@@ -2,12 +2,17 @@
 tests:
   - name: registry-proxy-test
     pull_secret: $GITHUB_TOKEN
+    secrets:
+      - name: tls-cert
+        files:
+          tls.crt: $TOPAZ_CERTS_DIR/gateway.crt
+          tls.key: $TOPAZ_CERTS_DIR/gateway.key
     deployments:
       - chart: registry-proxy
         values: test-values.yaml
         ports:
           8383: 8383
     run:
-      - ${POLICY:-policy} login -s localhost:8383 -u $GITHUB_USER -p $GITHUB_TOKEN -d --insecure
+      - echo $GITHUB_TOKEN | ${POLICY:-policy} login -s localhost:8383 -u gh_user --password-stdin -d --insecure
       - time ${POLICY:-policy} pull localhost:8383/aserto-policies/policy-todo:latest --insecure
       - time ${POLICY:-policy} pull localhost:8383/aserto-policies/policy-todo:latest --insecure

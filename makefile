@@ -67,7 +67,7 @@ lint-%:
 .PHONY: test-%
 test-%:
 	@echo -e "${ATTN_COLOR}==> test $* ${NO_COLOR}"
-	@uv run --project tools/ktest tools/ktest/ktest.py charts/$*/test/tests.yaml
+	@uv run --project tools/ktest tools/ktest/ktest.py charts/$*/test/tests.yaml --no-check
 
 .PHONY: update-%
 update-%:

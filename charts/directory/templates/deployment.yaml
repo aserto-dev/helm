@@ -41,8 +41,8 @@ spec:
           secret:
             secretName: {{ . }}
         {{- end }}
-        {{- with (include "aserto-lib.httpsConfig" . | fromYaml).certSecret }}
-        - name: https-certs
+        {{- with (include "aserto-lib.httpConfig" . | fromYaml).certSecret }}
+        - name: tls-certs
           secret:
             secretName: {{ . }}
         {{- end }}
@@ -65,8 +65,8 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
           {{- with (include "aserto-lib.selfPorts" . | fromYaml )}}
-            - name: https
-              containerPort: {{ .https }}
+            - name: http
+              containerPort: {{ .http }}
             - name: grpc
               containerPort: {{ .grpc }}
             - name: metrics
@@ -86,9 +86,9 @@ spec:
               mountPath: /grpc-certs
               readOnly: true
           {{- end }}
-          {{- with (include "aserto-lib.httpsConfig" . | fromYaml).certSecret }}
-            - name: https-certs
-              mountPath: /https-certs
+          {{- with (include "aserto-lib.httpConfig" . | fromYaml).certSecret }}
+            - name: tls-certs
+              mountPath: /tls-certs
               readOnly: true
           {{- end }}
 

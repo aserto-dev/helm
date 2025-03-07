@@ -1,12 +1,12 @@
 ---
 image:
-  tag: 0.33.13-ce1e7a05-amd64
+  tag: 0.33.13-ce1e7a05-arm64
 
 imagePullSecrets:
   - name: ghcr-creds
 
 database:
-  host: postgresql.postgres.svc.cluster.local
+  host: postgres.postgresql.svc.cluster.local
   dbName: test-controller
   sslMode: disable
   admin:
@@ -25,5 +25,5 @@ sshAdminKeys:
 grpc:
   certSecret: grpc-cert
 
-https:
+http:
   certSecret: gateway-cert

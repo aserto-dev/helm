@@ -32,7 +32,7 @@ spec:
               - key: config.yaml
                 path: config.yaml
       {{- with .Values.certSecret }}
-        - name: https-certs
+        - name: tls-certs
           secret:
             secretName: {{ . }}
       {{- end }}
@@ -61,8 +61,8 @@ spec:
               mountPath: /config
               readOnly: true
           {{- with .Values.certSecret }}
-            - name: https-certs
-              mountPath: /https-certs
+            - name: tls-certs
+              mountPath: /tls-certs
               readOnly: true
           {{- end }}
           {{- with ((include "aserto-lib.controllerClientCfg" . | fromYaml).caCertSecret).name }}

@@ -19,7 +19,7 @@ stringData:
         {{- include "aserto-lib.metricsService" . | nindent 8 }}
       service:
         {{- include "registry-proxy.gatewayService" . | nindent 8 }}
-        
+
     remote_registry:
       endpoint: {{ .Values.remoteEndpointURL | required "registry endpoint URL is required" }}
       {{- if .Values.remoteEndpointScheme }}
@@ -28,10 +28,10 @@ stringData:
       {{- if .Values.remoteEndpointToken }}
       token: {{.Values.remoteEndpointToken}}
       {{- end}}
-        
+
     nats_listener:
-      enabled: false #set to true to enable manifest pushed notifications
-    
+      enabled: false
+
     cache_settings:
       type: "freecache"
       cache_config:

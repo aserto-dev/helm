@@ -16,7 +16,7 @@ stringData:
       grpc:
         {{- include "aserto-lib.grpcService" . | nindent 8 }}
       gateway:
-        {{- include "aserto-lib.httpsService" . | nindent 8 }}
+        {{- include "aserto-lib.httpService" . | nindent 8 }}
       health:
         listen_address: 0.0.0.0:{{ include "aserto-lib.healthPort" . }}
       metrics:

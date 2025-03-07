@@ -196,7 +196,7 @@ ports:
   # gRPC services.
   grpc: 8282
   # REST services and web UI.
-  https: 8383
+  http: 8383
   # gRPC Health service (https://github.com/grpc-ecosystem/grpc-health-probe).
   health: 8484
   # Prometheus metrics (GET /metrics).
@@ -209,7 +209,7 @@ ports:
 # If not provided, topaz runs without TLS.
 tls:
 #   grpc: topaz-grpc-cert
-#   https: topaz-https-cert
+#   http: topaz-https-cert
 
 # Metrics configuration
 metrics:

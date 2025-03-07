@@ -6,10 +6,10 @@ Returns gRPC service options.
 {{- end }}
 
 {{/*
-Returns HTTPS service options.
+Returns HTTP service options.
 */}}
-{{- define "aserto-lib.httpsConfig" }}
-{{ include "aserto-lib.mergeGlobal" (list . "https") }}
+{{- define "aserto-lib.httpConfig" }}
+{{ include "aserto-lib.mergeGlobal" (list . "http") }}
 {{- end }}
 
 {{/*
@@ -29,11 +29,11 @@ certs:
 {{- end }}
 
 {{/*
-Renders HTTPS service configuration.
+Renders HTTP service configuration.
 */}}
-{{- define "aserto-lib.httpsService" -}}
-listen_address: 0.0.0.0:{{ include "aserto-lib.httpsPort" . }}
-{{- with include "aserto-lib.httpsConfig" . | fromYaml }}
+{{- define "aserto-lib.httpService" -}}
+listen_address: 0.0.0.0:{{ include "aserto-lib.httpPort" . }}
+{{- with include "aserto-lib.httpConfig" . | fromYaml }}
 {{- with .allowed_origins }}
 allowed_origins:
 {{- . | toYaml | nindent 2 }}
@@ -44,9 +44,9 @@ write_timeout: {{ .write_timeout | default "2s" }}
 idle_timeout: {{ .idle_timeout | default "30s" }}
 {{- with .certSecret }}
 certs:
-  tls_key_path: '/https-certs/tls.key'
-  tls_cert_path: '/https-certs/tls.crt'
-  tls_ca_cert_path: '/https-certs/ca.crt'
+  tls_key_path: '/tls-certs/tls.key'
+  tls_cert_path: '/tls-certs/tls.crt'
+  tls_ca_cert_path: '/tls-certs/ca.crt'
 {{- end }}
 {{- end }}
 {{- end }}

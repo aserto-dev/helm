@@ -10,8 +10,6 @@ tests:
           8383: 8383
       - chart: discovery
         values: no-tls.values.yaml
-        ports:
-          18383: 8383
     secrets:
       - name: discovery-keys
         values:
@@ -32,7 +30,7 @@ tests:
       - |
         ${TOPAZ:-topaz} ds import --directory charts/discovery/test/data \
           -H localhost:8282 --api-key controller-root-key --plaintext
-      - curl http://localhost:18383/api/v1/info
+      - curl http://discovery.local.test:8008/api/v1/info
       - |
         curl -H "Authorization:basic discovery-root-key" -H "aserto-tenant-id:4f71c224-e742-11ee-86df-00ba61ff9342" \
-          http://localhost:18383/api/v2/discovery/test-policy/test-policy/opa
+          http://discovery.local.test:8008/api/v2/discovery/test-policy/test-policy/opa

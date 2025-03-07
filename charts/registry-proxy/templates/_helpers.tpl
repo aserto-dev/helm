@@ -70,8 +70,8 @@ Local cluster address
 
 
 {{- define "registry-proxy.gatewayService" }}
-{{ include "aserto-lib.httpsService" .  }}
-{{- $cfg := include "aserto-lib.httpsConfig" . | fromYaml }}
+{{ include "aserto-lib.httpService" .  }}
+{{- $cfg := include "aserto-lib.httpConfig" . | fromYaml }}
 allowed_headers:
 {{- $cfg.allowed_headers | default (list "Aserto-Tenant-Id" "Authorization" "Content-Type" "Depth") | toYaml | nindent 2 }}
 {{- end }}
