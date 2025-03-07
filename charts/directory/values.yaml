@@ -108,7 +108,7 @@ grpc:
   # runs without it, you must configure TLS at the ingress or gateway.
   certSecret:
 
-# https:
+# http:
 #   allowed_origins:
 #     - https://*.example.com
 #   read_timeout: 2s

@@ -158,10 +158,6 @@ securityContext: {}
 service:
   type: ClusterIP
   annotations: {}
-  # When ingress is enabled, the gRPC port is defined on a separate 'controller-grpc' service.
-  # This allows for configuration of ingresses using service annotations. In particular, the service
-  # scheme needs to be set to 'h2c'.
-  # When ingress is not enabled, these values are ignored.
   grpc:
     type: ClusterIP
     annotations: {}

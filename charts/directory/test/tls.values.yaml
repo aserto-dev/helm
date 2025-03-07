@@ -17,5 +17,5 @@ database:
 grpc:
   certSecret: grpc-cert
 
-https:
+http:
   certSecret: gateway-cert

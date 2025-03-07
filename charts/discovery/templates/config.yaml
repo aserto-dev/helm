@@ -31,9 +31,6 @@ stringData:
     cache_settings:
       {{- include "discovery.cacheSettings" . | nindent 6 }}
 
-    registries:
-      {{- include "discovery.registriesConfig" . | nindent 6 }}
-
     ds0:
       {{- include "aserto-lib.controllerClient" . | nindent 6 }}
 

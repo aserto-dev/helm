@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "controller.fullname" . }}
+  name: {{ include "controller.fullname" . }}-http
   labels:
     {{- include "controller.labels" . | nindent 4 }}
 
@@ -19,15 +19,9 @@ spec:
     - name: metrics
       port: {{ include "aserto-lib.metricsPort" . }}
       targetPort: metrics
-    {{- if not .Values.ingress.enabled }}
-    - name: grpc
-      port: {{ include "aserto-lib.grpcPort" . }}
-      targetPort: grpc
-    {{- end }}
   selector:
     {{- include "controller.selectorLabels" . | nindent 4 }}
 
-{{- if .Values.ingress.enabled }}
 ---
 apiVersion: v1
 kind: Service
@@ -48,4 +42,3 @@ spec:
       targetPort: grpc
   selector:
     {{- include "controller.selectorLabels" . | nindent 4 }}
-{{- end }}

@@ -48,7 +48,7 @@ cacheSettings:
 #   # of type kubernetes.io/tls
 #   certSecret: discovery-grpc-cert
 
-# https:
+# http:
 #   allowed_origins:
 #     - https://*.example.com
 #

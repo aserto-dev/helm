@@ -101,7 +101,6 @@ spec:
               {{- . | nindent 14 }}
           {{- end }}
 
-            {{- include "discovery.registriesEnv" . | nindent 12 }}
           {{- with (include "aserto-lib.selfPorts" . | fromYaml )}}
           livenessProbe:
             grpc:
