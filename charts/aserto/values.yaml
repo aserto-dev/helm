@@ -218,5 +218,8 @@ scim:
 #   groupMappings: []
 #   userMappings: []
 
+multi-tenant-scim:
+  enabled: false
+
 registry-proxy:
   enabled: false
