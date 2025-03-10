@@ -43,6 +43,6 @@ Cluster address of the directory service
 Cluster address of the discovery service
 */}}
 {{- define "aserto-lib.discoveryAddress" }}
-{{- include "aserto-lib.svcClusterAddress" (list . "https" "discovery" )}}
+{{- include "aserto-lib.svcClusterAddress" (list . "http" "discovery" )}}
 {{- end }}
 

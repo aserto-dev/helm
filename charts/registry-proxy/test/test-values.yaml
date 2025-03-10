@@ -1,6 +1,4 @@
 ---
-image:
-  tag: 0.0.4-3f46f4a-arm64
 imagePullSecrets:
   - name: ghcr-creds
 

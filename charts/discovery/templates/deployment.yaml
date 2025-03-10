@@ -14,8 +14,9 @@ spec:
       {{- include "discovery.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/config.yaml") . | sha256sum }}
+      {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
@@ -97,7 +98,7 @@ spec:
           {{- end }}
 
           {{- with include "aserto-lib.controllerKeyEnv" (list . "readStore") }}
-            - name: DISCOVERY_DS0_API_KEY
+            - name: DISCOVERY_CONTROLLER_API_KEY
               {{- . | nindent 14 }}
           {{- end }}
 
