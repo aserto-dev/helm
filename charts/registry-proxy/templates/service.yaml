@@ -1,20 +1,44 @@
+---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "registry-proxy.fullname" . }}
+  name: {{ include "registry-proxy.fullname" . }}-http
   labels:
     {{- include "registry-proxy.labels" . | nindent 4 }}
+
+  {{- with .Values.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 8 }}
+  {{- end }}
 spec:
   type: {{ .Values.service.type }}
   ports:
-    - name: https
-      port: {{ include "aserto-lib.httpsPort" . }}
-      targetPort: https
-    - name: grpc
-      port: {{ include "aserto-lib.grpcPort" . }}
-      targetPort: grpc
+    - name: http
+      port: {{ include "aserto-lib.httpPort" . }}
+      targetPort: http
     - name: metrics
       port: {{ include "aserto-lib.metricsPort" . }}
       targetPort: metrics
+  selector:
+    {{- include "registry-proxy.selectorLabels" . | nindent 4 }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "registry-proxy.fullname" . }}-grpc
+  labels:
+    {{- include "registry-proxy.labels" . | nindent 4 }}
+
+  {{- with .Values.service.grpc.annotations }}
+  annotations:
+    {{- toYaml . | nindent 8 }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.grpc.type }}
+  ports:
+    - name: grpc
+      port: {{ include "aserto-lib.grpcPort" . }}
+      targetPort: grpc
   selector:
     {{- include "registry-proxy.selectorLabels" . | nindent 4 }}

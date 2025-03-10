@@ -89,9 +89,21 @@ jobs:
         name: Create k8s cluster
         with:
           cluster-name: "test"
-          args: >
+          args: >-
+            -p "9009:80@loadbalancer"
             --agents 1
             --k3s-arg "--disable=metrics-server@server:*"
+      -
+        name: Configure DNS
+        run: |
+          sudo tee -a /etc/hosts >/dev/null <<EOF
+          # Local self-host cluster
+          127.0.0.1 controller.local.test
+          127.0.0.1 grpc-controller.local.test
+          127.0.0.1 directory.local.test
+          127.0.0.1 grpc-directory.local.test
+          127.0.0.1 discovery.local.test
+          EOF
       -
         name: Test Topaz
         timeout-minutes: 10
@@ -110,14 +122,15 @@ jobs:
         name: Deploy Postgres
         run: |
           helm install postgresql oci://registry-1.docker.io/bitnamicharts/postgresql \
-            --namespace postgres --create-namespace \
+            --namespace postgresql --create-namespace \
+            --set fullnameOverride=postgres \
             --set auth.postgresPassword=${{ env.POSTGRES_PASSWORD }}
       -
         name: Wait for Postgres
         run: |
           echo "Waiting for postgres to be ready"
           kubectl wait pods --selector app.kubernetes.io/name=postgresql \
-            --for condition=Ready --namespace postgres --timeout=60s
+            --for condition=Ready --namespace postgresql --timeout=60s
       -
         name: Generate admin ssh key
         id: sshkey

@@ -1,12 +1,9 @@
 ---
-image:
-  tag: 0.33.13-ce1e7a05-amd64
-
 imagePullSecrets:
   - name: ghcr-creds
 
 database:
-  host: postgresql.postgres.svc.cluster.local
+  host: postgres.postgresql.svc.cluster.local
   dbName: test-controller
   sslMode: disable
   admin:
@@ -21,3 +18,12 @@ sshAdminKeys:
   configMap:
     name: controller-admin-keys
     key: authorized_keys
+
+ingress:
+  enabled: true
+  domain: local.test
+
+service:
+  grpc:
+    annotations:
+      traefik.ingress.kubernetes.io/service.serversscheme: h2c

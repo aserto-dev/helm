@@ -2,3 +2,7 @@
 oidc:
   domain: oidc_domain
   audience: oidc_audience
+
+ingress:
+  enabled: true
+  domain: aserto.com

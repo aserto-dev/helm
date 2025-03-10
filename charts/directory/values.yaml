@@ -11,7 +11,7 @@ image:
 # Optional: override default ports.
 # ports:
 #   grpc: 8282
-#   https: 8383
+#   http: 8383
 #   health: 8484
 #   metrics: 8585
 
@@ -108,7 +108,7 @@ grpc:
   # runs without it, you must configure TLS at the ingress or gateway.
   certSecret:
 
-# https:
+# http:
 #   allowed_origins:
 #     - https://*.example.com
 #   read_timeout: 2s
@@ -163,28 +163,34 @@ securityContext: {}
 
 service:
   type: ClusterIP
+  annotations: {}
+  # When ingress is enabled, the gRPC port is defined on a separate 'controller-grpc' service.
+  # This allows for configuration of ingresses using service annotations. In particular, the service
+  # scheme needs to be set to 'h2c'.
+  # When ingress is not enabled, these values are ignored.
+  grpc:
+    type: ClusterIP
+    annotations: {}
+    #   With traefik ingress use:
+    #   traefik.ingress.kubernetes.io/service.serversscheme: h2c
+    #
+    #   With kong:
+    #   konghq.com/protocol: grpc
 
 ingress:
   enabled: false
-  className: ""
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: directory.example.com
-      port: https
-    - host: grpc.directory.example.com
-      port: grpc
-      paths:
-        - path: /
-          pathType: Prefix
-  tls: []
-  #  - secretName: directory-example-com-tls
-  #    hosts:
-  #      - directory.example.com
-  #  - secretName: grpc-directory-example-com-tls
-  #    hosts:
-  #      - grpc.directory.example.com
+  # The ingress domain can be set here or in global.aserto.ingress.domain
+  # domain: example.com
+  http:
+    subdomain: directory
+    className: ""
+    annotations: {}
+    # tlsSecret: directory-tls
+  grpc:
+    subdomain: grpc-directory
+    className: ""
+    annotations: {}
+    # tlsSecret: grpc-directory-tls
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

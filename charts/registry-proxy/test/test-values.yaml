@@ -1,0 +1,8 @@
+---
+imagePullSecrets:
+  - name: ghcr-creds
+
+remoteEndpointURL: "ghcr.io"
+
+http:
+  certSecret: tls-cert

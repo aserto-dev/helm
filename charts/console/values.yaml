@@ -75,25 +75,12 @@ service:
 
 ingress:
   enabled: false
+  # The ingress domain can be set here or in global.aserto.ingress.domain
+  # domain: example.com
+  subdomain: console
   className: ""
   annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: directory.example.com
-      port: https
-    - host: grpc.directory.example.com
-      port: grpc
-      paths:
-        - path: /
-          pathType: Prefix
-  tls: []
-  #  - secretName: directory-example-com-tls
-  #    hosts:
-  #      - directory.example.com
-  #  - secretName: grpc-directory-example-com-tls
-  #    hosts:
-  #      - grpc.directory.example.com
+  # tlsSecret: console-tls
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

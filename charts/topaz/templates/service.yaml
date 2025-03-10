@@ -12,7 +12,7 @@ spec:
       targetPort: grpc
       protocol: TCP
       name: grpc
-    - port: {{ (.Values.ports).https | default "8383" }}
+    - port: {{ (.Values.ports).http | default "8383" }}
       targetPort: http
       protocol: TCP
       name: http

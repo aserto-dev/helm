@@ -1,11 +1,10 @@
-# Default values for directory.
+# Default values for registry-proxy.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-
+---
 image:
   repository: ghcr.io/aserto-dev/registry-proxy
   pullPolicy: IfNotPresent
-  tag: 0.0.2
   # Overrides the image tag whose default is the chart appVersion.
   # tag: x.y.z
 
@@ -41,22 +40,30 @@ securityContext: {}
 
 service:
   type: ClusterIP
+  annotations: {}
+  grpc:
+    type: ClusterIP
+    annotations: {}
+    #   With traefik ingress use:
+    #   traefik.ingress.kubernetes.io/service.serversscheme: h2c
+    #
+    #   With kong:
+    #   konghq.com/protocol: grpc
 
 ingress:
   enabled: false
-  className: ""
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: registry-proxy.example.com
-      port: https
-    - host: grpc.registry-proxy.example.com
-      port: grpc
-      paths:
-        - path: /
-          pathType: Prefix
-  tls: []
+  # The ingress domain can be set here or in global.aserto.ingress.domain
+  # domain: example.com
+  http:
+    subdomain: registry-proxy
+    className: ""
+    annotations: {}
+    # tlsSecret: registry-proxy-tls
+  grpc:
+    subdomain: grpc-registry-proxy
+    className: ""
+    annotations: {}
+    # tlsSecret: grpc-registry-proxy-tls
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

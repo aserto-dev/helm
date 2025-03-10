@@ -16,7 +16,7 @@ stringData:
       grpc:
         {{- include "aserto-lib.grpcService" . | nindent 8 }}
       gateway:
-        {{- include "aserto-lib.httpsService" . | nindent 8 }}
+        {{- include "aserto-lib.httpService" . | nindent 8 }}
       health:
         listen_address: 0.0.0.0:{{ include "aserto-lib.healthPort" . }}
       metrics:
@@ -31,17 +31,14 @@ stringData:
     cache_settings:
       {{- include "discovery.cacheSettings" . | nindent 6 }}
 
-    registries:
-      {{- include "discovery.registriesConfig" . | nindent 6 }}
-
-    ds0:
+    controller:
       {{- include "aserto-lib.controllerClient" . | nindent 6 }}
 
     authorization:
       enabled: {{ .Values.authorization.enabled }}
       ignored_methods:
         - /grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo
-        - /grpc.reflection.v1.ServerReflection.ServerReflectionInfo
+        - /grpc.reflection.v1.ServerReflection/ServerReflectionInfo
         - /aserto.common.info.v1.Info/Info
 
     authentication:
@@ -64,7 +61,7 @@ stringData:
       override:
         - methods:
             - /grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo
-            - /grpc.reflection.v1.ServerReflection.ServerReflectionInfo
+            - /grpc.reflection.v1.ServerReflection/ServerReflectionInfo
             - /aserto.common.info.v1.Info/Info
           authenticators_enabled:
             anonymous: true

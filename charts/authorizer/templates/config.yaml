@@ -42,7 +42,6 @@ stringData:
       authenticators_enabled:
         root_key: true
         oidc: true
-        anonymous: true
         {{- if (.Values.authentication).machineAccounts }}
         machine_account: true
         {{- end }}
@@ -54,6 +53,13 @@ stringData:
         keys:
         - key: ${AUTHORIZER_ROOT_KEY}
           account: root-key-authorizer@aserto.com
+
+      override:
+        - methods:
+            - /grpc.reflection.v1.ServerReflection/ServerReflectionInfo
+            - /grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo
+          authenticators_enabled:
+            anonymous: true
 
     opa:
       instance_id: "-"

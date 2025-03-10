@@ -162,7 +162,7 @@ global:
   aserto:
     ports:
       grpc: 8282
-      https: 8383
+      http: 8383
       health: 8484
       mertics: 8585
     ...
@@ -201,7 +201,7 @@ values for several required fields:
 
 - `global.aserto.oidc` holds the domain and client ID for your OpenID Connect application used
   to authenticate access to the management console.
-- `global.aserto.https.allowed_origins` should include the ingress domain where the management console
+- `global.aserto.http.allowed_origins` should include the ingress domain where the management console
   will be hosted.
 - `diretcory.rootDirectory.database.host` and `directory.tenantDirectory.database.host` should be set
   to the hostname of the PostgreSQL instance(s) for the root and tenant directories.

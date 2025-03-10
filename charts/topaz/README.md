@@ -378,7 +378,7 @@ Topaz pods expose the following ports:
 | Protocol | Default Port | Description |
 |----------|--------------|-------------|
 | gRPC     | 8282         | gRPC services |
-| HTTPS    | 8383         | REST endpoints and web console |
+| HTTP     | 8383         | REST endpoints and web console |
 | Health   | 8484         | gRPC [health service](https://github.com/grpc/grpc/blob/master/doc/health-checking.md) |
 | Metrics  | 8585         | Prometheus metrics [optional, enabled by default] |
 | Profiler | 8686         | Profiler service [optional, disabled by default] |
@@ -388,7 +388,7 @@ The default ports can be overridden in `values.yaml`:
 ```yaml
 ports:
   grpc: 8282
-  https: 8383
+  http: 8383
   health: 8484
   metrics: 8585
   profiler: 8686
@@ -444,5 +444,5 @@ of `values.yaml`:
 ```yaml
 tls:
   grpc: "<name of secret with gRPC certificate>"
-  https: "<name of secret with HTTPS certificate>"
+  http: "<name of secret with HTTPS certificate>"
 ```

@@ -33,14 +33,16 @@ tests:
         values: no-tls.values.yaml
         ports:
           2222: 2222
-          8282: 8282
     run:
       - |
         ssh -i ${SSH_PRIVATE_KEY:-$(ls -1 ~/.ssh/id_* | head -1)} -p 2222 -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR \
           localhost provision root-keys
+      - sleep 1
       - |
-        ${TOPAZ:-topaz} ds get manifest -H localhost:8282 --tenant-id 00000000-0000-11ef-0000-000000000000 \
+        ${TOPAZ:-topaz} ds get manifest -H grpc-controller.local.test:9009 --tenant-id 00000000-0000-11ef-0000-000000000000 \
           -k controller_apikey_reader --stdout --plaintext
+      - |
+        curl -f http://controller.local.test:9009/openapi.json
 
   - name: controller-tls
     pull_secret: $GITHUB_TOKEN
