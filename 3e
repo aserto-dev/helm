@@ -89,10 +89,9 @@ jobs:
         name: Create k8s cluster
         with:
           cluster-name: "test"
-          args: >-
-            -p "8008:80@loadbalancer"
+          args: >
             --agents 1
-            --k3s-arg "--disable=metrics-server@server:*"
+            --k3s-arg "--disable=metrics-server@server:* -p '8008:80@loadbalancer'"
       -
         name: Configure DNS
         run: |
