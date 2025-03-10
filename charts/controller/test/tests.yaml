@@ -39,10 +39,10 @@ tests:
           localhost provision root-keys
       - sleep 1
       - |
-        ${TOPAZ:-topaz} ds get manifest -H grpc-controller.local.test:8008 --tenant-id 00000000-0000-11ef-0000-000000000000 \
+        ${TOPAZ:-topaz} ds get manifest -H grpc-controller.local.test:9009 --tenant-id 00000000-0000-11ef-0000-000000000000 \
           -k controller_apikey_reader --stdout --plaintext
       - |
-        curl -f http://controller.local.test:8008/openapi.json
+        curl -f http://controller.local.test:9009/openapi.json
 
   - name: controller-tls
     pull_secret: $GITHUB_TOKEN

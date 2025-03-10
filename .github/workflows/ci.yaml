@@ -90,7 +90,7 @@ jobs:
         with:
           cluster-name: "test"
           args: >-
-            -p "8008:80@loadbalancer"
+            -p "9009:80@loadbalancer"
             --agents 1
             --k3s-arg "--disable=metrics-server@server:*"
       -
@@ -122,14 +122,15 @@ jobs:
         name: Deploy Postgres
         run: |
           helm install postgresql oci://registry-1.docker.io/bitnamicharts/postgresql \
-            --namespace postgres --create-namespace \
+            --namespace postgresql --create-namespace \
+            --set fullnameOverride=postgres \
             --set auth.postgresPassword=${{ env.POSTGRES_PASSWORD }}
       -
         name: Wait for Postgres
         run: |
           echo "Waiting for postgres to be ready"
           kubectl wait pods --selector app.kubernetes.io/name=postgresql \
-            --for condition=Ready --namespace postgres --timeout=60s
+            --for condition=Ready --namespace postgresql --timeout=60s
       -
         name: Generate admin ssh key
         id: sshkey

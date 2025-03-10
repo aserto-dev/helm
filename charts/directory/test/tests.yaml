@@ -30,17 +30,17 @@ tests:
       - |
         ${GRPCURL:=grpcurl} -plaintext -H "Authorization: basic apikey_store_writer" \
           -d '{"tenant": {"id": "3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1", "name": "test-tenant"}}' \
-          grpc-directory.local.test:8008 aserto.directory.store.v2.Store.CreateTenant
+          grpc-directory.local.test:9009 aserto.directory.store.v2.Store.CreateTenant
 
       # Set a manifest for the new tenant.
       - |
         ${TOPAZ:-topaz} ds set manifest charts/directory/test/manifest.yaml \
-          -H grpc-directory.local.test:8008 --tenant-id 3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1 \
+          -H grpc-directory.local.test:9009 --tenant-id 3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1 \
           -k apikey_reader --plaintext
 
       # Get the tenant's manifest.
       - |
-        ${TOPAZ:-topaz} ds get manifest -H grpc-directory.local.test:8008 --tenant-id 3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1 \
+        ${TOPAZ:-topaz} ds get manifest -H grpc-directory.local.test:9009 --tenant-id 3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1 \
           -k apikey_reader --plaintext $TMPDIR/manifest.yaml
 
       # Ensure the downloaded manifest has the expected content.
@@ -50,7 +50,7 @@ tests:
       - |
         ${GRPCURL:=grpcurl} -plaintext -H "Authorization: basic apikey_store_writer" \
           -d '{"id": "3dbaa470-9c7e-11ef-bf36-00fcb2a75cb1"}' \
-          grpc-directory.local.test:8008 aserto.directory.store.v2.Store.DeleteTenant
+          grpc-directory.local.test:9009 aserto.directory.store.v2.Store.DeleteTenant
 
   - name: directory-tls
     pull_secret: $GITHUB_TOKEN
