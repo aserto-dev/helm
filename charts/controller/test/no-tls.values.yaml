@@ -3,7 +3,7 @@ imagePullSecrets:
   - name: ghcr-creds
 
 database:
-  host: postgres.postgresql.svc.cluster.local
+  host: postgresql.postgres.svc.cluster.local
   dbName: test-controller
   sslMode: disable
   admin:
