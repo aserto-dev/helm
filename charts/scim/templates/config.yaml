@@ -33,11 +33,10 @@ stringData:
       create_role_groups: {{ .Values.createRoleGroups | default "false" }}
       user_object_type: {{ .Values.userObjectType | default "user" }}
       identity_object_type: {{ .Values.identityObjectType | default "identity" }}
-      identity_relation: {{ .Values.identityRelation | default "identifier" }}
+      identity_relation: {{ .Values.identityRelation | default "user#identifier" }}
       group_object_type: {{ .Values.groupObjectType | default "group" }}
       group_member_relation: {{ .Values.groupMemberRelation | default "member" }}
       group_mappings:
         {{- .Values.groupMappings | default list | toYaml | nindent 8 }}
       user_mappings:
         {{- .Values.userMappings | default list | toYaml | nindent 8 }}
-      invert_identity_relation: {{ .Values.invertIdentityRelation | default "true" }}

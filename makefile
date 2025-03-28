@@ -8,9 +8,12 @@ ATTN_COLOR 		:= \033[33;01m
 
 CHART_REPO		:= "oci://ghcr.io/aserto-dev/helm"
 CHARTS_DIR 		:= charts
-CHARTS 			:= ${shell ls ${CHARTS_DIR}}
-BUMP_PART 		?= patch
 
+# Exclude aserto-lib from ${CHARTS}.
+# It is included by other charts but isn't published on its own.
+CHARTS 			:= $(patsubst aserto-lib,,${shell ls ${CHARTS_DIR}})
+
+BUMP_PART 		?= patch
 CT_VERSION		:= 3.11.0
 GRPCURL_VERSION := 1.9.2
 
@@ -23,6 +26,15 @@ CT_LINT_CMD		:= ${EXT_BIN_DIR}/ct lint --config ct.yaml \
 	--chart-yaml-schema ${EXT_BIN_DIR}/etc/chart_schema.yaml \
 	--lint-conf ${EXT_BIN_DIR}/etc/lintconf.yaml \
 	--helm-repo-extra-args "aserto-helm=-u gh -p ${GITHUB_TOKEN}"
+
+.PHONY: info
+info:
+	@echo -e "${ATTN_COLOR}==> $@ ${NO_COLOR}"
+	@echo "CHARTS: ${CHARTS}"
+	@echo "BIN_DIR:     ${BIN_DIR}"
+	@echo "EXT_DIR:     ${EXT_DIR}"
+	@echo "EXT_BIN_DIR: ${EXT_BIN_DIR}"
+	@echo "EXT_TMP_DIR: ${EXT_TMP_DIR}"
 
 
 .PHONY: deps

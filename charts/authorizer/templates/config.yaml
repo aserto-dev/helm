@@ -38,7 +38,14 @@ stringData:
     jwt:
       acceptable_time_skew_seconds: {{ .Values.jwtAcceptableTimeSkewSeconds | default "5" }}
 
-    auth:
+    authorization:
+      enabled: true
+      ignored_methods:
+        - /grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo
+        - /grpc.reflection.v1.ServerReflection/ServerReflectionInfo
+        - /aserto.authorizer.v2.Authorizer/Info
+
+    authentication:
       authenticators_enabled:
         root_key: true
         oidc: true
@@ -58,6 +65,7 @@ stringData:
         - methods:
             - /grpc.reflection.v1.ServerReflection/ServerReflectionInfo
             - /grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo
+            - /aserto.authorizer.v2.Authorizer/Info
           authenticators_enabled:
             anonymous: true
 

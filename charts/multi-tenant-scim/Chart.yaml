@@ -31,5 +31,5 @@ appVersion: "0.0.1"
 
 dependencies:
   - name: aserto-lib
-    version: 0.2.1
+    version: 0.2.0
     repository: file://../aserto-lib
