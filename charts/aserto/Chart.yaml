@@ -51,14 +51,14 @@ dependencies:
     version: 0.2.0
     repository: file://../discovery
     condition: discovery.enabled
-  # - name: multi-tenant-scim
-  #   version: 0.0.1
-  #   repository: file://../multi-tenant-scim
-  #   condition: multi-tenant-scim.enabled
-  # - name: registry-proxy
-  #   version: 0.1.6
-  #   repository: file://../registry-proxy
-  #   condition: registry-proxy.enabled
+  - name: multi-tenant-scim
+    version: 0.0.1
+    repository: file://../multi-tenant-scim
+    condition: multi-tenant-scim.enabled
+  - name: registry-proxy
+    version: 0.1.0
+    repository: file://../registry-proxy
+    condition: registry-proxy.enabled
   - name: scim
     version: 0.2.0
     repository: file://../scim
