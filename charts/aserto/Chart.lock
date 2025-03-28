@@ -17,8 +17,14 @@ dependencies:
 - name: discovery
   repository: file://../discovery
   version: 0.2.0
+- name: multi-tenant-scim
+  repository: file://../multi-tenant-scim
+  version: 0.0.1
+- name: registry-proxy
+  repository: file://../registry-proxy
+  version: 0.1.0
 - name: scim
   repository: file://../scim
   version: 0.2.0
-digest: sha256:eeb8b6b65e31152eadc15ffd86d33a57b36f4c27bdb70f9548b63b147dc6b9d2
-generated: "2025-03-28T11:34:16.57247-04:00"
+digest: sha256:e933b20c19dda16e7ef644de07eed18b2e214f1f89a8dbfe9fdeac2262b5ca64
+generated: "2025-03-28T12:23:20.763001-04:00"
