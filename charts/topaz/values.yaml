@@ -442,6 +442,9 @@ volumeMounts: []
 #   mountPath: "/etc/foo"
 #   readOnly: true
 
+extraContainers: []
+# extraContainers allows you to add any sidecar containers you wish.
+
 nodeSelector: {}
 
 tolerations: []
