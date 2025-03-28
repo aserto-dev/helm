@@ -39,7 +39,7 @@ stringData:
       acceptable_time_skew_seconds: {{ .Values.jwtAcceptableTimeSkewSeconds | default "5" }}
 
     authorization:
-      enabled: false
+      enabled: true
       ignored_methods:
         - /grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo
         - /grpc.reflection.v1.ServerReflection/ServerReflectionInfo
