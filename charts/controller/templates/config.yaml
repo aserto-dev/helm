@@ -80,7 +80,18 @@ stringData:
         - /aserto.directory.reader.v3.Reader/Check
         - /aserto.directory.reader.v3.Reader/Checks
         - /aserto.directory.controller.v1.Controller/GetAPIKeyIdentity
-
+      system:
+        - /aserto.directory.reader
+        - /aserto.directory.controller.v1.Controller/ListUserTenants
+        - /aserto.directory.store.v2.Store/CreateTenant
+        - /aserto.directory.store.v2.Store/DeleteTenant
+        - /aserto.directory.store.v2.Store/GetTenant
+        - /aserto.directory.store.v2.Store/ListTenants
+        - /aserto.directory.store.v2.Store/MigrateSchema
+        - /aserto.directory.exporter
+        - /aserto.directory.importer
+        - /aserto.directory.model
+        - /aserto.directory.writer
     {{- end }}
 
     authentication:
