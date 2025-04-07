@@ -29,14 +29,20 @@ stringData:
     directory:
       {{- include "aserto-lib.controllerClient" . | nindent 6 }}
     scim:
-      create_email_identities: {{ .Values.createEmailIdentities | default "true" }}
-      create_role_groups: {{ .Values.createRoleGroups | default "false" }}
-      user_object_type: {{ .Values.userObjectType | default "user" }}
-      identity_object_type: {{ .Values.identityObjectType | default "identity" }}
-      identity_relation: {{ .Values.identityRelation | default "user#identifier" }}
-      group_object_type: {{ .Values.groupObjectType | default "group" }}
-      group_member_relation: {{ .Values.groupMemberRelation | default "member" }}
-      group_mappings:
-        {{- .Values.groupMappings | default list | toYaml | nindent 8 }}
-      user_mappings:
-        {{- .Values.userMappings | default list | toYaml | nindent 8 }}
+      user:
+        object_type: {{ .Values.user.objectType | default "user" }}
+        identity_object_type: {{ .Values.user.identityObjectType | default "identity" }}
+        identity_relation: {{ .Values.user.identityRelation | default "user#identifier" }}
+        property_mapping:
+          {{- .Values.user.propertyMapping | default list | toYaml | nindent 10 }}
+        source_object_type: {{ .Values.user.sourceObjectType | default "scim_user" }}
+        manager_relation: {{ .Values.user.managerRelation | default "manager" }}
+      group:
+        object_type: {{ .Values.group.objectType | default "group" }}
+        group_member_relation: {{ .Values.group.groupMemberRelation | default "member" }}
+        source_object_type: {{ .Values.group.sourceObjectType | default "scim_group" }}
+      role:
+        object_type: {{ .Values.role.objectType | default "group" }}
+        role_relation: {{ .Values.role.roleRelation | default "member" }}
+      relations:
+        {{- .Values.relations | default list | toYaml | nindent 8 }}
