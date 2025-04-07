@@ -7,7 +7,7 @@ dependencies:
   version: 0.2.0
 - name: controller
   repository: file://../controller
-  version: 0.0.1
+  version: 0.0.2
 - name: console
   repository: file://../console
   version: 0.1.7
@@ -26,5 +26,5 @@ dependencies:
 - name: scim
   repository: file://../scim
   version: 0.2.0
-digest: sha256:e933b20c19dda16e7ef644de07eed18b2e214f1f89a8dbfe9fdeac2262b5ca64
-generated: "2025-03-28T12:23:20.763001-04:00"
+digest: sha256:9116b8d669d6429d018323ca45486c31ec698e50f2f49b619b7adb4418fd9349
+generated: "2025-04-07T12:41:05.644272902+03:00"

@@ -80,6 +80,7 @@ stringData:
         - /aserto.directory.reader.v3.Reader/Check
         - /aserto.directory.reader.v3.Reader/Checks
         - /aserto.directory.controller.v1.Controller/GetAPIKeyIdentity
+        - /aserto.directory.controller.v1.Controller/ListRoles
       system:
         - /aserto.directory.reader
         - /aserto.directory.controller.v1.Controller/ListUserTenants
