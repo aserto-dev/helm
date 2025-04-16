@@ -11,7 +11,7 @@ env:
   PYTHON_VERSION: 3.13
   POSTGRES_PASSWORD: postgres
   UV_VERSION: 0.5.3
-  TOPAZ_VERSION: 0.32.36
+  TOPAZ_VERSION: 0.32.59
 
 jobs:
   lint:

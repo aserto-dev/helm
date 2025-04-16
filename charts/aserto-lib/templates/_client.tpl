@@ -2,12 +2,18 @@
 {{- if .noVerify | and .noTLS -}}
   {{- fail "'noVerify' and 'noTLS' are mutually exclusive." }}
 {{- end }}
+{{- if .skipTLSVerification | and .noTLS -}}
+  {{- fail "'skipTLSVerification' and 'noTLS' are mutually exclusive." }}
+{{- end }}
 {{- if .noTLS }}
 no_tls: true
-{{- else if .skipVerify }}
+{{- else if .noVerify | or .skipTLSVerification }}
 insecure : true
-{{- else if .caCertSecret }}
+{{- else if .caCertSecret | or .caCert }}
 ca_cert_path: /{{ .certVolume }}/ca.crt
+{{- end }}
+{{- if .noProxy }}
+no_proxy: true
 {{- end }}
 {{- end }}
 

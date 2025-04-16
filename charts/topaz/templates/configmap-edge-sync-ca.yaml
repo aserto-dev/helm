@@ -1,0 +1,10 @@
+{{- if (((.Values.directory).edge).sync).caCert }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "topaz.fullname" . }}-edge-sync-ca
+data:
+  ca.crt: |
+    {{- .Values.directory.edge.sync.caCert | nindent 4 }}
+{{- end }}

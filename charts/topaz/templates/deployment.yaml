@@ -79,18 +79,22 @@ spec:
               containerPort: {{ (.Values.ports).profiler | default "8686"}}
               protocol: TCP
           {{- end }}
-          startupProbe:
-            grpc:
-              port: {{ (.Values.ports).health | default "8484" }}
-            {{- toYaml .Values.startupProbe | nindent 12 }}
-          livenessProbe:
-            grpc:
-              port: {{ (.Values.ports).health | default "8484" }}
-            {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
             grpc:
               port: {{ (.Values.ports).health | default "8484" }}
             {{- toYaml .Values.readinessProbe | nindent 12 }}
+        {{- with .Values.startupProbe }}
+          startupProbe:
+            grpc:
+              port: {{ ($.Values.ports).health | default "8484" }}
+            {{- . | toYaml | nindent 12 }}
+        {{- end }}
+        {{- with .Values.livenessProbe }}
+          livenessProbe:
+            grpc:
+              port: {{ ($.Values.ports).health | default "8484" }}
+            {{- . | toYaml | nindent 12 }}
+        {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
@@ -118,6 +122,9 @@ spec:
           {{- end }}
           {{- with (.Values.directory).remote -}}
             {{ include "topaz.remoteDirectoryCertVolumeMount" . | nindent 12 }}
+          {{- end }}
+          {{- with ((.Values.directory).edge).sync -}}
+            {{ include "topaz.edgeSyncCertVolumeMount" . | nindent 12 }}
           {{- end }}
           {{- if (.Values.decisionLogs).remote }}
             - name: scribe-cert
@@ -164,6 +171,9 @@ spec:
       {{- end }}
       {{- if ((.Values.directory).remote).address -}}
         {{ include "topaz.remoteDirectoryCertVolume" . | nindent 8 }}
+      {{- end }}
+      {{- if (((.Values.directory).edge).sync).address -}}
+        {{ include "topaz.edgeSyncCertVolume" . | nindent 8 }}
       {{- end }}
       {{- if not $persistDB }}
         - name: db
