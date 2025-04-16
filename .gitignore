@@ -4,6 +4,7 @@
 
 # python
 **/__pycache__/
+**/.dmypy.json
 .venv-path
 
 # env
