@@ -4,27 +4,27 @@ dependencies:
   version: 0.2.1
 - name: authorizer
   repository: file://../authorizer
-  version: 0.2.0
+  version: 0.2.1
 - name: controller
   repository: file://../controller
-  version: 0.0.1
+  version: 0.0.2
 - name: console
   repository: file://../console
-  version: 0.1.7
+  version: 0.1.8
 - name: directory
   repository: file://../directory
-  version: 0.2.0
+  version: 0.2.1
 - name: discovery
   repository: file://../discovery
-  version: 0.2.0
+  version: 0.2.1
 - name: multi-tenant-scim
   repository: file://../multi-tenant-scim
-  version: 0.0.1
+  version: 0.0.2
 - name: registry-proxy
   repository: file://../registry-proxy
-  version: 0.1.0
+  version: 0.1.1
 - name: scim
   repository: file://../scim
-  version: 0.2.0
-digest: sha256:55c08e5c201aebc2b49f244d9f9d4c475ccfd63610aacdd80bcef5f694141e92
-generated: "2025-04-16T13:59:50.758199-04:00"
+  version: 0.2.1
+digest: sha256:f57ef96b77dd43cd56145479dc82fe7f151d4e0c55168d955d4a5e83bb667031
+generated: "2025-04-16T14:09:33.544401-04:00"
