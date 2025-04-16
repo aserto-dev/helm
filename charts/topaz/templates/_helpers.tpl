@@ -75,12 +75,7 @@ api_key: {{ .apiKey }}
 {{- else if (.apiKeySecret).name }}
 api_key: "${DIRECTORY_API_KEY}"
 {{- end }}
-{{- if .skipTLSVerification }}
-insecure: true
-{{- end }}
-{{- if not (empty .caCert | and (empty .caCertSecret)) }}
-ca_cert_path: /directory-certs/{{ (.caCertSecret).key | default "tls.crt" }}
-{{- end }}
+{{- include "aserto-lib.clientTLS" (merge (dict "certVolume" "remote-directory-ca-cert") .) -}}
 {{-  with .additionalHeaders }}
 headers:
   {{- toYaml . | toYaml | nindent 2 }}
@@ -102,11 +97,11 @@ headers:
 {{- $name := printf "%s-remote-ca" (include "topaz.fullname" .) -}}
 {{- with (.Values.directory).remote -}}
 {{- if .caCert -}}
-- name: remote-certs
+- name: remote-directory-certs
   configMap:
     name: {{ $name }}
 {{- else if (.caCertSecret).name -}}
-- name: remote-certs
+- name: remote-directory-certs
   secret:
     secretName: {{ .caCertSecret.name }}
 {{- end }}
@@ -116,8 +111,32 @@ headers:
 
 {{- define "topaz.remoteDirectoryCertVolumeMount" -}}
 {{- if .caCert | or (.caCertSecret).name -}}
-- name: remote-certs
-  mountPath: /directory-certs
+- name: remote-directory-certs
+  mountPath: /remote-directory-ca-cert
+  readOnly: true
+{{- end }}
+{{- end }}
+
+{{- define "topaz.edgeSyncCertVolume" -}}
+{{- $name := printf "%s-edge-sync-ca" (include "topaz.fullname" .) -}}
+{{- with ((.Values.directory).edge).sync -}}
+{{- if .caCert -}}
+- name: edge-sync-certs
+  configMap:
+    name: {{ $name }}
+{{- else if (.caCertSecret).name -}}
+- name: edge-sync-certs
+  secret:
+    secretName: {{ .caCertSecret.name }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+
+{{- define "topaz.edgeSyncCertVolumeMount" -}}
+{{- if .caCert | or (.caCertSecret).name -}}
+- name: edge-sync-certs
+  mountPath: /edge-sync-ca-cert
   readOnly: true
 {{- end }}
 {{- end }}
@@ -405,7 +424,7 @@ aserto_edge:
   apikey: {{ . }}
 {{- end }}
   enabled: true
-  insecure: {{ .skipTLSVerification | default false | toString }}
+  {{- include "aserto-lib.clientTLS" (merge (dict "certVolume" "edge-sync-ca-cert") .) -}}
   sync_interval: {{ .intervalMinutes | default "1" }}
   timeout: {{ .timeoutSeconds | default "5" }}
 {{- end }}

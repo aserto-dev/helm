@@ -119,6 +119,9 @@ spec:
           {{- with (.Values.directory).remote -}}
             {{ include "topaz.remoteDirectoryCertVolumeMount" . | nindent 12 }}
           {{- end }}
+          {{- with ((.Values.directory).edge).sync -}}
+            {{ include "topaz.edgeSyncCertVolumeMount" . | nindent 12 }}
+          {{- end }}
           {{- if (.Values.decisionLogs).remote }}
             - name: scribe-cert
               mountPath: /scribe-cert
@@ -164,6 +167,9 @@ spec:
       {{- end }}
       {{- if ((.Values.directory).remote).address -}}
         {{ include "topaz.remoteDirectoryCertVolume" . | nindent 8 }}
+      {{- end }}
+      {{- if (((.Values.directory).edge).sync).address -}}
+        {{ include "topaz.edgeSyncCertVolume" . | nindent 8 }}
       {{- end }}
       {{- if not $persistDB }}
         - name: db

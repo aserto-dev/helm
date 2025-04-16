@@ -57,8 +57,21 @@ directory:
       #   name: ""
       #   # Secret key
       #   key: "api-key"
+      # [Optional] CA certificate for the sync source
+      # caCert: |
+      #   -----BEGIN CERTIFICATE-----
+      #   ...
+      #   -----END CERTIFICATE-----
+      # # [Optional] Kubernetes secret containing the CA certificate for the sync source
+      # caCertSecret:
+      #   name: ""
+      #   key: "ca.crt"
       # # Skip verification of remote TLS certificate
       # skipTLSVerification: false
+      # # Connect without TLS
+      # noTLS: false
+      # # Bypass any configured HTTP proxies
+      # noProxy: false
       # # The frequency of syncs in minutes.
       # intervalMinutes: 1
       # # Request timeout
@@ -87,9 +100,13 @@ directory:
     # # [Optional] Kubernetes secret containing the CA certificate for the remote directory
     # caCertSecret:
     #   name: ""
-    #   key: "api-key"
+    #   key: "ca.crt"
     # [Optional] Skip verification of remote TLS certificate
     # skipTLSVerification: false
+    # # Connect without TLS
+    # noTLS: false
+    # # Bypass any configured HTTP proxies
+    # noProxy: false
     # # [Optional] Request timeout
     # timeoutSeconds: 5
     # [Optional] Additional headers to include in requests to the remote directory
@@ -116,6 +133,8 @@ controller:
   # mtlsCertSecretName: ""
   # # Skip verification of server certificate
   # skipTLSVerification: false
+  # # Bypass any configured HTTP proxies
+  # noProxy: false
   # # [Optional] Additional headers to include in requests to the controller.
   # additionalHeaders:
   #   "header-name": header-value
@@ -164,6 +183,8 @@ decisionLogs:
   #     mtlsCertSecretName: ""
   #     # Skip verification of server certificate
   #     skipTLSVerification: false
+  #     # Bypass any configured HTTP proxies
+  #     noProxy: false
   #     # additionslHeaders:
   #     #   "header-name": header-value
   #     # [Optional] Duration to wait for a batch of decisions to be acknowledged by the server.
