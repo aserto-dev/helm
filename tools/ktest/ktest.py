@@ -121,6 +121,7 @@ class Runner:
 
     def execute_steps(self):
         echo("🏃", "Running tests", nl=True)
+        time.sleep(2)  # give services time to fully start
         for step in self.test.run:
             echo("🧪", step, cl=COLOR_STEP)
             self.subprocess(step)
