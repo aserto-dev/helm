@@ -432,16 +432,16 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
-livenessProbe:
-  failureThreshold: 1
-  periodSeconds: 10
-
 readinessProbe:
-  periodSeconds: 5
+  periodSeconds: 1
 
-startupProbe:
-  failureThreshold: 30
-  periodSeconds: 10
+# livenessProbe:
+#   failureThreshold: 1
+#   periodSeconds: 10
+#
+# startupProbe:
+#   failureThreshold: 30
+#   periodSeconds: 10
 
 autoscaling:
   enabled: false
