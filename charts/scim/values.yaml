@@ -28,15 +28,31 @@ certSecret:
 #   bearer:
 #     enabled: true
 
-# createEmailIdentities: true
-# createRoleGroups: false
-# userObjectType: user
-# identityObjectType: identity
-# identityRelation: "user#identifier"
-# groupObjectType: group
-# groupMemberRelation: memeber
-# groupMappings: []
-# userMappings: []
+user:
+  # objectType: user
+  # identityObjectType: identifier
+  # identityRelation: "user#identifier"
+  # sourceObjectType: scim_user
+  # managerRelation: manager
+  # propertyMapping:
+  #   enabled: active
+
+group:
+  # objectType: group
+  # groupMemberRelation: member
+  # sourceObjectType: scim_group
+
+role:
+  # objectType: group
+  # roleRelation: member
+
+relations:
+  # - object_id: system
+  #   object_type: system
+  #   relation: admin
+  #   subject_id: aserto-admin
+  #   subject_type: group
+  #   subject_relation: member
 
 # controller:
 #   # Address and port of the controller's gRPC service.
